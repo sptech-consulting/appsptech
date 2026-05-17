@@ -1,5 +1,5 @@
-import { createFileRoute, Outlet, redirect, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAdminProfile, signOut, type AdminProfile } from "@/lib/auth";
 import { SptechLogo } from "@/components/SptechLogo";
@@ -17,12 +17,14 @@ import {
   MessageSquare,
   ScrollText,
   BarChart3,
+  ChevronDown,
+  Sparkles,
+  Settings,
+  Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
-    // getSession() lê do localStorage — não faz chamada de rede,
-    // evitando race condition e falsos negativos em re-runs do guard.
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) throw redirect({ to: "/admin/login" });
@@ -30,23 +32,55 @@ export const Route = createFileRoute("/admin")({
   component: AdminShell,
 });
 
-const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavGroup = { id: string; label: string; icon: typeof LayoutDashboard; items: NavItem[] };
+
+const SOLO: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/metricas", label: "Métricas", icon: BarChart3 },
-  { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
-  { to: "/admin/alunos", label: "Alunos", icon: Users },
-  { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
-  { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
-  { to: "/admin/cursos", label: "Cursos", icon: BookOpen },
-  { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
-  { to: "/admin/trabalhos", label: "Trabalhos (Mural)", icon: ScrollText },
-  { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
-  { to: "/admin/logs", label: "Logs", icon: ScrollText },
-  { to: "/admin/usuarios", label: "Usuários admin", icon: Users },
-  { to: "/admin/grupos", label: "Grupos & permissões", icon: Shield },
 ];
 
-const NAV_DISABLED: { label: string; icon: typeof Shield; hint: string }[] = [];
+const GROUPS: NavGroup[] = [
+  {
+    id: "ambientes",
+    label: "Ambientes e Turmas",
+    icon: Layers,
+    items: [
+      { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
+      { to: "/admin/alunos", label: "Alunos", icon: Users },
+      { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
+      { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
+    ],
+  },
+  {
+    id: "ead",
+    label: "EAD",
+    icon: GraduationCap,
+    items: [
+      { to: "/admin/cursos", label: "Cursos", icon: BookOpen },
+      { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
+      { to: "/admin/trabalhos", label: "Trabalhos (Mural)", icon: Sparkles },
+    ],
+  },
+  {
+    id: "monitoria",
+    label: "Monitoria",
+    icon: Eye,
+    items: [
+      { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
+      { to: "/admin/logs", label: "Logs", icon: ScrollText },
+    ],
+  },
+  {
+    id: "config",
+    label: "Configurações",
+    icon: Settings,
+    items: [
+      { to: "/admin/usuarios", label: "Usuários Admin", icon: Users },
+      { to: "/admin/grupos", label: "Grupos e Permissões", icon: Shield },
+    ],
+  },
+];
 
 function AdminShell() {
   const navigate = useNavigate();
