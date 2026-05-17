@@ -4,12 +4,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 async function assertCanManageUsers(userId: string) {
-  const { data, error } = await supabaseAdmin.rpc("has_admin_permission" as never, {
-    _permissao: "usuarios.criar",
-  } as never);
-  if (error) throw new Error(error.message);
-  // has_admin_permission usa auth.uid(); via admin client não temos sessão.
-  // Em vez disso, validamos manualmente:
+  // Buscamos manualmente as permissões do admin (admin client bypassa RLS,
+  // então não dá pra usar has_admin_permission que depende de auth.uid()).
   const { data: rows } = await supabaseAdmin
     .from("usuarios_admin")
     .select(
