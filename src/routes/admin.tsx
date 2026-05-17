@@ -150,3 +150,99 @@ function AdminShell() {
     </div>
   );
 }
+
+function AdminNav() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const isActive = (to: string, exact?: boolean) =>
+    exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
+
+  const initiallyOpen = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const g of GROUPS) map[g.id] = g.items.some((i) => isActive(i.to));
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  const [open, setOpen] = useState<Record<string, boolean>>(initiallyOpen);
+
+  // Garante que o grupo da rota ativa fique aberto ao navegar
+  useEffect(() => {
+    setOpen((prev) => {
+      const next = { ...prev };
+      for (const g of GROUPS) if (initiallyOpen[g.id]) next[g.id] = true;
+      return next;
+    });
+  }, [initiallyOpen]);
+
+  return (
+    <nav className="p-3 flex flex-col gap-0.5 text-sm flex-1 overflow-y-auto">
+      {SOLO.map((it) => {
+        const Icon = it.icon;
+        const active = isActive(it.to, it.exact);
+        return (
+          <Link
+            key={it.to}
+            to={it.to}
+            activeOptions={{ exact: !!it.exact }}
+            className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${
+              active ? "bg-primary text-primary-foreground" : "text-secondary hover:bg-muted"
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {it.label}
+          </Link>
+        );
+      })}
+
+      <div className="my-2 border-t border-border" />
+
+      {GROUPS.map((g) => {
+        const GIcon = g.icon;
+        const isOpen = open[g.id] ?? false;
+        const hasActive = g.items.some((i) => isActive(i.to));
+        return (
+          <div key={g.id} className="mt-1">
+            <button
+              type="button"
+              onClick={() => setOpen((p) => ({ ...p, [g.id]: !isOpen }))}
+              className={`w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-[11px] uppercase tracking-wider font-bold transition-colors ${
+                hasActive ? "text-primary" : "text-muted-foreground hover:text-secondary"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <GIcon className="h-3.5 w-3.5" />
+                {g.label}
+              </span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {isOpen && (
+              <div className="mt-0.5 ml-2 pl-2 border-l border-border flex flex-col gap-0.5">
+                {g.items.map((it) => {
+                  const Icon = it.icon;
+                  const active = isActive(it.to);
+                  return (
+                    <Link
+                      key={it.to}
+                      to={it.to}
+                      className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-secondary hover:bg-muted"
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {it.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
+  );
+}
