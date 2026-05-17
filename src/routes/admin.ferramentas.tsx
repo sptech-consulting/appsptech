@@ -165,12 +165,7 @@ function FerramentasPage() {
         title="Ferramentas"
         description="Cadastro global. Vincule a cada ambiente na tela do ambiente."
         actions={
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setOpen(true);
-            }}
-          >
+          <Button onClick={() => void openEdit(null)}>
             <Plus className="h-4 w-4" /> Nova ferramenta
           </Button>
         }
