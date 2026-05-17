@@ -16,6 +16,7 @@ import {
   LogOut,
   MessageSquare,
   ScrollText,
+  BarChart3,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/admin")({
 
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/admin/metricas", label: "Métricas", icon: BarChart3 },
   { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
   { to: "/admin/alunos", label: "Alunos", icon: Users },
   { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
