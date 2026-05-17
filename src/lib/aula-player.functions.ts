@@ -215,7 +215,7 @@ export const getAulaPlayer = createServerFn({ method: "POST" })
       recomendados = (cs ?? []).map((c) => {
         const cursoMods = (ms ?? []).filter((m) => m.curso_id === c.id);
         const cursoMIds = cursoMods.map((m) => m.id);
-        const cursoAulas = (as ?? []).filter((a) => cursoMIds.includes(a.modulo_id));
+        const cursoAulas = (as ?? []).filter((a) => a.modulo_id && cursoMIds.includes(a.modulo_id));
         return {
           curso_id: c.id,
           titulo: c.titulo,
