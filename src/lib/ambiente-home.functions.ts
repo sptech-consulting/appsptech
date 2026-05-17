@@ -265,6 +265,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       efeito_som_hover: !!amb.efeito_som_hover,
       efeito_som_volume: amb.efeito_som_volume ?? 40,
       efeito_blobs_fundo: !!amb.efeito_blobs_fundo,
+      tema: (amb.tema ?? "claro") as "claro" | "escuro",
     };
 
     return {
