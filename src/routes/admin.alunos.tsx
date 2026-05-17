@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Upload, Link2, Search, Trash2 } from "lucide-react";
+import { Plus, Pencil, Upload, Link2, Search, Trash2, History } from "lucide-react";
 import { toast } from "sonner";
 
 type Aluno = {
@@ -86,6 +86,11 @@ function AlunosPage() {
         description="Cadastro de alunos da plataforma. Vincule cada aluno a um ou mais ambientes para liberar o acesso."
         actions={
           <div className="flex gap-2">
+            <Link to="/admin/importacoes">
+              <Button variant="outline">
+                <History className="h-4 w-4" /> Histórico
+              </Button>
+            </Link>
             <Button variant="outline" onClick={() => setImportOpen(true)}>
               <Upload className="h-4 w-4" /> Importar CSV
             </Button>
