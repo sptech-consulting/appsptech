@@ -14,7 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlunoIndexRouteImport } from './routes/aluno.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AlunoLoginRouteImport } from './routes/aluno.login'
+import { Route as AlunoLoginRouteImport } from './routes/aluno_.login'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 
 const AlunoRoute = AlunoRouteImport.update({
@@ -43,9 +43,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const AlunoLoginRoute = AlunoLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => AlunoRoute,
+  id: '/aluno_/login',
+  path: '/aluno/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin_/login',
@@ -75,7 +75,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
   '/admin_/login': typeof AdminLoginRoute
-  '/aluno/login': typeof AlunoLoginRoute
+  '/aluno_/login': typeof AlunoLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/aluno/': typeof AlunoIndexRoute
 }
@@ -97,7 +97,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/aluno'
     | '/admin_/login'
-    | '/aluno/login'
+    | '/aluno_/login'
     | '/admin/'
     | '/aluno/'
   fileRoutesById: FileRoutesById
@@ -107,6 +107,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AlunoRoute: typeof AlunoRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
+  AlunoLoginRoute: typeof AlunoLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -146,12 +147,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/aluno/login': {
-      id: '/aluno/login'
-      path: '/login'
+    '/aluno_/login': {
+      id: '/aluno_/login'
+      path: '/aluno/login'
       fullPath: '/aluno/login'
       preLoaderRoute: typeof AlunoLoginRouteImport
-      parentRoute: typeof AlunoRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin_/login': {
       id: '/admin_/login'
@@ -174,12 +175,10 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AlunoRouteChildren {
-  AlunoLoginRoute: typeof AlunoLoginRoute
   AlunoIndexRoute: typeof AlunoIndexRoute
 }
 
 const AlunoRouteChildren: AlunoRouteChildren = {
-  AlunoLoginRoute: AlunoLoginRoute,
   AlunoIndexRoute: AlunoIndexRoute,
 }
 
@@ -190,6 +189,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AlunoRoute: AlunoRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
+  AlunoLoginRoute: AlunoLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
