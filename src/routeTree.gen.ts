@@ -20,6 +20,7 @@ import { Route as AlunoLoginRouteImport } from './routes/aluno_.login'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminNovidadesRouteImport } from './routes/admin.novidades'
+import { Route as AdminMetricasRouteImport } from './routes/admin.metricas'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminImportacoesRouteImport } from './routes/admin.importacoes'
 import { Route as AdminGruposRouteImport } from './routes/admin.grupos'
@@ -89,6 +90,11 @@ const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
 const AdminNovidadesRoute = AdminNovidadesRouteImport.update({
   id: '/novidades',
   path: '/novidades',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMetricasRoute = AdminMetricasRouteImport.update({
+  id: '/metricas',
+  path: '/metricas',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLogsRoute = AdminLogsRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
+  '/admin/metricas': typeof AdminMetricasRoute
   '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/login': typeof AdminLoginRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
+  '/admin/metricas': typeof AdminMetricasRoute
   '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/login': typeof AdminLoginRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
+  '/admin/metricas': typeof AdminMetricasRoute
   '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin_/login': typeof AdminLoginRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/admin/grupos'
     | '/admin/importacoes'
     | '/admin/logs'
+    | '/admin/metricas'
     | '/admin/novidades'
     | '/admin/usuarios'
     | '/admin/login'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/admin/grupos'
     | '/admin/importacoes'
     | '/admin/logs'
+    | '/admin/metricas'
     | '/admin/novidades'
     | '/admin/usuarios'
     | '/admin/login'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/admin/grupos'
     | '/admin/importacoes'
     | '/admin/logs'
+    | '/admin/metricas'
     | '/admin/novidades'
     | '/admin/usuarios'
     | '/admin_/login'
@@ -425,6 +437,13 @@ declare module '@tanstack/react-router' {
       path: '/novidades'
       fullPath: '/admin/novidades'
       preLoaderRoute: typeof AdminNovidadesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/metricas': {
+      id: '/admin/metricas'
+      path: '/metricas'
+      fullPath: '/admin/metricas'
+      preLoaderRoute: typeof AdminMetricasRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/logs': {
@@ -556,6 +575,7 @@ interface AdminRouteChildren {
   AdminGruposRoute: typeof AdminGruposRoute
   AdminImportacoesRoute: typeof AdminImportacoesRoute
   AdminLogsRoute: typeof AdminLogsRoute
+  AdminMetricasRoute: typeof AdminMetricasRoute
   AdminNovidadesRoute: typeof AdminNovidadesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -573,6 +593,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGruposRoute: AdminGruposRoute,
   AdminImportacoesRoute: AdminImportacoesRoute,
   AdminLogsRoute: AdminLogsRoute,
+  AdminMetricasRoute: AdminMetricasRoute,
   AdminNovidadesRoute: AdminNovidadesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
