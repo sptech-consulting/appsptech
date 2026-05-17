@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { signIn, signUp, signOut } from "@/lib/auth";
 import { getAmbienteBranding } from "@/lib/ambiente.functions";
+import { ensureAlunoAuthLink, checkAlunoAmbienteAccess } from "@/lib/aluno.functions";
 
 type Branding = Awaited<ReturnType<typeof getAmbienteBranding>>;
 
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/e/$slug/login")({
 function AmbienteLogin() {
   const { slug } = Route.useParams();
   const fetchBranding = useServerFn(getAmbienteBranding);
+  const linkAluno = useServerFn(ensureAlunoAuthLink);
+  const checkAccess = useServerFn(checkAlunoAmbienteAccess);
   const [b, setB] = useState<Branding | null>(null);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -41,17 +44,23 @@ function AmbienteLogin() {
       } else {
         await signIn(email, password);
       }
-      // Validate that this user is linked to this ambiente
-      const { data: amb, error: aerr } = await supabase
-        .from("ambientes")
-        .select("id")
-        .eq("slug", slug)
-        .eq("status", "ativo")
-        .maybeSingle();
-      if (aerr) throw aerr;
-      if (!amb) {
+
+      // Vincula auth.uid -> alunos.auth_user_id pelo email
+      await linkAluno();
+
+      // Confere acesso ao ambiente
+      const res = await checkAccess({ data: { slug } });
+      if (!res.ok) {
         await signOut();
-        throw new Error("Você não tem acesso a este ambiente.");
+        const msg =
+          res.reason === "no_aluno"
+            ? "Seu e-mail não está cadastrado como aluno. Procure o administrador."
+            : res.reason === "no_link"
+              ? "Você não tem acesso a este ambiente."
+              : res.reason === "inativo"
+                ? "Este ambiente está inativo."
+                : "Ambiente não encontrado.";
+        throw new Error(msg);
       }
       window.location.assign(`/e/${slug}`);
     } catch (err) {
