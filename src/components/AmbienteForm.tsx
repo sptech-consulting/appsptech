@@ -367,19 +367,29 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   return (
     <div>
       <Label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-secondary">{label}</Label>
-      <div className="flex items-center gap-2 rounded-md border border-border bg-card p-1">
+      <label
+        className="flex items-center gap-2 rounded-md border border-border p-1 cursor-pointer transition-shadow hover:shadow-sm"
+        style={{ backgroundColor: value }}
+      >
+        <span
+          className="relative h-8 w-10 rounded border border-border/60 overflow-hidden shrink-0"
+          style={{ backgroundColor: value }}
+        >
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            aria-label={`Escolher cor ${label}`}
+          />
+        </span>
         <input
-          type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-8 w-10 cursor-pointer rounded"
+          onClick={(e) => e.stopPropagation()}
+          className="h-8 flex-1 rounded bg-card/90 px-2 text-xs font-mono outline-none"
         />
-        <input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-8 flex-1 bg-transparent text-xs font-mono outline-none"
-        />
-      </div>
+      </label>
     </div>
   );
 }
