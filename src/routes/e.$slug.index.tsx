@@ -253,7 +253,7 @@ function AmbienteHome() {
           style={{ backgroundColor: tk.primaria, color: "#fff" }}
           title="Mural de Resultados"
         >
-          <Sparkles className="h-3 w-3" /> Resultados
+          <Sparkles className="h-3 w-3" /> <span className="hidden sm:inline">Resultados</span>
         </button>
         <button
           onClick={async () => {
