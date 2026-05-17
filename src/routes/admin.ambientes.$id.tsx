@@ -173,11 +173,12 @@ function LinkSection({
 
   async function load() {
     setLoading(true);
+    const sb: any = supabase;
     const [{ data: items }, { data: links }] = await Promise.all([
-      supabase.from(sourceTable).select(`id, ${labelField}`).order(labelField),
-      supabase.from(linkTable).select(itemFkColumn).eq("ambiente_id", ambienteId),
+      sb.from(sourceTable).select(`id, ${labelField}`).order(labelField),
+      sb.from(linkTable).select(itemFkColumn).eq("ambiente_id", ambienteId),
     ]);
-    setAll((items as Linkable[]) ?? []);
+    setAll(((items as any[]) ?? []) as Linkable[]);
     setLinkedIds(new Set(((links as any[]) ?? []).map((l) => l[itemFkColumn])));
     setLoading(false);
   }
@@ -188,17 +189,18 @@ function LinkSection({
   }, [ambienteId]);
 
   async function toggle(itemId: string, currentlyLinked: boolean) {
+    const sb: any = supabase;
     if (currentlyLinked) {
-      const { error } = await supabase
+      const { error } = await sb
         .from(linkTable)
         .delete()
         .eq("ambiente_id", ambienteId)
         .eq(itemFkColumn, itemId);
       if (error) return toast.error(error.message);
     } else {
-      const { error } = await supabase
+      const { error } = await sb
         .from(linkTable)
-        .insert({ ambiente_id: ambienteId, [itemFkColumn]: itemId } as any);
+        .insert({ ambiente_id: ambienteId, [itemFkColumn]: itemId });
       if (error) return toast.error(error.message);
     }
     void load();
