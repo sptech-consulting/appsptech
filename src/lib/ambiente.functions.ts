@@ -12,7 +12,7 @@ export const getAmbienteBranding = createServerFn({ method: "GET" })
     const { data: row, error } = await supabaseAdmin
       .from("ambientes")
       .select(
-        "id, nome, slug, status, tema, logo_url, imagem_login_url, cor_primaria, cor_secundaria, cor_fundo, cor_texto, cor_botao, cor_card, cor_borda"
+        "id, nome, slug, status, tema, logo_url, imagem_login_url, cor_primaria, cor_secundaria, cor_fundo, cor_texto, cor_botao, cor_card, cor_borda, efeito_card_tilt_3d, efeito_card_glow, efeito_card_scale, efeito_botao_lift, efeito_entrada_animada, efeito_som_hover, efeito_som_volume, efeito_blobs_fundo"
       )
       .eq("slug", data.slug)
       .maybeSingle();
