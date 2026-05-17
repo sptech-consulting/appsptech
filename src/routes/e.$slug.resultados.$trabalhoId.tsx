@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { obterTrabalhoPublico } from "@/lib/trabalhos.functions";
+import { obterTrabalhoPublico, registrarVisualizacaoTrabalho } from "@/lib/trabalhos.functions";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/resultados/$trabalhoId")({
