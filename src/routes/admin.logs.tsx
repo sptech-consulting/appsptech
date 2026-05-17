@@ -57,7 +57,7 @@ function AdminLogs() {
         ) : rows.length === 0 ? (
           <p className="p-6 text-sm text-muted-foreground">Nenhum log encontrado.</p>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="text-left px-4 py-2">Data</th>
@@ -100,7 +100,7 @@ function AdminLogs() {
                 </>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </div>

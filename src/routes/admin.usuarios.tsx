@@ -122,7 +122,7 @@ function UsuariosPage() {
             Nenhum administrador cadastrado.
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted text-secondary">
               <tr className="text-left">
                 <th className="px-4 py-3 font-semibold">Nome</th>
@@ -198,7 +198,7 @@ function UsuariosPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
 
