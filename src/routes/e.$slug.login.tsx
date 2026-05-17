@@ -12,7 +12,33 @@ export const Route = createFileRoute("/e/$slug/login")({
   beforeLoad: async ({ params }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/e/$slug", params: { slug: params.slug } });
+    if (!data.session) return;
+
+    const { data: aluno } = await supabase
+      .from("alunos")
+      .select("id, status")
+      .eq("auth_user_id", data.session.user.id)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (!aluno) return;
+
+    const { data: ambiente } = await supabase
+      .from("ambientes")
+      .select("id")
+      .eq("slug", params.slug)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (!ambiente) return;
+
+    const { data: vinculo } = await supabase
+      .from("ambiente_alunos")
+      .select("id")
+      .eq("aluno_id", aluno.id)
+      .eq("ambiente_id", ambiente.id)
+      .eq("status", "ativo")
+      .maybeSingle();
+
+    if (vinculo) throw redirect({ to: "/e/$slug", params: { slug: params.slug } });
   },
   component: AmbienteLogin,
 });
@@ -38,6 +64,9 @@ function AmbienteLogin() {
     setError(null);
     setLoading(true);
     try {
+      const { data: currentSession } = await supabase.auth.getSession();
+      if (currentSession.session) await signOut();
+
       if (mode === "signup") {
         await signUp(email, password);
         await signIn(email, password);
@@ -46,7 +75,11 @@ function AmbienteLogin() {
       }
 
       // Vincula auth.uid -> alunos.auth_user_id pelo email
-      await linkAluno();
+      const aluno = await linkAluno();
+      if (!aluno) {
+        await signOut();
+        throw new Error("Seu e-mail não está cadastrado como aluno. Procure o administrador.");
+      }
 
       // Confere acesso ao ambiente
       const res = await checkAccess({ data: { slug } });
