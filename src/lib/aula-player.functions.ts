@@ -307,6 +307,7 @@ export const getAulaPlayer = createServerFn({ method: "POST" })
       },
       modulos,
       recomendados,
+      comentarios,
     };
   });
 
