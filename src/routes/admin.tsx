@@ -1,5 +1,5 @@
-import { createFileRoute, Outlet, redirect, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Outlet, redirect, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAdminProfile, signOut, type AdminProfile } from "@/lib/auth";
 import { SptechLogo } from "@/components/SptechLogo";
@@ -17,12 +17,14 @@ import {
   MessageSquare,
   ScrollText,
   BarChart3,
+  ChevronDown,
+  Sparkles,
+  Settings,
+  Eye,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
-    // getSession() lê do localStorage — não faz chamada de rede,
-    // evitando race condition e falsos negativos em re-runs do guard.
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) throw redirect({ to: "/admin/login" });
@@ -30,23 +32,55 @@ export const Route = createFileRoute("/admin")({
   component: AdminShell,
 });
 
-const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+type NavGroup = { id: string; label: string; icon: typeof LayoutDashboard; items: NavItem[] };
+
+const SOLO: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/metricas", label: "Métricas", icon: BarChart3 },
-  { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
-  { to: "/admin/alunos", label: "Alunos", icon: Users },
-  { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
-  { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
-  { to: "/admin/cursos", label: "Cursos", icon: BookOpen },
-  { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
-  { to: "/admin/trabalhos", label: "Trabalhos (Mural)", icon: ScrollText },
-  { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
-  { to: "/admin/logs", label: "Logs", icon: ScrollText },
-  { to: "/admin/usuarios", label: "Usuários admin", icon: Users },
-  { to: "/admin/grupos", label: "Grupos & permissões", icon: Shield },
 ];
 
-const NAV_DISABLED: { label: string; icon: typeof Shield; hint: string }[] = [];
+const GROUPS: NavGroup[] = [
+  {
+    id: "ambientes",
+    label: "Ambientes e Turmas",
+    icon: Layers,
+    items: [
+      { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
+      { to: "/admin/alunos", label: "Alunos", icon: Users },
+      { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
+      { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
+    ],
+  },
+  {
+    id: "ead",
+    label: "EAD",
+    icon: GraduationCap,
+    items: [
+      { to: "/admin/cursos", label: "Cursos", icon: BookOpen },
+      { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
+      { to: "/admin/trabalhos", label: "Trabalhos (Mural)", icon: Sparkles },
+    ],
+  },
+  {
+    id: "monitoria",
+    label: "Monitoria",
+    icon: Eye,
+    items: [
+      { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
+      { to: "/admin/logs", label: "Logs", icon: ScrollText },
+    ],
+  },
+  {
+    id: "config",
+    label: "Configurações",
+    icon: Settings,
+    items: [
+      { to: "/admin/usuarios", label: "Usuários Admin", icon: Users },
+      { to: "/admin/grupos", label: "Grupos e Permissões", icon: Shield },
+    ],
+  },
+];
 
 function AdminShell() {
   const navigate = useNavigate();
@@ -93,38 +127,8 @@ function AdminShell() {
             Área administrativa
           </div>
         </div>
-        <nav className="p-3 flex flex-col gap-0.5 text-sm flex-1">
-          {NAV.map((it) => {
-            const Icon = it.icon;
-            return (
-              <Link
-                key={it.to}
-                to={it.to}
-                activeOptions={{ exact: !!it.exact }}
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-secondary hover:bg-muted [&.active]:bg-primary [&.active]:text-primary-foreground"
-              >
-                <Icon className="h-4 w-4" />
-                {it.label}
-              </Link>
-            );
-          })}
-          <div className="my-2 border-t border-border" />
-          {NAV_DISABLED.map((it) => {
-            const Icon = it.icon;
-            return (
-              <div
-                key={it.label}
-                className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-muted-foreground/70 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
-                  {it.label}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider">{it.hint}</span>
-              </div>
-            );
-          })}
-        </nav>
+        <AdminNav />
+
         <div className="p-3 border-t border-border text-xs">
           <div className="font-semibold text-secondary">{profile.nome}</div>
           <div className="text-muted-foreground truncate">{profile.email}</div>
@@ -144,5 +148,101 @@ function AdminShell() {
       </main>
       <Toaster richColors position="top-right" />
     </div>
+  );
+}
+
+function AdminNav() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  const isActive = (to: string, exact?: boolean) =>
+    exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
+
+  const initiallyOpen = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const g of GROUPS) map[g.id] = g.items.some((i) => isActive(i.to));
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  const [open, setOpen] = useState<Record<string, boolean>>(initiallyOpen);
+
+  // Garante que o grupo da rota ativa fique aberto ao navegar
+  useEffect(() => {
+    setOpen((prev) => {
+      const next = { ...prev };
+      for (const g of GROUPS) if (initiallyOpen[g.id]) next[g.id] = true;
+      return next;
+    });
+  }, [initiallyOpen]);
+
+  return (
+    <nav className="p-3 flex flex-col gap-0.5 text-sm flex-1 overflow-y-auto">
+      {SOLO.map((it) => {
+        const Icon = it.icon;
+        const active = isActive(it.to, it.exact);
+        return (
+          <Link
+            key={it.to}
+            to={it.to}
+            activeOptions={{ exact: !!it.exact }}
+            className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${
+              active ? "bg-primary text-primary-foreground" : "text-secondary hover:bg-muted"
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {it.label}
+          </Link>
+        );
+      })}
+
+      <div className="my-2 border-t border-border" />
+
+      {GROUPS.map((g) => {
+        const GIcon = g.icon;
+        const isOpen = open[g.id] ?? false;
+        const hasActive = g.items.some((i) => isActive(i.to));
+        return (
+          <div key={g.id} className="mt-1">
+            <button
+              type="button"
+              onClick={() => setOpen((p) => ({ ...p, [g.id]: !isOpen }))}
+              className={`w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-[11px] uppercase tracking-wider font-bold transition-colors ${
+                hasActive ? "text-primary" : "text-muted-foreground hover:text-secondary"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <GIcon className="h-3.5 w-3.5" />
+                {g.label}
+              </span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            {isOpen && (
+              <div className="mt-0.5 ml-2 pl-2 border-l border-border flex flex-col gap-0.5">
+                {g.items.map((it) => {
+                  const Icon = it.icon;
+                  const active = isActive(it.to);
+                  return (
+                    <Link
+                      key={it.to}
+                      to={it.to}
+                      className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-secondary hover:bg-muted"
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {it.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </nav>
   );
 }
