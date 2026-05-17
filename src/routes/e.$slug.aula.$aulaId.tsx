@@ -364,9 +364,37 @@ function AulaPlayerPage() {
           </section>
         </main>
 
-        {/* Sidebar direita */}
+        {/* Sidebar direita (desktop) + Drawer (mobile) */}
         {videoSize === "default" && (
-          <aside className="space-y-5">
+          <>
+            {mobileNav && (
+              <div
+                className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+                onClick={() => setMobileNav(false)}
+                aria-hidden
+              />
+            )}
+            <aside
+              className={
+                mobileNav
+                  ? "fixed right-0 top-0 bottom-0 z-50 w-[85vw] max-w-sm overflow-y-auto p-4 space-y-5 lg:static lg:w-auto lg:max-w-none lg:p-0 lg:overflow-visible"
+                  : "hidden lg:block space-y-5"
+              }
+              style={mobileNav ? { backgroundColor: bg } : undefined}
+            >
+              {mobileNav && (
+                <div className="flex items-center justify-between lg:hidden">
+                  <span className="text-sm font-bold">Aulas do curso</span>
+                  <button
+                    onClick={() => setMobileNav(false)}
+                    className="p-1.5 rounded-md border"
+                    style={{ borderColor: border }}
+                    aria-label="Fechar"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
             <div
               className="rounded-2xl overflow-hidden"
               style={{ backgroundColor: card, border: `1px solid ${border}` }}
