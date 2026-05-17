@@ -16,8 +16,12 @@ import { Route as AlunoIndexRouteImport } from './routes/aluno.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AlunoLoginRouteImport } from './routes/aluno_.login'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
+import { Route as AdminNovidadesRouteImport } from './routes/admin.novidades'
+import { Route as AdminFerramentasRouteImport } from './routes/admin.ferramentas'
+import { Route as AdminAulasRouteImport } from './routes/admin.aulas'
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
+import { Route as AdminAmbientesIdRouteImport } from './routes/admin.ambientes.$id'
 
 const AlunoRoute = AlunoRouteImport.update({
   id: '/aluno',
@@ -54,6 +58,21 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminNovidadesRoute = AdminNovidadesRouteImport.update({
+  id: '/novidades',
+  path: '/novidades',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFerramentasRoute = AdminFerramentasRouteImport.update({
+  id: '/ferramentas',
+  path: '/ferramentas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAulasRoute = AdminAulasRouteImport.update({
+  id: '/aulas',
+  path: '/aulas',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAmbientesIndexRoute = AdminAmbientesIndexRouteImport.update({
   id: '/ambientes/',
   path: '/ambientes/',
@@ -64,24 +83,37 @@ const AdminAmbientesNovoRoute = AdminAmbientesNovoRouteImport.update({
   path: '/ambientes/novo',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAmbientesIdRoute = AdminAmbientesIdRouteImport.update({
+  id: '/ambientes/$id',
+  path: '/ambientes/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
+  '/admin/aulas': typeof AdminAulasRoute
+  '/admin/ferramentas': typeof AdminFerramentasRoute
+  '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/login': typeof AdminLoginRoute
   '/aluno/login': typeof AlunoLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/aluno/': typeof AlunoIndexRoute
+  '/admin/ambientes/$id': typeof AdminAmbientesIdRoute
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/aulas': typeof AdminAulasRoute
+  '/admin/ferramentas': typeof AdminFerramentasRoute
+  '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/login': typeof AdminLoginRoute
   '/aluno/login': typeof AlunoLoginRoute
   '/admin': typeof AdminIndexRoute
   '/aluno': typeof AlunoIndexRoute
+  '/admin/ambientes/$id': typeof AdminAmbientesIdRoute
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
 }
@@ -90,10 +122,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
+  '/admin/aulas': typeof AdminAulasRoute
+  '/admin/ferramentas': typeof AdminFerramentasRoute
+  '/admin/novidades': typeof AdminNovidadesRoute
   '/admin_/login': typeof AdminLoginRoute
   '/aluno_/login': typeof AlunoLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/aluno/': typeof AlunoIndexRoute
+  '/admin/ambientes/$id': typeof AdminAmbientesIdRoute
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
 }
@@ -103,19 +139,27 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/aluno'
+    | '/admin/aulas'
+    | '/admin/ferramentas'
+    | '/admin/novidades'
     | '/admin/login'
     | '/aluno/login'
     | '/admin/'
     | '/aluno/'
+    | '/admin/ambientes/$id'
     | '/admin/ambientes/novo'
     | '/admin/ambientes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/aulas'
+    | '/admin/ferramentas'
+    | '/admin/novidades'
     | '/admin/login'
     | '/aluno/login'
     | '/admin'
     | '/aluno'
+    | '/admin/ambientes/$id'
     | '/admin/ambientes/novo'
     | '/admin/ambientes'
   id:
@@ -123,10 +167,14 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/aluno'
+    | '/admin/aulas'
+    | '/admin/ferramentas'
+    | '/admin/novidades'
     | '/admin_/login'
     | '/aluno_/login'
     | '/admin/'
     | '/aluno/'
+    | '/admin/ambientes/$id'
     | '/admin/ambientes/novo'
     | '/admin/ambientes/'
   fileRoutesById: FileRoutesById
@@ -190,6 +238,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/novidades': {
+      id: '/admin/novidades'
+      path: '/novidades'
+      fullPath: '/admin/novidades'
+      preLoaderRoute: typeof AdminNovidadesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ferramentas': {
+      id: '/admin/ferramentas'
+      path: '/ferramentas'
+      fullPath: '/admin/ferramentas'
+      preLoaderRoute: typeof AdminFerramentasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/aulas': {
+      id: '/admin/aulas'
+      path: '/aulas'
+      fullPath: '/admin/aulas'
+      preLoaderRoute: typeof AdminAulasRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ambientes/': {
       id: '/admin/ambientes/'
       path: '/ambientes'
@@ -204,17 +273,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAmbientesNovoRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/ambientes/$id': {
+      id: '/admin/ambientes/$id'
+      path: '/ambientes/$id'
+      fullPath: '/admin/ambientes/$id'
+      preLoaderRoute: typeof AdminAmbientesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAulasRoute: typeof AdminAulasRoute
+  AdminFerramentasRoute: typeof AdminFerramentasRoute
+  AdminNovidadesRoute: typeof AdminNovidadesRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminAmbientesIdRoute: typeof AdminAmbientesIdRoute
   AdminAmbientesNovoRoute: typeof AdminAmbientesNovoRoute
   AdminAmbientesIndexRoute: typeof AdminAmbientesIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAulasRoute: AdminAulasRoute,
+  AdminFerramentasRoute: AdminFerramentasRoute,
+  AdminNovidadesRoute: AdminNovidadesRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminAmbientesIdRoute: AdminAmbientesIdRoute,
   AdminAmbientesNovoRoute: AdminAmbientesNovoRoute,
   AdminAmbientesIndexRoute: AdminAmbientesIndexRoute,
 }
@@ -241,3 +325,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
