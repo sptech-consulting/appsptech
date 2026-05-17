@@ -150,9 +150,11 @@ function AmbienteHome() {
   const enterClass = effects.efeito_entrada_animada ? "fx-enter" : "";
   const btnLift = effects.efeito_botao_lift ? "fx-btn-lift" : "";
 
+  const aulasComMaterial = data.aulas.filter((a) => !!a.material_url);
   const sections: { key: SectionKey; label: string; icon: React.ReactNode; count: number }[] = [
     { key: "ferramentas", label: "Ferramentas", icon: <Wrench className="h-3.5 w-3.5" />, count: data.ferramentas.length },
     { key: "novidades", label: "Novidades", icon: <Newspaper className="h-3.5 w-3.5" />, count: data.novidades.length },
+    { key: "playbook", label: "Playbook", icon: <BookOpen className="h-3.5 w-3.5" />, count: aulasComMaterial.length },
     { key: "aulas", label: "Aulas", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.aulas.length },
   ];
 
