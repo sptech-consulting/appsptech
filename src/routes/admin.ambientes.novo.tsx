@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
-import { AmbienteForm, type AmbienteFormState } from "@/components/AmbienteForm";
+import { AmbienteForm, type AmbienteFormState, gerarCodigoAcesso } from "@/components/AmbienteForm";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/ambientes/novo")({
