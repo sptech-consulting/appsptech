@@ -37,6 +37,7 @@ import { Route as ESlugLoginRouteImport } from './routes/e.$slug.login'
 import { Route as AdminCursosIdRouteImport } from './routes/admin.cursos.$id'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
 import { Route as AdminAmbientesIdRouteImport } from './routes/admin.ambientes.$id'
+import { Route as ESlugResultadosTrabalhoIdRouteImport } from './routes/e.$slug.resultados.$trabalhoId'
 import { Route as ESlugAulaAulaIdRouteImport } from './routes/e.$slug.aula.$aulaId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -179,6 +180,12 @@ const AdminAmbientesIdRoute = AdminAmbientesIdRouteImport.update({
   path: '/ambientes/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const ESlugResultadosTrabalhoIdRoute =
+  ESlugResultadosTrabalhoIdRouteImport.update({
+    id: '/$trabalhoId',
+    path: '/$trabalhoId',
+    getParentRoute: () => ESlugResultadosRoute,
+  } as any)
 const ESlugAulaAulaIdRoute = ESlugAulaAulaIdRouteImport.update({
   id: '/e/$slug/aula/$aulaId',
   path: '/e/$slug/aula/$aulaId',
@@ -211,10 +218,11 @@ export interface FileRoutesByFullPath {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/e/$slug/login': typeof ESlugLoginRoute
-  '/e/$slug/resultados': typeof ESlugResultadosRoute
+  '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -240,10 +248,11 @@ export interface FileRoutesByTo {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/e/$slug/login': typeof ESlugLoginRoute
-  '/e/$slug/resultados': typeof ESlugResultadosRoute
+  '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -272,10 +281,11 @@ export interface FileRoutesById {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/e/$slug/login': typeof ESlugLoginRoute
-  '/e/$slug/resultados': typeof ESlugResultadosRoute
+  '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/resultados/$trabalhoId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes'
     | '/e/$slug'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/resultados/$trabalhoId'
   id:
     | '__root__'
     | '/'
@@ -369,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/resultados/$trabalhoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -380,7 +393,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AlunoLoginRoute: typeof AlunoLoginRoute
   ESlugLoginRoute: typeof ESlugLoginRoute
-  ESlugResultadosRoute: typeof ESlugResultadosRoute
+  ESlugResultadosRoute: typeof ESlugResultadosRouteWithChildren
   ESlugIndexRoute: typeof ESlugIndexRoute
   ESlugAulaAulaIdRoute: typeof ESlugAulaAulaIdRoute
 }
@@ -583,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAmbientesIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/e/$slug/resultados/$trabalhoId': {
+      id: '/e/$slug/resultados/$trabalhoId'
+      path: '/$trabalhoId'
+      fullPath: '/e/$slug/resultados/$trabalhoId'
+      preLoaderRoute: typeof ESlugResultadosTrabalhoIdRouteImport
+      parentRoute: typeof ESlugResultadosRoute
+    }
     '/e/$slug/aula/$aulaId': {
       id: '/e/$slug/aula/$aulaId'
       path: '/e/$slug/aula/$aulaId'
@@ -655,6 +675,18 @@ const AlunoRouteChildren: AlunoRouteChildren = {
 
 const AlunoRouteWithChildren = AlunoRoute._addFileChildren(AlunoRouteChildren)
 
+interface ESlugResultadosRouteChildren {
+  ESlugResultadosTrabalhoIdRoute: typeof ESlugResultadosTrabalhoIdRoute
+}
+
+const ESlugResultadosRouteChildren: ESlugResultadosRouteChildren = {
+  ESlugResultadosTrabalhoIdRoute: ESlugResultadosTrabalhoIdRoute,
+}
+
+const ESlugResultadosRouteWithChildren = ESlugResultadosRoute._addFileChildren(
+  ESlugResultadosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -664,7 +696,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AlunoLoginRoute: AlunoLoginRoute,
   ESlugLoginRoute: ESlugLoginRoute,
-  ESlugResultadosRoute: ESlugResultadosRoute,
+  ESlugResultadosRoute: ESlugResultadosRouteWithChildren,
   ESlugIndexRoute: ESlugIndexRoute,
   ESlugAulaAulaIdRoute: ESlugAulaAulaIdRoute,
 }
