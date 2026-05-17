@@ -22,6 +22,11 @@ export const Route = createFileRoute("/admin/ferramentas")({
   component: FerramentasPage,
 });
 
+async function loadAmbienteOptions(): Promise<[string, string][]> {
+  const { data } = await supabase.from("ambientes").select("id,nome").order("nome");
+  return (data ?? []).map((a) => [a.id as string, a.nome as string]);
+}
+
 const FIELDS: FieldDef[] = [
   { name: "nome", label: "Nome", required: true },
   { name: "descricao", label: "Descrição", type: "textarea" },
@@ -47,6 +52,12 @@ const FIELDS: FieldDef[] = [
       ["inativo", "Inativo"],
     ],
   },
+  {
+    name: "ambiente_ids",
+    label: "Vincular a ambientes",
+    type: "multiselect",
+    loadOptions: loadAmbienteOptions,
+  },
 ];
 
 function FerramentasPage() {
@@ -54,6 +65,7 @@ function FerramentasPage() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Ferramenta | null>(null);
+  const [editingAmbienteIds, setEditingAmbienteIds] = useState<string[]>([]);
 
   async function load() {
     setLoading(true);
@@ -70,7 +82,47 @@ function FerramentasPage() {
     void load();
   }, []);
 
-  async function save(data: Partial<Ferramenta>) {
+  async function openEdit(it: Ferramenta | null) {
+    setEditing(it);
+    if (it) {
+      const { data } = await supabase
+        .from("ambiente_ferramentas")
+        .select("ambiente_id")
+        .eq("ferramenta_id", it.id);
+      setEditingAmbienteIds((data ?? []).map((r) => r.ambiente_id as string));
+    } else {
+      setEditingAmbienteIds([]);
+    }
+    setOpen(true);
+  }
+
+  async function syncVinculos(ferramentaId: string, ambienteIds: string[]) {
+    const { data: existing } = await supabase
+      .from("ambiente_ferramentas")
+      .select("ambiente_id")
+      .eq("ferramenta_id", ferramentaId);
+    const current = new Set((existing ?? []).map((r) => r.ambiente_id as string));
+    const target = new Set(ambienteIds);
+    const toAdd = [...target].filter((id) => !current.has(id));
+    const toRemove = [...current].filter((id) => !target.has(id));
+    if (toAdd.length) {
+      const { error } = await supabase
+        .from("ambiente_ferramentas")
+        .insert(toAdd.map((ambiente_id) => ({ ambiente_id, ferramenta_id: ferramentaId })));
+      if (error) toast.error(error.message);
+    }
+    if (toRemove.length) {
+      const { error } = await supabase
+        .from("ambiente_ferramentas")
+        .delete()
+        .eq("ferramenta_id", ferramentaId)
+        .in("ambiente_id", toRemove);
+      if (error) toast.error(error.message);
+    }
+  }
+
+  async function save(data: Partial<Ferramenta> & { ambiente_ids?: string[] }) {
+    const ambienteIds = data.ambiente_ids ?? [];
     const payload = {
       nome: data.nome!,
       descricao: data.descricao || null,
@@ -80,6 +132,7 @@ function FerramentasPage() {
       tipo_abertura: (data.tipo_abertura as any) || "nova_aba",
       status: (data.status as any) || "ativo",
     };
+    let ferramentaId = editing?.id ?? null;
     if (editing) {
       const { error } = await supabase.from("ferramentas").update(payload).eq("id", editing.id);
       if (error) {
@@ -88,13 +141,19 @@ function FerramentasPage() {
       }
       toast.success("Ferramenta atualizada.");
     } else {
-      const { error } = await supabase.from("ferramentas").insert(payload);
-      if (error) {
-        toast.error(error.message);
+      const { data: created, error } = await supabase
+        .from("ferramentas")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error || !created) {
+        toast.error(error?.message ?? "Erro ao criar");
         return false;
       }
+      ferramentaId = created.id;
       toast.success("Ferramenta criada.");
     }
+    if (ferramentaId) await syncVinculos(ferramentaId, ambienteIds);
     setEditing(null);
     void load();
     return true;
@@ -106,12 +165,7 @@ function FerramentasPage() {
         title="Ferramentas"
         description="Cadastro global. Vincule a cada ambiente na tela do ambiente."
         actions={
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setOpen(true);
-            }}
-          >
+          <Button onClick={() => void openEdit(null)}>
             <Plus className="h-4 w-4" /> Nova ferramenta
           </Button>
         }
@@ -155,10 +209,7 @@ function FerramentasPage() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
-                      onClick={() => {
-                        setEditing(it);
-                        setOpen(true);
-                      }}
+                      onClick={() => void openEdit(it)}
                       className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
                     >
                       <Pencil className="h-3 w-3" /> Editar
@@ -174,7 +225,7 @@ function FerramentasPage() {
       <RecordDialog
         title={editing ? "Editar ferramenta" : "Nova ferramenta"}
         fields={FIELDS}
-        initial={editing ?? { tipo_abertura: "nova_aba", status: "ativo" }}
+        initial={{ ...(editing ?? { tipo_abertura: "nova_aba", status: "ativo" }), ambiente_ids: editingAmbienteIds }}
         onSubmit={save}
         open={open}
         onOpenChange={setOpen}

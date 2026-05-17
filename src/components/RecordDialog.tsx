@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,11 @@ import { ImageUpload } from "@/components/ImageUpload";
 export type FieldDef = {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "url" | "number" | "select" | "image";
+  type?: "text" | "textarea" | "url" | "number" | "select" | "image" | "multiselect";
   required?: boolean;
   options?: [string, string][];
+  /** Para type=multiselect: opções carregadas dinamicamente. */
+  loadOptions?: () => Promise<[string, string][]>;
   placeholder?: string;
   /** Pasta no bucket para uploads (type=image). */
   uploadFolder?: string;
@@ -104,6 +106,12 @@ export function RecordDialog<T extends Record<string, any>>({
                     </option>
                   ))}
                 </select>
+              ) : f.type === "multiselect" ? (
+                <MultiSelectField
+                  field={f}
+                  value={(state[f.name] as string[]) ?? []}
+                  onChange={(v: string[]) => setState((s) => ({ ...s, [f.name]: v }))}
+                />
               ) : (
                 <Input
                   type={f.type === "url" ? "url" : f.type === "number" ? "number" : "text"}
@@ -128,5 +136,65 @@ export function RecordDialog<T extends Record<string, any>>({
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function MultiSelectField({
+  field,
+  value,
+  onChange,
+}: {
+  field: FieldDef;
+  value: string[];
+  onChange: (v: string[]) => void;
+}) {
+  const [opts, setOpts] = useState<[string, string][]>(field.options ?? []);
+  const [loading, setLoading] = useState(!!field.loadOptions);
+
+  useEffect(() => {
+    if (!field.loadOptions) return;
+    (async () => {
+      setLoading(true);
+      try {
+        setOpts(await field.loadOptions!());
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function toggle(v: string) {
+    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v]);
+  }
+
+  if (loading) return <div className="text-xs text-muted-foreground">Carregando…</div>;
+  if (opts.length === 0)
+    return (
+      <div className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
+        Nenhuma opção disponível.
+      </div>
+    );
+
+  return (
+    <div className="max-h-48 overflow-auto rounded-md border border-border divide-y divide-border">
+      {opts.map(([v, l]) => {
+        const checked = value.includes(v);
+        return (
+          <label
+            key={v}
+            className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={() => toggle(v)}
+              className="h-4 w-4 accent-primary"
+            />
+            <span className="text-secondary">{l}</span>
+          </label>
+        );
+      })}
+    </div>
   );
 }
