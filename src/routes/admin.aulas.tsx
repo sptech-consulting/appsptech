@@ -30,7 +30,7 @@ const FIELDS: FieldDef[] = [
   { name: "modulo", label: "Módulo" },
   { name: "video_url", label: "Vídeo (URL)", type: "url" },
   { name: "material_url", label: "Material (URL)", type: "url" },
-  { name: "thumbnail_url", label: "Thumbnail (URL)", type: "url" },
+  { name: "thumbnail_url", label: "Thumbnail", type: "image", uploadFolder: "aulas/thumbs", aspect: "aspect-video" },
   { name: "duracao_minutos", label: "Duração (min)", type: "number" },
   {
     name: "tipo_conteudo",
