@@ -32,6 +32,7 @@ import { Route as AdminAulasRouteImport } from './routes/admin.aulas'
 import { Route as AdminAlunosRouteImport } from './routes/admin.alunos'
 import { Route as ESlugIndexRouteImport } from './routes/e.$slug.index'
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
+import { Route as ESlugResultadosRouteImport } from './routes/e.$slug.resultados'
 import { Route as ESlugLoginRouteImport } from './routes/e.$slug.login'
 import { Route as AdminCursosIdRouteImport } from './routes/admin.cursos.$id'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
@@ -153,6 +154,11 @@ const AdminAmbientesIndexRoute = AdminAmbientesIndexRouteImport.update({
   path: '/ambientes/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ESlugResultadosRoute = ESlugResultadosRouteImport.update({
+  id: '/e/$slug/resultados',
+  path: '/e/$slug/resultados',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ESlugLoginRoute = ESlugLoginRouteImport.update({
   id: '/e/$slug/login',
   path: '/e/$slug/login',
@@ -205,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/e/$slug/login': typeof ESlugLoginRoute
+  '/e/$slug/resultados': typeof ESlugResultadosRoute
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/e/$slug/login': typeof ESlugLoginRoute
+  '/e/$slug/resultados': typeof ESlugResultadosRoute
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/e/$slug/login': typeof ESlugLoginRoute
+  '/e/$slug/resultados': typeof ESlugResultadosRoute
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/e/$slug/login'
+    | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/e/$slug/login'
+    | '/e/$slug/resultados'
     | '/admin/ambientes'
     | '/e/$slug'
     | '/e/$slug/aula/$aulaId'
@@ -354,6 +365,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/e/$slug/login'
+    | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
@@ -368,6 +380,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AlunoLoginRoute: typeof AlunoLoginRoute
   ESlugLoginRoute: typeof ESlugLoginRoute
+  ESlugResultadosRoute: typeof ESlugResultadosRoute
   ESlugIndexRoute: typeof ESlugIndexRoute
   ESlugAulaAulaIdRoute: typeof ESlugAulaAulaIdRoute
 }
@@ -535,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAmbientesIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/e/$slug/resultados': {
+      id: '/e/$slug/resultados'
+      path: '/e/$slug/resultados'
+      fullPath: '/e/$slug/resultados'
+      preLoaderRoute: typeof ESlugResultadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/e/$slug/login': {
       id: '/e/$slug/login'
       path: '/e/$slug/login'
@@ -644,6 +664,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AlunoLoginRoute: AlunoLoginRoute,
   ESlugLoginRoute: ESlugLoginRoute,
+  ESlugResultadosRoute: ESlugResultadosRoute,
   ESlugIndexRoute: ESlugIndexRoute,
   ESlugAulaAulaIdRoute: ESlugAulaAulaIdRoute,
 }
