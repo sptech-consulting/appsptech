@@ -346,8 +346,6 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
-// Lightweight wrapper around ImageUpload via RecordDialog's pattern — but inline using component
-import { ImageUpload } from "@/components/ImageUpload";
 function CapaUpload({ value, onChange }: { value: string | null; onChange: (u: string | null) => void }) {
   return (
     <ImageUpload
