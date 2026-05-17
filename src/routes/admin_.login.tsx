@@ -1,10 +1,15 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
 export const Route = createFileRoute("/admin_/login")({
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (data.session) throw redirect({ to: "/admin" });
+  },
   head: () => ({ meta: [{ title: "Login Admin — SPTech" }] }),
   component: AdminLogin,
 });
