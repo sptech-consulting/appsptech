@@ -88,3 +88,54 @@
   }
   h1, h2, h3, h4 { font-weight: 700; letter-spacing: -0.01em; }
 }
+
+/* ============================================================
+ * Ambiente effects (white-label)
+ * Classes applied conditionally via <EffectCard> and the home shell.
+ * ============================================================ */
+
+.effect-card.fx-scale { transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .3s ease; }
+.effect-card.fx-scale:hover { transform: translateY(-2px) scale(1.025); }
+
+.effect-card.fx-glow { position: relative; }
+.effect-card.fx-glow::after {
+  content: "";
+  position: absolute; inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+  box-shadow: 0 0 0 1px var(--glow, #ED145B), 0 12px 40px -8px var(--glow, #ED145B);
+}
+.effect-card.fx-glow:hover::after { opacity: .55; }
+
+.fx-btn-lift { transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s; }
+.fx-btn-lift:hover { transform: translateY(-1px); }
+
+@keyframes fx-fade-in-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.fx-enter > * { animation: fx-fade-in-up .5s cubic-bezier(.16,1,.3,1) both; }
+.fx-enter > *:nth-child(1) { animation-delay: .04s; }
+.fx-enter > *:nth-child(2) { animation-delay: .10s; }
+.fx-enter > *:nth-child(3) { animation-delay: .16s; }
+.fx-enter > *:nth-child(4) { animation-delay: .22s; }
+.fx-enter > *:nth-child(5) { animation-delay: .28s; }
+.fx-enter > *:nth-child(6) { animation-delay: .34s; }
+
+@keyframes fx-swim-1 {
+  0% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(20vw,-10vh) scale(1.1); }
+  66% { transform: translate(-15vw,15vh) scale(.9); }
+  100% { transform: translate(0,0) scale(1); }
+}
+@keyframes fx-swim-2 {
+  0% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-18vw,12vh) scale(1.15); }
+  100% { transform: translate(0,0) scale(1); }
+}
+.fx-blobs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.fx-blobs::before, .fx-blobs::after {
+  content: ""; position: absolute; width: 380px; height: 380px; border-radius: 9999px;
+  filter: blur(70px); opacity: .35;
+}
+.fx-blobs::before { background: var(--blob-1, #ED145B); top: -120px; left: -80px; animation: fx-swim-1 22s ease-in-out infinite; }
+.fx-blobs::after  { background: var(--blob-2, #63B1BC); bottom: -120px; right: -80px; animation: fx-swim-2 28s ease-in-out infinite; }
