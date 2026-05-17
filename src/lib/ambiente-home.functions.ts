@@ -30,6 +30,7 @@ export type AmbienteHomeBranding = {
   efeito_som_hover: boolean;
   efeito_som_volume: number;
   efeito_blobs_fundo: boolean;
+  tema: "claro" | "escuro";
 };
 
 export type FerramentaItem = {
