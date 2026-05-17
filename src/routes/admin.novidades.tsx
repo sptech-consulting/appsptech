@@ -212,7 +212,7 @@ function NovidadesPage() {
       <RecordDialog
         title={editing ? "Editar novidade" : "Nova novidade"}
         fields={FIELDS}
-        initial={editing ?? { status: "rascunho" }}
+        initial={{ ...(editing ?? { status: "rascunho" }), ambiente_ids: editingAmbienteIds }}
         onSubmit={save}
         open={open}
         onOpenChange={setOpen}
