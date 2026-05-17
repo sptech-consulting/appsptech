@@ -127,38 +127,8 @@ function AdminShell() {
             Área administrativa
           </div>
         </div>
-        <nav className="p-3 flex flex-col gap-0.5 text-sm flex-1">
-          {NAV.map((it) => {
-            const Icon = it.icon;
-            return (
-              <Link
-                key={it.to}
-                to={it.to}
-                activeOptions={{ exact: !!it.exact }}
-                className="flex items-center gap-2 rounded-md px-3 py-2 text-secondary hover:bg-muted [&.active]:bg-primary [&.active]:text-primary-foreground"
-              >
-                <Icon className="h-4 w-4" />
-                {it.label}
-              </Link>
-            );
-          })}
-          <div className="my-2 border-t border-border" />
-          {NAV_DISABLED.map((it) => {
-            const Icon = it.icon;
-            return (
-              <div
-                key={it.label}
-                className="flex items-center justify-between gap-2 rounded-md px-3 py-2 text-muted-foreground/70 cursor-not-allowed"
-              >
-                <span className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
-                  {it.label}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider">{it.hint}</span>
-              </div>
-            );
-          })}
-        </nav>
+        <AdminNav />
+
         <div className="p-3 border-t border-border text-xs">
           <div className="font-semibold text-secondary">{profile.nome}</div>
           <div className="text-muted-foreground truncate">{profile.email}</div>
