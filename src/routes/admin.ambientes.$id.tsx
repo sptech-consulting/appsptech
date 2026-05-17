@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { AmbienteForm, type AmbienteFormState, DEFAULT_AMBIENTE } from "@/components/AmbienteForm";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Link2, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/admin/ambientes/$id")({
   component: EditAmbiente,
@@ -104,6 +105,7 @@ function EditAmbiente() {
           </Button>
         }
       />
+      <AccessLinkCard slug={initial.slug} />
       <AmbienteForm
         initial={initial}
         onSubmit={handleSave}
@@ -111,6 +113,37 @@ function EditAmbiente() {
         submitLabel="Salvar alterações"
         extra={<VinculosManager ambienteId={id} />}
       />
+    </div>
+  );
+}
+
+function AccessLinkCard({ slug }: { slug: string }) {
+  const url = typeof window !== "undefined" ? `${window.location.origin}/e/${slug}/login` : `/e/${slug}/login`;
+  return (
+    <div className="mb-4 rounded-xl border border-border bg-card p-4 flex items-center gap-3">
+      <Link2 className="h-4 w-4 text-primary" />
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-bold text-secondary uppercase tracking-widest">Link de acesso do aluno</div>
+        <code className="block truncate text-xs text-muted-foreground">{url}</code>
+      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          void navigator.clipboard.writeText(url);
+          toast.success("Link copiado");
+        }}
+      >
+        <Link2 className="h-3 w-3" /> Copiar
+      </Button>
+      <a
+        href={`/e/${slug}/login`}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
+      >
+        <ExternalLink className="h-3 w-3" /> Abrir
+      </a>
     </div>
   );
 }

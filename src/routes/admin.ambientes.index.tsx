@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
-import { Plus, Pencil, Power } from "lucide-react";
+import { Plus, Pencil, Power, Link2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -97,6 +97,26 @@ function AmbientesList() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex gap-1">
+                      <button
+                        onClick={() => {
+                          const url = `${window.location.origin}/e/${a.slug}/login`;
+                          void navigator.clipboard.writeText(url);
+                          toast.success("Link copiado", { description: url });
+                        }}
+                        title="Copiar link de acesso do aluno"
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
+                      >
+                        <Link2 className="h-3 w-3" /> Copiar link
+                      </button>
+                      <a
+                        href={`/e/${a.slug}/login`}
+                        target="_blank"
+                        rel="noreferrer"
+                        title="Abrir link de acesso"
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
                       <Link
                         to="/admin/ambientes/$id"
                         params={{ id: a.id }}
