@@ -28,6 +28,8 @@ import {
   FileText,
   Loader2,
   SkipForward,
+  Menu,
+  X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/aula/$aulaId")({
@@ -59,6 +61,12 @@ function AulaPlayerPage() {
   const [novoComentario, setNovoComentario] = useState("");
   const [replyText, setReplyText] = useState("");
   const [posting, setPosting] = useState(false);
+  const [mobileNav, setMobileNav] = useState(false);
+
+  // Fecha o drawer mobile ao trocar de aula
+  useEffect(() => {
+    setMobileNav(false);
+  }, [aulaId]);
 
   const reload = async () => {
     try {
@@ -153,12 +161,20 @@ function AulaPlayerPage() {
             <Home className="h-3.5 w-3.5" /> {b.nome}
           </Link>
           <Breadcrumb sep={muted}>
-            <span className="opacity-70">{data.curso.titulo}</span>
-            <span className="opacity-70">{data.modulo_atual.titulo}</span>
-            <span className="font-semibold" style={{ color: b.cor_primaria }}>
+            <span className="opacity-70 hidden sm:inline">{data.curso.titulo}</span>
+            <span className="opacity-70 hidden md:inline">{data.modulo_atual.titulo}</span>
+            <span className="font-semibold truncate" style={{ color: b.cor_primaria }}>
               {data.aula.titulo}
             </span>
           </Breadcrumb>
+          <button
+            onClick={() => setMobileNav(true)}
+            className="ml-auto inline-flex lg:hidden items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border"
+            style={{ borderColor: border, color: text }}
+            aria-label="Abrir lista de aulas"
+          >
+            <Menu className="h-3.5 w-3.5" /> Aulas
+          </button>
         </div>
       </header>
 
@@ -348,9 +364,37 @@ function AulaPlayerPage() {
           </section>
         </main>
 
-        {/* Sidebar direita */}
+        {/* Sidebar direita (desktop) + Drawer (mobile) */}
         {videoSize === "default" && (
-          <aside className="space-y-5">
+          <>
+            {mobileNav && (
+              <div
+                className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+                onClick={() => setMobileNav(false)}
+                aria-hidden
+              />
+            )}
+            <aside
+              className={
+                mobileNav
+                  ? "fixed right-0 top-0 bottom-0 z-50 w-[85vw] max-w-sm overflow-y-auto p-4 space-y-5 lg:static lg:w-auto lg:max-w-none lg:p-0 lg:overflow-visible"
+                  : "hidden lg:block space-y-5"
+              }
+              style={mobileNav ? { backgroundColor: bg } : undefined}
+            >
+              {mobileNav && (
+                <div className="flex items-center justify-between lg:hidden">
+                  <span className="text-sm font-bold">Aulas do curso</span>
+                  <button
+                    onClick={() => setMobileNav(false)}
+                    className="p-1.5 rounded-md border"
+                    style={{ borderColor: border }}
+                    aria-label="Fechar"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
             <div
               className="rounded-2xl overflow-hidden"
               style={{ backgroundColor: card, border: `1px solid ${border}` }}
@@ -458,6 +502,7 @@ function AulaPlayerPage() {
               />
             </div>
           </aside>
+          </>
         )}
       </div>
     </div>

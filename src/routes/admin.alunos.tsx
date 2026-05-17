@@ -12,8 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Upload, Link2, Search, Trash2, History } from "lucide-react";
+import { Plus, Pencil, Upload, Link2, Search, Trash2, History, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { enviarConviteAluno } from "@/lib/aluno-convite.functions";
 
 type Aluno = {
   id: string;
@@ -34,6 +36,8 @@ export const Route = createFileRoute("/admin/alunos")({
 function AlunosPage() {
   const [items, setItems] = useState<Aluno[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [convidando, setConvidando] = useState<string | null>(null);
+  const fnConvidar = useServerFn(enviarConviteAluno);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [ambientes, setAmbientes] = useState<AmbienteOpt[]>([]);
@@ -173,6 +177,36 @@ function AlunosPage() {
                         className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
                       >
                         <Link2 className="h-3 w-3" /> Ambientes
+                      </button>
+                      <button
+                        onClick={async () => {
+                          setConvidando(a.id);
+                          try {
+                            const res = await fnConvidar({
+                              data: {
+                                aluno_id: a.id,
+                                redirect_to: `${window.location.origin}/reset-password`,
+                              },
+                            });
+                            if (res.action_link) {
+                              await navigator.clipboard?.writeText(res.action_link).catch(() => {});
+                              toast.success("Convite enviado. Link copiado.");
+                            } else {
+                              toast.success("Convite enviado por e-mail.");
+                            }
+                            await load();
+                          } catch (e) {
+                            toast.error(e instanceof Error ? e.message : "Erro ao enviar convite");
+                          } finally {
+                            setConvidando(null);
+                          }
+                        }}
+                        disabled={convidando === a.id}
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted disabled:opacity-50"
+                        title={a.auth_user_id ? "Reenviar link de definição de senha" : "Convidar por e-mail"}
+                      >
+                        <Mail className="h-3 w-3" />
+                        {a.auth_user_id ? "Reenviar" : "Convidar"}
                       </button>
                       <button
                         onClick={() => {
