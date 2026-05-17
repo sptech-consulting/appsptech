@@ -29,13 +29,13 @@ export const Route = createFileRoute("/admin")({
 const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
+  { to: "/admin/alunos", label: "Alunos", icon: Users },
   { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
   { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
   { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
 ];
 
 const NAV_DISABLED = [
-  { label: "Alunos", icon: Users, hint: "Fase 3" },
   { label: "Usuários & Permissões", icon: Shield, hint: "Fase 4" },
 ] as const;
 
