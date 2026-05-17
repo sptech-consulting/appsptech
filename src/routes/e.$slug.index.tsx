@@ -184,7 +184,7 @@ function AmbienteHome() {
 
       {/* Floating nav */}
       <nav
-        className="fixed top-3 left-1/2 -translate-x-1/2 z-40 px-2 py-1.5 backdrop-blur-md flex items-center gap-1 shadow-lg"
+        className="fixed bottom-3 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-3 z-40 px-2 py-1.5 backdrop-blur-md flex items-center gap-1 shadow-lg max-w-[calc(100vw-1.5rem)] overflow-x-auto"
         style={{
           backgroundColor: tk.navBg,
           color: tk.navText,
@@ -253,7 +253,7 @@ function AmbienteHome() {
           style={{ backgroundColor: tk.primaria, color: "#fff" }}
           title="Mural de Resultados"
         >
-          <Sparkles className="h-3 w-3" /> Resultados
+          <Sparkles className="h-3 w-3" /> <span className="hidden sm:inline">Resultados</span>
         </button>
         <button
           onClick={async () => {
@@ -263,7 +263,7 @@ function AmbienteHome() {
           className={`inline-flex items-center gap-1 text-[11px] font-semibold px-3 py-2 rounded-full ${btnLift}`}
           style={{ backgroundColor: tk.botao, color: "#fff" }}
         >
-          <LogOut className="h-3 w-3" /> Sair
+          <LogOut className="h-3 w-3" /> <span className="hidden sm:inline">Sair</span>
         </button>
       </div>
 
