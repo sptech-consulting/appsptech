@@ -60,6 +60,7 @@ function NovidadesPage() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Novidade | null>(null);
+  const [editingAmbienteIds, setEditingAmbienteIds] = useState<string[]>([]);
 
   async function load() {
     setLoading(true);
@@ -76,8 +77,48 @@ function NovidadesPage() {
     void load();
   }, []);
 
-  async function save(data: Partial<Novidade>) {
+  async function openEdit(it: Novidade | null) {
+    setEditing(it);
+    if (it) {
+      const { data } = await supabase
+        .from("ambiente_novidades")
+        .select("ambiente_id")
+        .eq("novidade_id", it.id);
+      setEditingAmbienteIds((data ?? []).map((r) => r.ambiente_id as string));
+    } else {
+      setEditingAmbienteIds([]);
+    }
+    setOpen(true);
+  }
+
+  async function syncVinculos(novidadeId: string, ambienteIds: string[]) {
+    const { data: existing } = await supabase
+      .from("ambiente_novidades")
+      .select("ambiente_id")
+      .eq("novidade_id", novidadeId);
+    const current = new Set((existing ?? []).map((r) => r.ambiente_id as string));
+    const target = new Set(ambienteIds);
+    const toAdd = [...target].filter((id) => !current.has(id));
+    const toRemove = [...current].filter((id) => !target.has(id));
+    if (toAdd.length) {
+      const { error } = await supabase
+        .from("ambiente_novidades")
+        .insert(toAdd.map((ambiente_id) => ({ ambiente_id, novidade_id: novidadeId })));
+      if (error) toast.error(error.message);
+    }
+    if (toRemove.length) {
+      const { error } = await supabase
+        .from("ambiente_novidades")
+        .delete()
+        .eq("novidade_id", novidadeId)
+        .in("ambiente_id", toRemove);
+      if (error) toast.error(error.message);
+    }
+  }
+
+  async function save(data: Partial<Novidade> & { ambiente_ids?: string[] }) {
     const status = (data.status as any) || "rascunho";
+    const ambienteIds = data.ambiente_ids ?? [];
     const payload = {
       titulo: data.titulo!,
       resumo: data.resumo || null,
@@ -89,6 +130,7 @@ function NovidadesPage() {
       status,
       publicado_em: status === "publicada" ? (editing?.publicado_em ?? new Date().toISOString()) : null,
     };
+    let novidadeId = editing?.id ?? null;
     if (editing) {
       const { error } = await supabase.from("novidades").update(payload).eq("id", editing.id);
       if (error) {
@@ -97,13 +139,19 @@ function NovidadesPage() {
       }
       toast.success("Novidade atualizada.");
     } else {
-      const { error } = await supabase.from("novidades").insert(payload);
-      if (error) {
-        toast.error(error.message);
+      const { data: created, error } = await supabase
+        .from("novidades")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error || !created) {
+        toast.error(error?.message ?? "Erro ao criar");
         return false;
       }
+      novidadeId = created.id;
       toast.success("Novidade criada.");
     }
+    if (novidadeId) await syncVinculos(novidadeId, ambienteIds);
     setEditing(null);
     void load();
     return true;
