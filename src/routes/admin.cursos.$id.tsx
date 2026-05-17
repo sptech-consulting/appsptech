@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { RecordDialog, type FieldDef } from "@/components/RecordDialog";
+import { ImageUpload } from "@/components/ImageUpload";
 import { toast } from "sonner";
 import {
   ArrowLeft,
