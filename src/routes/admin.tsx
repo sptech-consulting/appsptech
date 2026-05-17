@@ -39,6 +39,7 @@ const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
   { to: "/admin/cursos", label: "Cursos", icon: BookOpen },
   { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
+  { to: "/admin/trabalhos", label: "Trabalhos (Mural)", icon: ScrollText },
   { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
   { to: "/admin/logs", label: "Logs", icon: ScrollText },
   { to: "/admin/usuarios", label: "Usuários admin", icon: Users },
