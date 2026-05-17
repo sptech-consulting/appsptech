@@ -265,6 +265,14 @@ export type Database = {
           criado_em: string
           criado_por: string | null
           descricao: string | null
+          efeito_blobs_fundo: boolean
+          efeito_botao_lift: boolean
+          efeito_card_glow: boolean
+          efeito_card_scale: boolean
+          efeito_card_tilt_3d: boolean
+          efeito_entrada_animada: boolean
+          efeito_som_hover: boolean
+          efeito_som_volume: number
           favicon_url: string | null
           id: string
           imagem_capa_url: string | null
@@ -294,6 +302,14 @@ export type Database = {
           criado_em?: string
           criado_por?: string | null
           descricao?: string | null
+          efeito_blobs_fundo?: boolean
+          efeito_botao_lift?: boolean
+          efeito_card_glow?: boolean
+          efeito_card_scale?: boolean
+          efeito_card_tilt_3d?: boolean
+          efeito_entrada_animada?: boolean
+          efeito_som_hover?: boolean
+          efeito_som_volume?: number
           favicon_url?: string | null
           id?: string
           imagem_capa_url?: string | null
@@ -323,6 +339,14 @@ export type Database = {
           criado_em?: string
           criado_por?: string | null
           descricao?: string | null
+          efeito_blobs_fundo?: boolean
+          efeito_botao_lift?: boolean
+          efeito_card_glow?: boolean
+          efeito_card_scale?: boolean
+          efeito_card_tilt_3d?: boolean
+          efeito_entrada_animada?: boolean
+          efeito_som_hover?: boolean
+          efeito_som_volume?: number
           favicon_url?: string | null
           id?: string
           imagem_capa_url?: string | null
