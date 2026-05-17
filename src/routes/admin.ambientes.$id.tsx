@@ -189,7 +189,15 @@ function VinculosManager({ ambienteId }: { ambienteId: string }) {
         />
         <LinkSection
           ambienteId={ambienteId}
-          title="Aulas"
+          title="Cursos"
+          sourceTable="cursos"
+          linkTable="ambiente_cursos"
+          itemFkColumn="curso_id"
+          labelField="titulo"
+        />
+        <LinkSection
+          ambienteId={ambienteId}
+          title="Aulas avulsas"
           sourceTable="aulas"
           linkTable="ambiente_aulas"
           itemFkColumn="aula_id"
@@ -210,9 +218,9 @@ function LinkSection({
 }: {
   ambienteId: string;
   title: string;
-  sourceTable: "ferramentas" | "novidades" | "aulas";
-  linkTable: "ambiente_ferramentas" | "ambiente_novidades" | "ambiente_aulas";
-  itemFkColumn: "ferramenta_id" | "novidade_id" | "aula_id";
+  sourceTable: "ferramentas" | "novidades" | "aulas" | "cursos";
+  linkTable: "ambiente_ferramentas" | "ambiente_novidades" | "ambiente_aulas" | "ambiente_cursos";
+  itemFkColumn: "ferramenta_id" | "novidade_id" | "aula_id" | "curso_id";
   labelField: "nome" | "titulo";
 }) {
   const [all, setAll] = useState<Linkable[]>([]);
