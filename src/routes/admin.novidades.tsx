@@ -24,6 +24,11 @@ export const Route = createFileRoute("/admin/novidades")({
   component: NovidadesPage,
 });
 
+async function loadAmbienteOptions(): Promise<[string, string][]> {
+  const { data } = await supabase.from("ambientes").select("id,nome").order("nome");
+  return (data ?? []).map((a) => [a.id as string, a.nome as string]);
+}
+
 const FIELDS: FieldDef[] = [
   { name: "titulo", label: "Título", required: true },
   { name: "resumo", label: "Resumo", type: "textarea" },
@@ -41,6 +46,12 @@ const FIELDS: FieldDef[] = [
       ["publicada", "Publicada"],
       ["arquivada", "Arquivada"],
     ],
+  },
+  {
+    name: "ambiente_ids",
+    label: "Vincular a ambientes",
+    type: "multiselect",
+    loadOptions: loadAmbienteOptions,
   },
 ];
 
