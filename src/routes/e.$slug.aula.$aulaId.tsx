@@ -28,6 +28,8 @@ import {
   FileText,
   Loader2,
   SkipForward,
+  Menu,
+  X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/aula/$aulaId")({
@@ -59,6 +61,12 @@ function AulaPlayerPage() {
   const [novoComentario, setNovoComentario] = useState("");
   const [replyText, setReplyText] = useState("");
   const [posting, setPosting] = useState(false);
+  const [mobileNav, setMobileNav] = useState(false);
+
+  // Fecha o drawer mobile ao trocar de aula
+  useEffect(() => {
+    setMobileNav(false);
+  }, [aulaId]);
 
   const reload = async () => {
     try {
