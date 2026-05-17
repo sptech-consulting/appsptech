@@ -141,8 +141,8 @@ export type AdminLogRow = {
   ambiente_nome: string | null;
   usuario_admin_id: string | null;
   usuario_admin_nome: string | null;
-  dados_novos: unknown;
-  dados_anteriores: unknown;
+  dados_novos: any;
+  dados_anteriores: any;
   criado_em: string;
 };
 
