@@ -52,23 +52,47 @@ function AmbienteHome() {
   const corTexto = b?.cor_texto ?? "#1F2A44";
   const corPrim = b?.cor_primaria ?? "#ED145B";
 
+  const corSec = b?.cor_secundaria ?? "#1F2A44";
+  const blobs = !!b?.efeito_blobs_fundo;
+  const btnLift = b?.efeito_botao_lift ? "fx-btn-lift" : "";
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: corFundo, color: corTexto }}>
-      <header className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${b?.cor_borda ?? "#eee"}` }}>
+    <div
+      className="min-h-screen relative overflow-hidden"
+      style={
+        {
+          backgroundColor: corFundo,
+          color: corTexto,
+          ["--blob-1" as any]: corPrim,
+          ["--blob-2" as any]: corSec,
+        } as React.CSSProperties
+      }
+    >
+      {blobs && <div className="fx-blobs" />}
+      <header
+        className="relative z-10 px-6 py-4 flex items-center justify-between"
+        style={{ borderBottom: `1px solid ${b?.cor_borda ?? "#eee"}` }}
+      >
         <div className="flex items-center gap-3">
-          {b?.logo_url ? <img src={b.logo_url} alt="" className="h-8" /> : <div className="font-black" style={{ color: corPrim }}>{b?.nome ?? slug}</div>}
+          {b?.logo_url ? (
+            <img src={b.logo_url} alt="" className="h-8" />
+          ) : (
+            <div className="font-black" style={{ color: corPrim }}>
+              {b?.nome ?? slug}
+            </div>
+          )}
         </div>
         <button
           onClick={async () => {
             await signOut();
             window.location.assign(`/e/${slug}/login`);
           }}
-          className="text-xs font-semibold opacity-70 hover:opacity-100"
+          className={`text-xs font-semibold opacity-70 hover:opacity-100 ${btnLift}`}
         >
           Sair
         </button>
       </header>
-      <main className="mx-auto max-w-5xl px-6 py-16 text-center">
+      <main className="relative z-10 mx-auto max-w-5xl px-6 py-16 text-center">
         <h1 className="text-3xl font-black">Bem-vindo ao {b?.nome ?? slug}</h1>
         <p className="mt-2 opacity-70">Home white-label será construída na Fase 5.</p>
       </main>

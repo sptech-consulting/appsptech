@@ -1,4 +1,6 @@
 import { Wrench, Newspaper, GraduationCap } from "lucide-react";
+import { EffectCard } from "./EffectCard";
+import { DEFAULT_EFFECTS, type AmbienteEffects } from "@/lib/ambiente-effects";
 
 export type AmbienteVisual = {
   nome: string;
@@ -17,7 +19,7 @@ export type AmbienteVisual = {
   card_sombra: boolean;
   card_exibir_icone: boolean;
   card_exibir_imagem: boolean;
-};
+} & Partial<AmbienteEffects>;
 
 const RADII: Record<AmbienteVisual["card_borda"], string> = {
   quadrado: "0px",
@@ -40,7 +42,19 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
   const border =
     v.card_estilo === "borda" ? `1px solid ${v.cor_borda}` : v.card_estilo === "flat" ? "none" : "none";
 
-  const cardStyle: React.CSSProperties = {
+  const effects: AmbienteEffects = {
+    ...DEFAULT_EFFECTS,
+    efeito_card_tilt_3d: v.efeito_card_tilt_3d ?? false,
+    efeito_card_glow: v.efeito_card_glow ?? false,
+    efeito_card_scale: v.efeito_card_scale ?? false,
+    efeito_botao_lift: v.efeito_botao_lift ?? false,
+    efeito_entrada_animada: v.efeito_entrada_animada ?? false,
+    efeito_som_hover: v.efeito_som_hover ?? false,
+    efeito_som_volume: v.efeito_som_volume ?? 40,
+    efeito_blobs_fundo: v.efeito_blobs_fundo ?? false,
+  };
+
+  const cardBase: React.CSSProperties = {
     backgroundColor: v.card_estilo === "imagem" ? "transparent" : v.cor_card,
     color: v.cor_texto,
     borderRadius: radius,
@@ -53,14 +67,24 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
         : undefined,
   };
 
+  const enterClass = effects.efeito_entrada_animada ? "fx-enter" : "";
+
   return (
     <div
-      className="rounded-xl overflow-hidden border border-border"
-      style={{ ["--cp" as any]: v.cor_primaria, ["--cs" as any]: v.cor_secundaria } as React.CSSProperties}
+      className="rounded-xl overflow-hidden border border-border relative"
+      style={
+        {
+          ["--cp" as any]: v.cor_primaria,
+          ["--cs" as any]: v.cor_secundaria,
+          ["--blob-1" as any]: v.cor_primaria,
+          ["--blob-2" as any]: v.cor_secundaria,
+        } as React.CSSProperties
+      }
     >
+      {effects.efeito_blobs_fundo && <div className="fx-blobs" />}
       {/* Header */}
       <div
-        className="px-5 py-3 flex items-center justify-between"
+        className="px-5 py-3 flex items-center justify-between relative z-10"
         style={{ backgroundColor: v.cor_secundaria, color: "#fff" }}
       >
         <div className="flex items-center gap-2">
@@ -72,7 +96,7 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
           <span className="text-sm font-bold tracking-tight">{v.nome || "Ambiente"}</span>
         </div>
         <button
-          className="text-xs font-semibold px-3 py-1"
+          className={`text-xs font-semibold px-3 py-1 ${effects.efeito_botao_lift ? "fx-btn-lift" : ""}`}
           style={{ backgroundColor: v.cor_botao, color: "#fff", borderRadius: radius }}
         >
           Entrar
@@ -80,8 +104,10 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
       </div>
 
       {/* Body */}
-      <div style={{ backgroundColor: v.cor_fundo, color: v.cor_texto }} className="p-5 space-y-5">
-        {/* Banner */}
+      <div
+        style={{ backgroundColor: v.cor_fundo, color: v.cor_texto }}
+        className="p-5 space-y-5 relative z-10"
+      >
         <div
           className="rounded-lg p-6 text-white"
           style={{
@@ -97,11 +123,10 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
           <div className="mt-1 text-lg font-black">Bem-vindo ao {v.nome || "ambiente"}</div>
         </div>
 
-        {/* Seção ferramentas */}
         <PreviewSection title="Ferramentas" icon={<Wrench className="h-3 w-3" />} corTitulo={v.cor_secundaria}>
-          <div className="grid grid-cols-3 gap-3">
+          <div className={`grid grid-cols-3 gap-3 ${enterClass}`}>
             {[1, 2, 3].map((i) => (
-              <div key={i} style={cardStyle}>
+              <EffectCard key={i} effects={effects} baseStyle={cardBase} primaria={v.cor_primaria}>
                 {v.card_exibir_icone && (
                   <div
                     className="h-7 w-7 rounded mb-2 flex items-center justify-center text-white"
@@ -112,15 +137,15 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
                 )}
                 <div className="text-xs font-bold">Ferramenta {i}</div>
                 <div className="text-[10px] opacity-70">Acesso rápido</div>
-              </div>
+              </EffectCard>
             ))}
           </div>
         </PreviewSection>
 
         <PreviewSection title="Novidades" icon={<Newspaper className="h-3 w-3" />} corTitulo={v.cor_secundaria}>
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`grid grid-cols-2 gap-3 ${enterClass}`}>
             {[1, 2].map((i) => (
-              <div key={i} style={cardStyle}>
+              <EffectCard key={i} effects={effects} baseStyle={cardBase} primaria={v.cor_primaria}>
                 {v.card_exibir_imagem && (
                   <div
                     className="h-12 mb-2 rounded"
@@ -132,18 +157,18 @@ export function AmbientePreview({ v }: { v: AmbienteVisual }) {
                 )}
                 <div className="text-xs font-bold">Novidade {i}</div>
                 <div className="text-[10px] opacity-70">Lorem ipsum dolor sit amet</div>
-              </div>
+              </EffectCard>
             ))}
           </div>
         </PreviewSection>
 
         <PreviewSection title="Aulas" icon={<GraduationCap className="h-3 w-3" />} corTitulo={v.cor_secundaria}>
-          <div className="grid grid-cols-3 gap-3">
+          <div className={`grid grid-cols-3 gap-3 ${enterClass}`}>
             {[1, 2, 3].map((i) => (
-              <div key={i} style={cardStyle}>
+              <EffectCard key={i} effects={effects} baseStyle={cardBase} primaria={v.cor_primaria}>
                 <div className="text-xs font-bold">Aula {i}</div>
                 <div className="text-[10px] opacity-70">12 min · Vídeo</div>
-              </div>
+              </EffectCard>
             ))}
           </div>
         </PreviewSection>

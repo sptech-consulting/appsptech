@@ -44,6 +44,14 @@ function NovoAmbiente() {
         card_sombra: state.card_sombra,
         card_exibir_icone: state.card_exibir_icone,
         card_exibir_imagem: state.card_exibir_imagem,
+        efeito_card_tilt_3d: state.efeito_card_tilt_3d,
+        efeito_card_glow: state.efeito_card_glow,
+        efeito_card_scale: state.efeito_card_scale,
+        efeito_botao_lift: state.efeito_botao_lift,
+        efeito_entrada_animada: state.efeito_entrada_animada,
+        efeito_som_hover: state.efeito_som_hover,
+        efeito_som_volume: state.efeito_som_volume,
+        efeito_blobs_fundo: state.efeito_blobs_fundo,
       })
       .select("id")
       .single();
