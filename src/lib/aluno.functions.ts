@@ -11,8 +11,12 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const ensureAlunoAuthLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const email = (context.claims.email as string | undefined)?.toLowerCase().trim();
     const userId = context.userId;
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    if (authError) throw new Error(authError.message);
+    const email = (authUser.user?.email ?? (context.claims.email as string | undefined) ?? "")
+      .toLowerCase()
+      .trim();
     if (!email) return null;
 
     // Já vinculado?
@@ -20,6 +24,7 @@ export const ensureAlunoAuthLink = createServerFn({ method: "POST" })
       .from("alunos")
       .select("id, nome_completo, email_acesso, status, auth_user_id")
       .eq("auth_user_id", userId)
+      .limit(1)
       .maybeSingle();
     if (existing) return existing;
 
@@ -28,6 +33,7 @@ export const ensureAlunoAuthLink = createServerFn({ method: "POST" })
       .from("alunos")
       .select("id, nome_completo, email_acesso, status, auth_user_id")
       .ilike("email_acesso", email)
+      .limit(1)
       .maybeSingle();
 
     if (!byEmail) return null;
@@ -60,6 +66,7 @@ export const checkAlunoAmbienteAccess = createServerFn({ method: "POST" })
       .from("ambientes")
       .select("id, status")
       .eq("slug", data.slug)
+      .limit(1)
       .maybeSingle();
     if (!amb) return { ok: false as const, reason: "not_found" as const };
     if (amb.status !== "ativo") return { ok: false as const, reason: "inativo" as const };
@@ -68,6 +75,7 @@ export const checkAlunoAmbienteAccess = createServerFn({ method: "POST" })
       .from("alunos")
       .select("id, status")
       .eq("auth_user_id", userId)
+      .limit(1)
       .maybeSingle();
     if (!aluno || aluno.status !== "ativo") {
       return { ok: false as const, reason: "no_aluno" as const };
@@ -78,6 +86,7 @@ export const checkAlunoAmbienteAccess = createServerFn({ method: "POST" })
       .select("id, status")
       .eq("aluno_id", aluno.id)
       .eq("ambiente_id", amb.id)
+      .limit(1)
       .maybeSingle();
     if (!vinc || vinc.status !== "ativo") {
       return { ok: false as const, reason: "no_link" as const };
