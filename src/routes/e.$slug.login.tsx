@@ -16,15 +16,29 @@ export const Route = createFileRoute("/e/$slug/login")({
 
     const { data: aluno } = await supabase
       .from("alunos")
-      .select("id, status, ambiente_alunos!inner(ambientes!inner(slug, status), status)")
+      .select("id, status")
       .eq("auth_user_id", data.session.user.id)
       .eq("status", "ativo")
-      .eq("ambiente_alunos.status", "ativo")
-      .eq("ambiente_alunos.ambientes.slug", params.slug)
-      .eq("ambiente_alunos.ambientes.status", "ativo")
+      .maybeSingle();
+    if (!aluno) return;
+
+    const { data: ambiente } = await supabase
+      .from("ambientes")
+      .select("id")
+      .eq("slug", params.slug)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (!ambiente) return;
+
+    const { data: vinculo } = await supabase
+      .from("ambiente_alunos")
+      .select("id")
+      .eq("aluno_id", aluno.id)
+      .eq("ambiente_id", ambiente.id)
+      .eq("status", "ativo")
       .maybeSingle();
 
-    if (aluno) throw redirect({ to: "/e/$slug", params: { slug: params.slug } });
+    if (vinculo) throw redirect({ to: "/e/$slug", params: { slug: params.slug } });
   },
   component: AmbienteLogin,
 });
