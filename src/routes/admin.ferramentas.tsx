@@ -209,10 +209,7 @@ function FerramentasPage() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
-                      onClick={() => {
-                        setEditing(it);
-                        setOpen(true);
-                      }}
+                      onClick={() => void openEdit(it)}
                       className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
                     >
                       <Pencil className="h-3 w-3" /> Editar
