@@ -16,9 +16,11 @@ import { ImageUpload } from "@/components/ImageUpload";
 export type FieldDef = {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "url" | "number" | "select" | "image";
+  type?: "text" | "textarea" | "url" | "number" | "select" | "image" | "multiselect";
   required?: boolean;
   options?: [string, string][];
+  /** Para type=multiselect: opções carregadas dinamicamente. */
+  loadOptions?: () => Promise<[string, string][]>;
   placeholder?: string;
   /** Pasta no bucket para uploads (type=image). */
   uploadFolder?: string;
