@@ -8,6 +8,7 @@ import {
   postarComentario,
   removerComentario,
   toggleCurtidaComentario,
+  salvarProgressoVideo,
   type AulaPlayerData,
   type AulaPlayerComentario,
 } from "@/lib/aula-player.functions";
@@ -26,6 +27,7 @@ import {
   PlayCircle,
   FileText,
   Loader2,
+  SkipForward,
 } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/aula/$aulaId")({
@@ -47,6 +49,7 @@ function AulaPlayerPage() {
   const fnComentar = useServerFn(postarComentario);
   const fnRemover = useServerFn(removerComentario);
   const fnCurtir = useServerFn(toggleCurtidaComentario);
+  const fnProgresso = useServerFn(salvarProgressoVideo);
 
   const [data, setData] = useState<AulaPlayerData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -174,7 +177,21 @@ function AulaPlayerPage() {
               aspectRatio: videoSize === "theater" ? "21/9" : "16/9",
             }}
           >
-            <VideoPlayer url={data.aula.video_url} />
+            <VideoPlayer
+              url={data.aula.video_url}
+              startAt={data.aula.segundos_assistidos}
+              onProgress={(s) => {
+                void fnProgresso({ data: { slug, aulaId, segundos: s } }).catch(() => {});
+              }}
+              onEnded={() => {
+                void fnProgresso({ data: { slug, aulaId, segundos: 0, concluida: true } });
+                if (data.proxima_aula_id) {
+                  navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: data.proxima_aula_id } });
+                } else {
+                  void reload();
+                }
+              }}
+            />
             <button
               onClick={() => setVideoSize((s) => (s === "default" ? "theater" : "default"))}
               className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold bg-black/60 text-white hover:bg-black/80 transition"
@@ -231,6 +248,21 @@ function AulaPlayerPage() {
                   </>
                 )}
               </button>
+              {data.proxima_aula_id && (
+                <button
+                  onClick={() =>
+                    navigate({
+                      to: "/e/$slug/aula/$aulaId",
+                      params: { slug, aulaId: data.proxima_aula_id! },
+                    })
+                  }
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border"
+                  style={{ borderColor: border, color: text }}
+                  title={data.proxima_aula_titulo ?? ""}
+                >
+                  Próxima aula <SkipForward className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -432,7 +464,30 @@ function AulaPlayerPage() {
   );
 }
 
-function VideoPlayer({ url }: { url: string | null }) {
+function VideoPlayer({
+  url,
+  startAt,
+  onProgress,
+  onEnded,
+}: {
+  url: string | null;
+  startAt: number;
+  onProgress: (segundos: number) => void;
+  onEnded: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSaved = useRef(0);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !startAt) return;
+    const onMeta = () => {
+      try { v.currentTime = Math.max(0, Math.min(startAt, (v.duration || startAt) - 1)); } catch {}
+    };
+    v.addEventListener("loadedmetadata", onMeta, { once: true });
+    return () => v.removeEventListener("loadedmetadata", onMeta);
+  }, [startAt, url]);
+
   if (!url) {
     return (
       <div className="absolute inset-0 flex items-center justify-center text-white/70 text-sm">
@@ -454,10 +509,19 @@ function VideoPlayer({ url }: { url: string | null }) {
   }
   return (
     <video
+      ref={videoRef}
       src={url}
       controls
       className="absolute inset-0 w-full h-full bg-black"
       preload="metadata"
+      onTimeUpdate={(e) => {
+        const t = e.currentTarget.currentTime;
+        if (t - lastSaved.current >= 10) {
+          lastSaved.current = t;
+          onProgress(t);
+        }
+      }}
+      onEnded={onEnded}
     />
   );
 }

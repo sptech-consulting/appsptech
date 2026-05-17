@@ -87,10 +87,15 @@ function AdminLogin() {
             </button>
           </form>
 
-          <button onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
-            className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-secondary">
-            {mode === "signin" ? "Primeiro acesso? Criar conta admin" : "Já tenho conta — entrar"}
-          </button>
+          <div className="mt-4 flex items-center justify-between gap-3 text-xs">
+            <button
+              onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
+              className="text-muted-foreground hover:text-secondary"
+            >
+              {mode === "signin" ? "Primeiro acesso? Criar conta admin" : "Já tenho conta — entrar"}
+            </button>
+            <Link to="/forgot-password" className="text-primary hover:underline">Esqueci minha senha</Link>
+          </div>
         </div>
         <p className="mt-4 text-center text-xs text-muted-foreground">
           O primeiro usuário a se cadastrar vira Super Admin automaticamente.

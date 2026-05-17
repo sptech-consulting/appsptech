@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AlunoRouteImport } from './routes/aluno'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,10 +20,12 @@ import { Route as AlunoLoginRouteImport } from './routes/aluno_.login'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminNovidadesRouteImport } from './routes/admin.novidades'
+import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminImportacoesRouteImport } from './routes/admin.importacoes'
 import { Route as AdminGruposRouteImport } from './routes/admin.grupos'
 import { Route as AdminFerramentasRouteImport } from './routes/admin.ferramentas'
 import { Route as AdminCursosRouteImport } from './routes/admin.cursos'
+import { Route as AdminComentariosRouteImport } from './routes/admin.comentarios'
 import { Route as AdminAulasRouteImport } from './routes/admin.aulas'
 import { Route as AdminAlunosRouteImport } from './routes/admin.alunos'
 import { Route as ESlugIndexRouteImport } from './routes/e.$slug.index'
@@ -32,6 +36,16 @@ import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes
 import { Route as AdminAmbientesIdRouteImport } from './routes/admin.ambientes.$id'
 import { Route as ESlugAulaAulaIdRouteImport } from './routes/e.$slug.aula.$aulaId'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AlunoRoute = AlunoRouteImport.update({
   id: '/aluno',
   path: '/aluno',
@@ -77,6 +91,11 @@ const AdminNovidadesRoute = AdminNovidadesRouteImport.update({
   path: '/novidades',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLogsRoute = AdminLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminImportacoesRoute = AdminImportacoesRouteImport.update({
   id: '/importacoes',
   path: '/importacoes',
@@ -95,6 +114,11 @@ const AdminFerramentasRoute = AdminFerramentasRouteImport.update({
 const AdminCursosRoute = AdminCursosRouteImport.update({
   id: '/cursos',
   path: '/cursos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminComentariosRoute = AdminComentariosRouteImport.update({
+  id: '/comentarios',
+  path: '/comentarios',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAulasRoute = AdminAulasRouteImport.update({
@@ -147,12 +171,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
+  '/admin/comentarios': typeof AdminComentariosRoute
   '/admin/cursos': typeof AdminCursosRouteWithChildren
   '/admin/ferramentas': typeof AdminFerramentasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
+  '/admin/logs': typeof AdminLogsRoute
   '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/login': typeof AdminLoginRoute
@@ -169,12 +197,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
+  '/admin/comentarios': typeof AdminComentariosRoute
   '/admin/cursos': typeof AdminCursosRouteWithChildren
   '/admin/ferramentas': typeof AdminFerramentasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
+  '/admin/logs': typeof AdminLogsRoute
   '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/login': typeof AdminLoginRoute
@@ -194,12 +226,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
+  '/admin/comentarios': typeof AdminComentariosRoute
   '/admin/cursos': typeof AdminCursosRouteWithChildren
   '/admin/ferramentas': typeof AdminFerramentasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
+  '/admin/logs': typeof AdminLogsRoute
   '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin_/login': typeof AdminLoginRoute
@@ -220,12 +256,16 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/aluno'
+    | '/forgot-password'
+    | '/reset-password'
     | '/admin/alunos'
     | '/admin/aulas'
+    | '/admin/comentarios'
     | '/admin/cursos'
     | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
+    | '/admin/logs'
     | '/admin/novidades'
     | '/admin/usuarios'
     | '/admin/login'
@@ -242,12 +282,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
+    | '/reset-password'
     | '/admin/alunos'
     | '/admin/aulas'
+    | '/admin/comentarios'
     | '/admin/cursos'
     | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
+    | '/admin/logs'
     | '/admin/novidades'
     | '/admin/usuarios'
     | '/admin/login'
@@ -266,12 +310,16 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/aluno'
+    | '/forgot-password'
+    | '/reset-password'
     | '/admin/alunos'
     | '/admin/aulas'
+    | '/admin/comentarios'
     | '/admin/cursos'
     | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
+    | '/admin/logs'
     | '/admin/novidades'
     | '/admin/usuarios'
     | '/admin_/login'
@@ -291,6 +339,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AlunoRoute: typeof AlunoRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AlunoLoginRoute: typeof AlunoLoginRoute
   ESlugLoginRoute: typeof ESlugLoginRoute
@@ -300,6 +350,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/aluno': {
       id: '/aluno'
       path: '/aluno'
@@ -363,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNovidadesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/logs': {
+      id: '/admin/logs'
+      path: '/logs'
+      fullPath: '/admin/logs'
+      preLoaderRoute: typeof AdminLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/importacoes': {
       id: '/admin/importacoes'
       path: '/importacoes'
@@ -389,6 +460,13 @@ declare module '@tanstack/react-router' {
       path: '/cursos'
       fullPath: '/admin/cursos'
       preLoaderRoute: typeof AdminCursosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/comentarios': {
+      id: '/admin/comentarios'
+      path: '/comentarios'
+      fullPath: '/admin/comentarios'
+      preLoaderRoute: typeof AdminComentariosRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/aulas': {
@@ -472,10 +550,12 @@ const AdminCursosRouteWithChildren = AdminCursosRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminAlunosRoute: typeof AdminAlunosRoute
   AdminAulasRoute: typeof AdminAulasRoute
+  AdminComentariosRoute: typeof AdminComentariosRoute
   AdminCursosRoute: typeof AdminCursosRouteWithChildren
   AdminFerramentasRoute: typeof AdminFerramentasRoute
   AdminGruposRoute: typeof AdminGruposRoute
   AdminImportacoesRoute: typeof AdminImportacoesRoute
+  AdminLogsRoute: typeof AdminLogsRoute
   AdminNovidadesRoute: typeof AdminNovidadesRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -487,10 +567,12 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlunosRoute: AdminAlunosRoute,
   AdminAulasRoute: AdminAulasRoute,
+  AdminComentariosRoute: AdminComentariosRoute,
   AdminCursosRoute: AdminCursosRouteWithChildren,
   AdminFerramentasRoute: AdminFerramentasRoute,
   AdminGruposRoute: AdminGruposRoute,
   AdminImportacoesRoute: AdminImportacoesRoute,
+  AdminLogsRoute: AdminLogsRoute,
   AdminNovidadesRoute: AdminNovidadesRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -515,6 +597,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AlunoRoute: AlunoRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
   AlunoLoginRoute: AlunoLoginRoute,
   ESlugLoginRoute: ESlugLoginRoute,

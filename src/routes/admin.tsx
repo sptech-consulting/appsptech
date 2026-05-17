@@ -14,6 +14,8 @@ import {
   Users,
   Shield,
   LogOut,
+  MessageSquare,
+  ScrollText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -35,6 +37,8 @@ const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
   { to: "/admin/cursos", label: "Cursos", icon: BookOpen },
   { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
+  { to: "/admin/comentarios", label: "Comentários", icon: MessageSquare },
+  { to: "/admin/logs", label: "Logs", icon: ScrollText },
   { to: "/admin/usuarios", label: "Usuários admin", icon: Users },
   { to: "/admin/grupos", label: "Grupos & permissões", icon: Shield },
 ];

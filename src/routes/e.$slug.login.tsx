@@ -199,16 +199,21 @@ function AmbienteLogin() {
               {loading ? "Aguarde..." : mode === "signin" ? "Entrar" : "Criar acesso"}
             </button>
           </form>
-          <button
-            onClick={() => {
-              setMode(mode === "signin" ? "signup" : "signin");
-              setError(null);
-              setInfo(null);
-            }}
-            className="mt-4 w-full text-center text-xs opacity-70 hover:opacity-100"
-          >
-            {mode === "signin" ? "Primeiro acesso? Definir senha" : "Já tenho senha — entrar"}
-          </button>
+          <div className="mt-4 flex items-center justify-between gap-3 text-xs opacity-80">
+            <button
+              onClick={() => {
+                setMode(mode === "signin" ? "signup" : "signin");
+                setError(null);
+                setInfo(null);
+              }}
+              className="hover:opacity-100"
+            >
+              {mode === "signin" ? "Primeiro acesso? Definir senha" : "Já tenho senha — entrar"}
+            </button>
+            <a href="/forgot-password" className="hover:opacity-100" style={{ color: corPrim }}>
+              Esqueci minha senha
+            </a>
+          </div>
         </div>
       </div>
     </div>
