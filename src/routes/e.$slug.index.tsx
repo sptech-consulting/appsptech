@@ -13,6 +13,8 @@ import {
   ExternalLink,
   PlayCircle,
   FileText,
+  Download,
+  Sparkles,
   LogOut,
   Sun,
   Moon,
@@ -20,6 +22,7 @@ import {
   VolumeX,
   ChevronRight,
   ChevronLeft,
+  BookOpen,
 } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/")({
@@ -40,7 +43,7 @@ const RADII = {
 
 const PAD = { compacto: "14px", medio: "20px", grande: "26px" } as const;
 
-type SectionKey = "ferramentas" | "novidades" | "aulas";
+type SectionKey = "ferramentas" | "novidades" | "playbook" | "aulas";
 
 function AmbienteHome() {
   const { slug } = Route.useParams();
@@ -147,9 +150,11 @@ function AmbienteHome() {
   const enterClass = effects.efeito_entrada_animada ? "fx-enter" : "";
   const btnLift = effects.efeito_botao_lift ? "fx-btn-lift" : "";
 
+  const aulasComMaterial = data.aulas.filter((a) => !!a.material_url);
   const sections: { key: SectionKey; label: string; icon: React.ReactNode; count: number }[] = [
     { key: "ferramentas", label: "Ferramentas", icon: <Wrench className="h-3.5 w-3.5" />, count: data.ferramentas.length },
     { key: "novidades", label: "Novidades", icon: <Newspaper className="h-3.5 w-3.5" />, count: data.novidades.length },
+    { key: "playbook", label: "Playbook", icon: <BookOpen className="h-3.5 w-3.5" />, count: aulasComMaterial.length },
     { key: "aulas", label: "Aulas", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.aulas.length },
   ];
 
@@ -242,6 +247,14 @@ function AmbienteHome() {
         >
           {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
         </IconToggle>
+        <button
+          onClick={() => navigate({ to: "/e/$slug/resultados", params: { slug } })}
+          className={`inline-flex items-center gap-1 text-[11px] font-semibold px-3 py-2 rounded-full ${btnLift}`}
+          style={{ backgroundColor: tk.primaria, color: "#fff" }}
+          title="Mural de Resultados"
+        >
+          <Sparkles className="h-3 w-3" /> Resultados
+        </button>
         <button
           onClick={async () => {
             await signOut();
@@ -409,6 +422,59 @@ function AmbienteHome() {
                     </span>
                     {n.fonte_nome && <span>{n.fonte_nome}</span>}
                   </div>
+                </div>
+              </EffectCard>
+            ))}
+          </Carousel>
+        </Section>
+
+        {/* Playbook */}
+        <Section
+          id="sec-playbook"
+          title="Playbook"
+          subtitle="Baixe os materiais complementares das aulas"
+          tk={tk}
+          empty={aulasComMaterial.length === 0}
+          emptyMsg="Nenhum material disponível para download ainda."
+        >
+          <Carousel enterClass={enterClass}>
+            {aulasComMaterial.map((a) => (
+              <EffectCard
+                key={`pb-${a.id}`}
+                effects={effects}
+                baseStyle={{ ...cardBase, minWidth: 280, maxWidth: 320 }}
+                primaria={tk.primaria}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div
+                    className="h-12 w-12 rounded-lg flex items-center justify-center text-white"
+                    style={{ backgroundColor: tk.primaria }}
+                  >
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                </div>
+                {a.modulo && (
+                  <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{a.modulo}</div>
+                )}
+                <div className="font-bold leading-snug">{a.titulo}</div>
+                {a.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">{a.descricao}</div>}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={a.material_url ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                    style={{ backgroundColor: tk.botao, color: "#fff" }}
+                  >
+                    <Download className="h-3 w-3" /> Baixar material
+                  </a>
+                  <button
+                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.id } })}
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                    style={{ backgroundColor: "transparent", color: tk.text, border: `1px solid ${tk.border}` }}
+                  >
+                    Ver aula <ChevronRight className="h-3 w-3" />
+                  </button>
                 </div>
               </EffectCard>
             ))}
