@@ -54,6 +54,7 @@ export const DEFAULT_AMBIENTE: AmbienteFormState = {
   card_sombra: true,
   card_exibir_icone: true,
   card_exibir_imagem: true,
+  codigo_acesso_resultados: null,
   ...DEFAULT_EFFECTS,
 };
 
