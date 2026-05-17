@@ -13,6 +13,8 @@ import {
   ExternalLink,
   PlayCircle,
   FileText,
+  Download,
+  Sparkles,
   LogOut,
   Sun,
   Moon,
@@ -20,6 +22,7 @@ import {
   VolumeX,
   ChevronRight,
   ChevronLeft,
+  BookOpen,
 } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/")({
