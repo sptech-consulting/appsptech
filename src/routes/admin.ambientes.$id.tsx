@@ -50,6 +50,14 @@ function EditAmbiente() {
         card_sombra: data.card_sombra ?? true,
         card_exibir_icone: data.card_exibir_icone ?? true,
         card_exibir_imagem: data.card_exibir_imagem ?? true,
+        efeito_card_tilt_3d: (data as any).efeito_card_tilt_3d ?? false,
+        efeito_card_glow: (data as any).efeito_card_glow ?? false,
+        efeito_card_scale: (data as any).efeito_card_scale ?? false,
+        efeito_botao_lift: (data as any).efeito_botao_lift ?? false,
+        efeito_entrada_animada: (data as any).efeito_entrada_animada ?? false,
+        efeito_som_hover: (data as any).efeito_som_hover ?? false,
+        efeito_som_volume: (data as any).efeito_som_volume ?? 40,
+        efeito_blobs_fundo: (data as any).efeito_blobs_fundo ?? false,
       });
     })();
   }, [id]);
@@ -81,7 +89,15 @@ function EditAmbiente() {
         card_sombra: state.card_sombra,
         card_exibir_icone: state.card_exibir_icone,
         card_exibir_imagem: state.card_exibir_imagem,
-      })
+        efeito_card_tilt_3d: state.efeito_card_tilt_3d,
+        efeito_card_glow: state.efeito_card_glow,
+        efeito_card_scale: state.efeito_card_scale,
+        efeito_botao_lift: state.efeito_botao_lift,
+        efeito_entrada_animada: state.efeito_entrada_animada,
+        efeito_som_hover: state.efeito_som_hover,
+        efeito_som_volume: state.efeito_som_volume,
+        efeito_blobs_fundo: state.efeito_blobs_fundo,
+      } as any)
       .eq("id", id);
     setSaving(false);
     if (error) {
