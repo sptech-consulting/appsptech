@@ -37,6 +37,7 @@ function EditAmbiente() {
         favicon_url: data.favicon_url,
         imagem_capa_url: data.imagem_capa_url,
         imagem_login_url: data.imagem_login_url,
+        codigo_acesso_resultados: (data as any).codigo_acesso_resultados ?? null,
         cor_primaria: data.cor_primaria ?? DEFAULT_AMBIENTE.cor_primaria,
         cor_secundaria: data.cor_secundaria ?? DEFAULT_AMBIENTE.cor_secundaria,
         cor_fundo: data.cor_fundo ?? DEFAULT_AMBIENTE.cor_fundo,
