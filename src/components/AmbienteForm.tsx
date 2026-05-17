@@ -236,6 +236,81 @@ export function AmbienteForm({
                 </div>
               </>
             )}
+
+            {tab === "efeitos" && (
+              <>
+                <div>
+                  <Label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-secondary">
+                    Presets
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {(["nenhum", "sutil", "padrao", "imersivo"] as const).map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setState((s) => ({ ...s, ...EFFECT_PRESETS[p] }))}
+                        className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-semibold capitalize hover:bg-muted"
+                      >
+                        {p === "padrao" ? "Padrão" : p}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Presets sobrescrevem todos os toggles abaixo. Você pode ajustar depois.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-border">
+                  <Label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-secondary">
+                    Hover nos cards
+                  </Label>
+                  <div className="flex flex-wrap gap-4">
+                    <Toggle label="Tilt 3D (parallax)" checked={state.efeito_card_tilt_3d} onChange={(v) => set("efeito_card_tilt_3d", v)} />
+                    <Toggle label="Glow / borda iluminada" checked={state.efeito_card_glow} onChange={(v) => set("efeito_card_glow", v)} />
+                    <Toggle label="Scale-up suave" checked={state.efeito_card_scale} onChange={(v) => set("efeito_card_scale", v)} />
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-border">
+                  <Label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-secondary">
+                    Outros efeitos visuais
+                  </Label>
+                  <div className="flex flex-wrap gap-4">
+                    <Toggle label="Elevação dos botões" checked={state.efeito_botao_lift} onChange={(v) => set("efeito_botao_lift", v)} />
+                    <Toggle label="Entrada animada (fade-in escalonado)" checked={state.efeito_entrada_animada} onChange={(v) => set("efeito_entrada_animada", v)} />
+                    <Toggle label="Blobs animados no fundo" checked={state.efeito_blobs_fundo} onChange={(v) => set("efeito_blobs_fundo", v)} />
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-border space-y-3">
+                  <Label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
+                    Som ao passar o mouse
+                  </Label>
+                  <Toggle label="Som sintetizado no hover dos cards" checked={state.efeito_som_hover} onChange={(v) => set("efeito_som_hover", v)} />
+                  <div className="flex items-center gap-3">
+                    <Label className="text-xs text-muted-foreground whitespace-nowrap">Volume {state.efeito_som_volume}%</Label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={state.efeito_som_volume}
+                      onChange={(e) => set("efeito_som_volume", parseInt(e.target.value, 10))}
+                      className="flex-1 accent-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => playHoverTap(state.efeito_som_volume)}
+                      className="rounded-md border border-border px-3 py-1 text-xs font-semibold hover:bg-muted"
+                    >
+                      Testar
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Som gerado em tempo real (Web Audio) — sem arquivo. Funciona após primeira interação do usuário no browser.
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
