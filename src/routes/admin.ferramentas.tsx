@@ -26,7 +26,7 @@ const FIELDS: FieldDef[] = [
   { name: "nome", label: "Nome", required: true },
   { name: "descricao", label: "Descrição", type: "textarea" },
   { name: "url", label: "URL", type: "url", placeholder: "https://…" },
-  { name: "icone_url", label: "Ícone (URL)", type: "url" },
+  { name: "icone_url", label: "Ícone", type: "image", uploadFolder: "ferramentas/icones", aspect: "aspect-square" },
   { name: "categoria", label: "Categoria" },
   {
     name: "tipo_abertura",

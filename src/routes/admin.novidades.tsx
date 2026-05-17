@@ -28,7 +28,7 @@ const FIELDS: FieldDef[] = [
   { name: "titulo", label: "Título", required: true },
   { name: "resumo", label: "Resumo", type: "textarea" },
   { name: "conteudo", label: "Conteúdo", type: "textarea" },
-  { name: "imagem_url", label: "Imagem (URL)", type: "url" },
+  { name: "imagem_url", label: "Imagem", type: "image", uploadFolder: "novidades", aspect: "aspect-video" },
   { name: "fonte_nome", label: "Fonte (nome)" },
   { name: "fonte_url", label: "Fonte (URL)", type: "url" },
   { name: "categoria", label: "Categoria" },

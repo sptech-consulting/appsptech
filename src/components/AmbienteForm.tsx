@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AmbientePreview, type AmbienteVisual } from "./AmbientePreview";
 import { DEFAULT_EFFECTS, EFFECT_PRESETS, playHoverTap, type AmbienteEffects } from "@/lib/ambiente-effects";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export type AmbienteFormState = AmbienteVisual &
   AmbienteEffects & {
@@ -160,19 +161,39 @@ export function AmbienteForm({
 
             {tab === "identidade" && (
               <>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Logo (URL)">
-                    <Input value={state.logo_url ?? ""} onChange={(e) => set("logo_url", e.target.value || null)} placeholder="https://…" />
-                  </Field>
-                  <Field label="Favicon (URL)">
-                    <Input value={state.favicon_url ?? ""} onChange={(e) => set("favicon_url", e.target.value || null)} placeholder="https://…" />
-                  </Field>
-                  <Field label="Imagem de capa (URL)">
-                    <Input value={state.imagem_capa_url ?? ""} onChange={(e) => set("imagem_capa_url", e.target.value || null)} placeholder="https://…" />
-                  </Field>
-                  <Field label="Imagem de login (URL)">
-                    <Input value={state.imagem_login_url ?? ""} onChange={(e) => set("imagem_login_url", e.target.value || null)} placeholder="https://…" />
-                  </Field>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ImageUpload
+                    label="Logo"
+                    value={state.logo_url}
+                    onChange={(url) => set("logo_url", url)}
+                    folder="ambientes/logos"
+                    aspect="aspect-square"
+                    helper="PNG ou SVG com fundo transparente (até 5 MB)."
+                  />
+                  <ImageUpload
+                    label="Favicon"
+                    value={state.favicon_url}
+                    onChange={(url) => set("favicon_url", url)}
+                    folder="ambientes/favicons"
+                    aspect="aspect-square"
+                    helper="PNG quadrado (32x32 ou 64x64)."
+                  />
+                  <ImageUpload
+                    label="Imagem de capa"
+                    value={state.imagem_capa_url}
+                    onChange={(url) => set("imagem_capa_url", url)}
+                    folder="ambientes/capas"
+                    aspect="aspect-video"
+                    helper="Aparece no topo da home do aluno."
+                  />
+                  <ImageUpload
+                    label="Imagem de login"
+                    value={state.imagem_login_url}
+                    onChange={(url) => set("imagem_login_url", url)}
+                    folder="ambientes/login"
+                    aspect="aspect-video"
+                    helper="Fundo da tela de login do ambiente."
+                  />
                 </div>
 
                 <div className="pt-2 border-t border-border">

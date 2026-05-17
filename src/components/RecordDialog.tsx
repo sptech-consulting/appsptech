@@ -11,14 +11,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export type FieldDef = {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "url" | "number" | "select";
+  type?: "text" | "textarea" | "url" | "number" | "select" | "image";
   required?: boolean;
   options?: [string, string][];
   placeholder?: string;
+  /** Pasta no bucket para uploads (type=image). */
+  uploadFolder?: string;
+  /** Aspect ratio do preview (type=image). */
+  aspect?: string;
 };
 
 export function RecordDialog<T extends Record<string, any>>({
@@ -77,6 +82,13 @@ export function RecordDialog<T extends Record<string, any>>({
                   onChange={(e) => setState((s) => ({ ...s, [f.name]: e.target.value }))}
                   placeholder={f.placeholder}
                   rows={3}
+                />
+              ) : f.type === "image" ? (
+                <ImageUpload
+                  value={state[f.name] ?? null}
+                  onChange={(url) => setState((s) => ({ ...s, [f.name]: url }))}
+                  folder={f.uploadFolder ?? "diversos"}
+                  aspect={f.aspect ?? "aspect-square"}
                 />
               ) : f.type === "select" ? (
                 <select
