@@ -21,6 +21,8 @@ import {
   Sparkles,
   Settings,
   Eye,
+  Menu,
+  X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -118,34 +120,114 @@ function AdminShell() {
     );
   }
 
-  return (
-    <div className="min-h-screen flex bg-muted">
-      <aside className="w-64 border-r border-border bg-card flex flex-col">
-        <div className="p-5 border-b border-border">
+  return <AdminShellLayout profile={profile} onSignOut={async () => { await signOut(); navigate({ to: "/" }); }} />;
+}
+
+function AdminShellLayout({
+  profile,
+  onSignOut,
+}: {
+  profile: AdminProfile;
+  onSignOut: () => Promise<void>;
+}) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Fecha o drawer ao mudar de rota
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Trava scroll do body quando drawer aberto
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  const SidebarContent = (
+    <>
+      <div className="p-5 border-b border-border flex items-center justify-between">
+        <div>
           <SptechLogo />
           <div className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">
             Área administrativa
           </div>
         </div>
-        <AdminNav />
+        <button
+          type="button"
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden p-1.5 rounded-md hover:bg-muted text-secondary"
+          aria-label="Fechar menu"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+      <AdminNav />
+      <div className="p-3 border-t border-border text-xs">
+        <div className="font-semibold text-secondary">{profile.nome}</div>
+        <div className="text-muted-foreground truncate">{profile.email}</div>
+        <button
+          onClick={onSignOut}
+          className="mt-2 inline-flex items-center gap-1 text-primary hover:underline"
+        >
+          <LogOut className="h-3 w-3" /> Sair
+        </button>
+      </div>
+    </>
+  );
 
-        <div className="p-3 border-t border-border text-xs">
-          <div className="font-semibold text-secondary">{profile.nome}</div>
-          <div className="text-muted-foreground truncate">{profile.email}</div>
-          <button
-            onClick={async () => {
-              await signOut();
-              navigate({ to: "/" });
-            }}
-            className="mt-2 inline-flex items-center gap-1 text-primary hover:underline"
-          >
-            <LogOut className="h-3 w-3" /> Sair
-          </button>
-        </div>
+  return (
+    <div className="min-h-screen flex bg-muted">
+      {/* Sidebar desktop */}
+      <aside className="hidden md:flex w-64 border-r border-border bg-card flex-col shrink-0">
+        {SidebarContent}
       </aside>
-      <main className="flex-1 overflow-auto">
-        <Outlet />
-      </main>
+
+      {/* Drawer mobile */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden
+        />
+      )}
+      <aside
+        className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-card border-r border-border flex flex-col transition-transform duration-300 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {SidebarContent}
+      </aside>
+
+      {/* Conteúdo */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Topbar mobile */}
+        <header className="md:hidden sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-border bg-card px-4 py-2.5">
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="p-2 -ml-2 rounded-md hover:bg-muted text-secondary"
+            aria-label="Abrir menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <SptechLogo />
+          <button
+            onClick={onSignOut}
+            className="p-2 -mr-2 rounded-md hover:bg-muted text-secondary"
+            aria-label="Sair"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </header>
+
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </div>
       <Toaster richColors position="top-right" />
     </div>
   );

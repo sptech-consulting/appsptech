@@ -51,7 +51,7 @@ function MetricasPage() {
   ];
 
   return (
-    <div className="p-8 max-w-6xl space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl space-y-8">
       <PageHeader
         title="Métricas"
         description="Visão consolidada de engajamento e conteúdo dos últimos 30 dias."
@@ -132,7 +132,7 @@ function MetricasPage() {
         {data.ambientes_mais_engajados.length === 0 ? (
           <p className="text-sm text-muted-foreground">Sem dados ainda.</p>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm min-w-[640px]">
             <thead>
               <tr className="text-xs uppercase tracking-wider text-muted-foreground text-left">
                 <th className="py-2">Ambiente</th>
@@ -159,7 +159,7 @@ function MetricasPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </section>
     </div>

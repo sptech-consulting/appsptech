@@ -187,7 +187,7 @@ function CursoDetalhe() {
   }
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       <Link
         to="/admin/cursos"
         className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-secondary mb-3"

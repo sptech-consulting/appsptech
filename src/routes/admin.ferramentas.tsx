@@ -101,7 +101,7 @@ function FerramentasPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       <PageHeader
         title="Ferramentas"
         description="Cadastro global. Vincule a cada ambiente na tela do ambiente."
@@ -123,7 +123,7 @@ function FerramentasPage() {
         ) : items.length === 0 ? (
           <div className="p-10 text-center text-sm text-muted-foreground">Nenhuma ferramenta cadastrada.</div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full text-sm min-w-[640px]">
             <thead className="bg-muted text-secondary">
               <tr className="text-left">
                 <th className="px-4 py-3 font-semibold">Nome</th>
@@ -167,7 +167,7 @@ function FerramentasPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
 

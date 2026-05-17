@@ -112,7 +112,7 @@ function EditAmbiente() {
   if (!initial) return <div className="p-8 text-muted-foreground">Carregando…</div>;
 
   return (
-    <div className="p-8 max-w-7xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
       <PageHeader
         title={initial.nome || "Ambiente"}
         description="Edição completa do ambiente, com preview ao vivo e gestão de vínculos."
