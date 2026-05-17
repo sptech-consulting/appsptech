@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { signOut } from "@/lib/auth";
-import { getAmbienteHome, type AmbienteHomeData } from "@/lib/ambiente-home.functions";
+import { getAmbienteHome, type AmbienteHomeData, type FerramentaItem } from "@/lib/ambiente-home.functions";
 import { EffectCard } from "@/components/EffectCard";
 import { DEFAULT_EFFECTS, type AmbienteEffects } from "@/lib/ambiente-effects";
 import { Wrench, Newspaper, GraduationCap, ExternalLink, PlayCircle, FileText, Link as LinkIcon, LogOut, Clock } from "lucide-react";
@@ -105,7 +105,7 @@ function AmbienteHome() {
   const enterClass = effects.efeito_entrada_animada ? "fx-enter" : "";
   const btnLift = effects.efeito_botao_lift ? "fx-btn-lift" : "";
 
-  function openFerramenta(f: typeof data.ferramentas[number]) {
+  function openFerramenta(f: FerramentaItem) {
     if (!f.url) return;
     if (f.tipo_abertura === "mesma_aba") {
       window.location.assign(f.url);
