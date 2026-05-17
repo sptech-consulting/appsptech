@@ -4,8 +4,9 @@ import { signOut } from "@/lib/auth";
 
 export const Route = createFileRoute("/aluno")({
   beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/aluno/login" });
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/aluno/login" });
   },
   component: AlunoShell,
 });
