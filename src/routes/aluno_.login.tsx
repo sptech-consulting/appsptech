@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { SptechLogo } from "@/components/SptechLogo";
 
-export const Route = createFileRoute("/aluno/login")({
+export const Route = createFileRoute("/aluno_/login")({
   head: () => ({ meta: [{ title: "Acesso do Aluno — SPTech" }] }),
   component: AlunoLogin,
 });
