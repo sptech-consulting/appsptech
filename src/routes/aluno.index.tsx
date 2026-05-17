@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getAlunoProfile } from "@/lib/auth";
@@ -50,16 +50,31 @@ function AlunoHome() {
           ) : (
             <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
               {ambientes.map((a) => (
-                <div key={a.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
-                  <div className="h-24" style={{ backgroundColor: a.cor_primaria ?? "#ED145B" }} />
+                <Link
+                  key={a.id}
+                  to="/e/$slug"
+                  params={{ slug: a.slug }}
+                  className="rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div
+                    className="h-24"
+                    style={{
+                      backgroundImage: a.imagem_capa_url
+                        ? `linear-gradient(135deg, rgba(0,0,0,0.3), rgba(0,0,0,0)), url(${a.imagem_capa_url})`
+                        : undefined,
+                      backgroundColor: a.cor_primaria ?? "#ED145B",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
                   <div className="p-4">
                     <div className="font-bold text-secondary">{a.nome}</div>
                     <div className="text-xs text-muted-foreground">/{a.slug}</div>
-                    <button disabled className="mt-3 w-full rounded-md bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground opacity-60">
-                      Home do ambiente — Fase 5
-                    </button>
+                    <div className="mt-3 inline-block rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground">
+                      Entrar →
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
