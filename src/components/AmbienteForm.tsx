@@ -93,7 +93,7 @@ export function AmbienteForm({
                   tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                 }`}
               >
-                {t === "geral" ? "Dados gerais" : t === "identidade" ? "Identidade visual" : "Cards"}
+                {t === "geral" ? "Dados gerais" : t === "identidade" ? "Identidade visual" : t === "cards" ? "Cards" : "Efeitos"}
               </button>
             ))}
           </div>
