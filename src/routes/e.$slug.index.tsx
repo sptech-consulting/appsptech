@@ -263,7 +263,7 @@ function AmbienteHome() {
           className={`inline-flex items-center gap-1 text-[11px] font-semibold px-3 py-2 rounded-full ${btnLift}`}
           style={{ backgroundColor: tk.botao, color: "#fff" }}
         >
-          <LogOut className="h-3 w-3" /> Sair
+          <LogOut className="h-3 w-3" /> <span className="hidden sm:inline">Sair</span>
         </button>
       </div>
 
