@@ -22,34 +22,6 @@ export const Route = createFileRoute("/admin/cursos")({
   component: CursosPage,
 });
 
-const FIELDS: FieldDef[] = [
-  { name: "titulo", label: "Título", required: true },
-  { name: "descricao", label: "Descrição", type: "textarea" },
-  { name: "categoria", label: "Categoria" },
-  {
-    name: "nivel",
-    label: "Nível",
-    type: "select",
-    options: [
-      ["iniciante", "Iniciante"],
-      ["intermediario", "Intermediário"],
-      ["avancado", "Avançado"],
-    ],
-  },
-  { name: "carga_horaria_minutos", label: "Carga horária (min)", type: "number" },
-  { name: "capa_url", label: "Capa do curso", type: "image", uploadFolder: "cursos/capa", aspect: "aspect-video" },
-  {
-    name: "status",
-    label: "Status",
-    type: "select",
-    options: [
-      ["rascunho", "Rascunho"],
-      ["publicada", "Publicada"],
-      ["arquivada", "Arquivada"],
-    ],
-  },
-];
-
 function CursosPage() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Curso[]>([]);
