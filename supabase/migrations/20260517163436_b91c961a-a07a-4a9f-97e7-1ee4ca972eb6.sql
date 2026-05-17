@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.claim_super_admin(text) FROM authenticated, anon, public;
