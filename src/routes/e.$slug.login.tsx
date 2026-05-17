@@ -53,6 +53,7 @@ function AmbienteLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -62,6 +63,7 @@ function AmbienteLogin() {
   async function handle(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setLoading(true);
     try {
       const { data: currentSession } = await supabase.auth.getSession();
@@ -97,7 +99,15 @@ function AmbienteLogin() {
       }
       window.location.assign(`/e/${slug}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao autenticar");
+      const message = err instanceof Error ? err.message : "Erro ao autenticar";
+      if (mode === "signin" && message.toLowerCase().includes("invalid login credentials")) {
+        setError("Ainda não existe uma senha válida para este e-mail ou a senha está incorreta.");
+        setInfo("Se for o primeiro acesso de tiago.souza+teste@dtcode.com.br, clique em “Primeiro acesso? Definir senha”.");
+      } else if (mode === "signup" && message.toLowerCase().includes("user already registered")) {
+        setError("Este e-mail já tem acesso criado. Volte para “Já tenho senha — entrar”.");
+      } else {
+        setError(message);
+      }
       setLoading(false);
     }
   }
@@ -175,6 +185,11 @@ function AmbienteLogin() {
                 {error}
               </div>
             )}
+            {info && (
+              <div className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 border border-amber-200">
+                {info}
+              </div>
+            )}
             <button
               type="submit"
               disabled={loading}
@@ -188,6 +203,7 @@ function AmbienteLogin() {
             onClick={() => {
               setMode(mode === "signin" ? "signup" : "signin");
               setError(null);
+              setInfo(null);
             }}
             className="mt-4 w-full text-center text-xs opacity-70 hover:opacity-100"
           >
