@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
-import { AmbienteForm, type AmbienteFormState } from "@/components/AmbienteForm";
+import { AmbienteForm, type AmbienteFormState, gerarCodigoAcesso } from "@/components/AmbienteForm";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/ambientes/novo")({
@@ -31,6 +31,7 @@ function NovoAmbiente() {
         favicon_url: state.favicon_url,
         imagem_capa_url: state.imagem_capa_url,
         imagem_login_url: state.imagem_login_url,
+        codigo_acesso_resultados: state.codigo_acesso_resultados || gerarCodigoAcesso(6),
         cor_primaria: state.cor_primaria,
         cor_secundaria: state.cor_secundaria,
         cor_fundo: state.cor_fundo,

@@ -15,7 +15,21 @@ export type AmbienteFormState = AmbienteVisual &
     tema: "claro" | "escuro" | "personalizado";
     favicon_url: string | null;
     imagem_login_url: string | null;
+    codigo_acesso_resultados: string | null;
   };
+
+export function gerarCodigoAcesso(len = 6): string {
+  // alfabeto sem caracteres ambíguos (0/O, 1/I)
+  const alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "";
+  const arr = new Uint32Array(len);
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) crypto.getRandomValues(arr);
+  for (let i = 0; i < len; i++) {
+    const n = arr[i] ?? Math.floor(Math.random() * 0xffffffff);
+    out += alfabeto[n % alfabeto.length];
+  }
+  return out;
+}
 
 export const DEFAULT_AMBIENTE: AmbienteFormState = {
   nome: "",
@@ -40,6 +54,7 @@ export const DEFAULT_AMBIENTE: AmbienteFormState = {
   card_sombra: true,
   card_exibir_icone: true,
   card_exibir_imagem: true,
+  codigo_acesso_resultados: null,
   ...DEFAULT_EFFECTS,
 };
 
@@ -156,6 +171,42 @@ export function AmbienteForm({
                     />
                   </Field>
                 </div>
+                <Field
+                  label="Código de acesso aos Resultados"
+                  hint="Único por ambiente. Compartilhe com a turma — alunos usam este código para abrir o mural de trabalhos publicados, sem precisar de login."
+                >
+                  <div className="flex gap-2">
+                    <Input
+                      value={state.codigo_acesso_resultados ?? ""}
+                      onChange={(e) =>
+                        set(
+                          "codigo_acesso_resultados",
+                          e.target.value ? e.target.value.toUpperCase().replace(/\s+/g, "") : null,
+                        )
+                      }
+                      placeholder="Ex.: SPT2026"
+                      className="font-mono tracking-widest uppercase"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => set("codigo_acesso_resultados", gerarCodigoAcesso(6))}
+                    >
+                      Gerar
+                    </Button>
+                    {state.codigo_acesso_resultados && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(state.codigo_acesso_resultados ?? "");
+                        }}
+                      >
+                        Copiar
+                      </Button>
+                    )}
+                  </div>
+                </Field>
               </>
             )}
 

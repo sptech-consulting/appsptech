@@ -332,6 +332,7 @@ export type Database = {
           card_exibir_imagem: boolean | null
           card_sombra: boolean | null
           card_tamanho: Database["public"]["Enums"]["card_tamanho_t"] | null
+          codigo_acesso_resultados: string | null
           cor_borda: string | null
           cor_botao: string | null
           cor_card: string | null
@@ -369,6 +370,7 @@ export type Database = {
           card_exibir_imagem?: boolean | null
           card_sombra?: boolean | null
           card_tamanho?: Database["public"]["Enums"]["card_tamanho_t"] | null
+          codigo_acesso_resultados?: string | null
           cor_borda?: string | null
           cor_botao?: string | null
           cor_card?: string | null
@@ -406,6 +408,7 @@ export type Database = {
           card_exibir_imagem?: boolean | null
           card_sombra?: boolean | null
           card_tamanho?: Database["public"]["Enums"]["card_tamanho_t"] | null
+          codigo_acesso_resultados?: string | null
           cor_borda?: string | null
           cor_botao?: string | null
           cor_card?: string | null
@@ -1021,6 +1024,77 @@ export type Database = {
         }
         Relationships: []
       }
+      trabalhos: {
+        Row: {
+          ambiente_id: string
+          atualizado_em: string
+          autor_nome: string
+          conteudo: string | null
+          criado_em: string
+          criado_por: string | null
+          destaque: boolean
+          id: string
+          imagem_capa_url: string | null
+          link_externo: string | null
+          ordem: number
+          publicado_em: string | null
+          resumo: string | null
+          status: Database["public"]["Enums"]["publicacao_status"]
+          tags: string[] | null
+          titulo: string
+          turma: string | null
+          visualizacoes: number
+        }
+        Insert: {
+          ambiente_id: string
+          atualizado_em?: string
+          autor_nome: string
+          conteudo?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          destaque?: boolean
+          id?: string
+          imagem_capa_url?: string | null
+          link_externo?: string | null
+          ordem?: number
+          publicado_em?: string | null
+          resumo?: string | null
+          status?: Database["public"]["Enums"]["publicacao_status"]
+          tags?: string[] | null
+          titulo: string
+          turma?: string | null
+          visualizacoes?: number
+        }
+        Update: {
+          ambiente_id?: string
+          atualizado_em?: string
+          autor_nome?: string
+          conteudo?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          destaque?: boolean
+          id?: string
+          imagem_capa_url?: string | null
+          link_externo?: string | null
+          ordem?: number
+          publicado_em?: string | null
+          resumo?: string | null
+          status?: Database["public"]["Enums"]["publicacao_status"]
+          tags?: string[] | null
+          titulo?: string
+          turma?: string | null
+          visualizacoes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trabalhos_ambiente_id_fkey"
+            columns: ["ambiente_id"]
+            isOneToOne: false
+            referencedRelation: "ambientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usuarios_admin: {
         Row: {
           atualizado_em: string
@@ -1118,6 +1192,50 @@ export type Database = {
         Returns: boolean
       }
       is_any_admin: { Args: never; Returns: boolean }
+      listar_trabalhos_publicos: {
+        Args: { _codigo: string }
+        Returns: {
+          autor_nome: string
+          destaque: boolean
+          id: string
+          imagem_capa_url: string
+          publicado_em: string
+          resumo: string
+          tags: string[]
+          titulo: string
+          turma: string
+        }[]
+      }
+      obter_trabalho_publico: {
+        Args: { _codigo: string; _trabalho_id: string }
+        Returns: {
+          ambiente_nome: string
+          ambiente_slug: string
+          autor_nome: string
+          conteudo: string
+          id: string
+          imagem_capa_url: string
+          link_externo: string
+          publicado_em: string
+          resumo: string
+          tags: string[]
+          titulo: string
+          turma: string
+        }[]
+      }
+      resolver_ambiente_por_codigo: {
+        Args: { _codigo: string }
+        Returns: {
+          ambiente_id: string
+          cor_fundo: string
+          cor_primaria: string
+          cor_secundaria: string
+          cor_texto: string
+          logo_url: string
+          nome: string
+          slug: string
+        }[]
+      }
     }
     Enums: {
       aluno_status: "ativo" | "inativo" | "bloqueado"
