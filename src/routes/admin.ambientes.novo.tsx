@@ -50,7 +50,7 @@ function NovoAmbiente() {
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Ambiente criado.");
-    await navigate({ to: "/admin/ambientes/$id", params: { id: data.id } });
+    void navigate({ to: "/admin/ambientes/$id", params: { id: data.id } });
   }
 
   return (
