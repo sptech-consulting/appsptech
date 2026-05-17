@@ -15,7 +15,21 @@ export type AmbienteFormState = AmbienteVisual &
     tema: "claro" | "escuro" | "personalizado";
     favicon_url: string | null;
     imagem_login_url: string | null;
+    codigo_acesso_resultados: string | null;
   };
+
+export function gerarCodigoAcesso(len = 6): string {
+  // alfabeto sem caracteres ambíguos (0/O, 1/I)
+  const alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "";
+  const arr = new Uint32Array(len);
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) crypto.getRandomValues(arr);
+  for (let i = 0; i < len; i++) {
+    const n = arr[i] ?? Math.floor(Math.random() * 0xffffffff);
+    out += alfabeto[n % alfabeto.length];
+  }
+  return out;
+}
 
 export const DEFAULT_AMBIENTE: AmbienteFormState = {
   nome: "",
