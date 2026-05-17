@@ -77,6 +77,7 @@ function EditAmbiente() {
         favicon_url: state.favicon_url,
         imagem_capa_url: state.imagem_capa_url,
         imagem_login_url: state.imagem_login_url,
+        codigo_acesso_resultados: state.codigo_acesso_resultados || null,
         cor_primaria: state.cor_primaria,
         cor_secundaria: state.cor_secundaria,
         cor_fundo: state.cor_fundo,
