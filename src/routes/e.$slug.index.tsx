@@ -1,12 +1,26 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { signOut } from "@/lib/auth";
 import { getAmbienteHome, type AmbienteHomeData, type FerramentaItem } from "@/lib/ambiente-home.functions";
 import { EffectCard } from "@/components/EffectCard";
 import { DEFAULT_EFFECTS, type AmbienteEffects } from "@/lib/ambiente-effects";
-import { Wrench, Newspaper, GraduationCap, ExternalLink, PlayCircle, FileText, Link as LinkIcon, LogOut, Clock } from "lucide-react";
+import {
+  Wrench,
+  Newspaper,
+  GraduationCap,
+  ExternalLink,
+  PlayCircle,
+  FileText,
+  LogOut,
+  Sun,
+  Moon,
+  Volume2,
+  VolumeX,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/")({
   beforeLoad: async ({ params }) => {
@@ -24,28 +38,36 @@ const RADII = {
   pill: "9999px",
 } as const;
 
-const PAD = {
-  compacto: "12px",
-  medio: "18px",
-  grande: "24px",
-} as const;
+const PAD = { compacto: "14px", medio: "20px", grande: "26px" } as const;
+
+type SectionKey = "ferramentas" | "novidades" | "aulas";
 
 function AmbienteHome() {
   const { slug } = Route.useParams();
   const fetchHome = useServerFn(getAmbienteHome);
   const [data, setData] = useState<AmbienteHomeData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<"claro" | "escuro">("claro");
+  const [muted, setMuted] = useState(false);
+  const [active, setActive] = useState<SectionKey>("ferramentas");
 
   useEffect(() => {
     (async () => {
       try {
         const res = await fetchHome({ data: { slug } });
         setData(res);
+        const savedTheme = localStorage.getItem(`amb:${slug}:theme`) as "claro" | "escuro" | null;
+        setTheme(savedTheme ?? (res.branding.tema as "claro" | "escuro"));
+        setMuted(localStorage.getItem(`amb:${slug}:muted`) === "1");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erro ao carregar ambiente");
       }
     })();
   }, [slug, fetchHome]);
+
+  useEffect(() => {
+    if (data) localStorage.setItem(`amb:${slug}:theme`, theme);
+  }, [theme, slug, data]);
 
   if (error) {
     return (
@@ -72,10 +94,22 @@ function AmbienteHome() {
   }
 
   const b = data.branding;
+  const isDark = theme === "escuro";
   const radius = RADII[b.card_borda];
   const padding = PAD[b.card_tamanho];
-  const shadow = b.card_estilo === "sombra" || b.card_sombra ? "0 10px 24px -12px rgba(0,0,0,0.25)" : "none";
-  const border = b.card_estilo === "borda" ? `1px solid ${b.cor_borda}` : "none";
+
+  // tokens efetivos respeitando o tema
+  const tk = {
+    bg: isDark ? "#0a0a0f" : b.cor_fundo,
+    text: isDark ? "#f4f4f5" : b.cor_texto,
+    card: isDark ? "rgba(255,255,255,0.05)" : b.cor_card,
+    border: isDark ? "rgba(255,255,255,0.10)" : b.cor_borda,
+    navBg: isDark ? "rgba(20,20,28,0.78)" : "rgba(255,255,255,0.78)",
+    navText: isDark ? "#f4f4f5" : b.cor_secundaria,
+    primaria: b.cor_primaria,
+    secundaria: b.cor_secundaria,
+    botao: b.cor_botao,
+  };
 
   const effects: AmbienteEffects = {
     ...DEFAULT_EFFECTS,
@@ -84,18 +118,25 @@ function AmbienteHome() {
     efeito_card_scale: b.efeito_card_scale,
     efeito_botao_lift: b.efeito_botao_lift,
     efeito_entrada_animada: b.efeito_entrada_animada,
-    efeito_som_hover: b.efeito_som_hover,
+    efeito_som_hover: b.efeito_som_hover && !muted,
     efeito_som_volume: b.efeito_som_volume,
     efeito_blobs_fundo: b.efeito_blobs_fundo,
   };
 
+  const shadow = b.card_estilo === "sombra" || b.card_sombra
+    ? isDark
+      ? "0 10px 30px -12px rgba(0,0,0,0.7)"
+      : "0 10px 24px -12px rgba(0,0,0,0.25)"
+    : "none";
+  const cardBorder = b.card_estilo === "borda" ? `1px solid ${tk.border}` : "none";
+
   const cardBase: React.CSSProperties = {
-    backgroundColor: b.card_estilo === "imagem" ? "transparent" : b.cor_card,
-    color: b.cor_texto,
+    backgroundColor: b.card_estilo === "imagem" ? "transparent" : tk.card,
+    color: tk.text,
     borderRadius: radius,
     padding,
     boxShadow: shadow,
-    border,
+    border: cardBorder,
     backgroundImage:
       b.card_estilo === "imagem"
         ? "linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.15)), linear-gradient(135deg, var(--cp), var(--cs))"
@@ -105,167 +146,316 @@ function AmbienteHome() {
   const enterClass = effects.efeito_entrada_animada ? "fx-enter" : "";
   const btnLift = effects.efeito_botao_lift ? "fx-btn-lift" : "";
 
+  const sections: { key: SectionKey; label: string; icon: React.ReactNode; count: number }[] = [
+    { key: "ferramentas", label: "Ferramentas", icon: <Wrench className="h-3.5 w-3.5" />, count: data.ferramentas.length },
+    { key: "novidades", label: "Novidades", icon: <Newspaper className="h-3.5 w-3.5" />, count: data.novidades.length },
+    { key: "aulas", label: "Aulas", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.aulas.length },
+  ];
+
   function openFerramenta(f: FerramentaItem) {
     if (!f.url) return;
-    if (f.tipo_abertura === "mesma_aba") {
-      window.location.assign(f.url);
-    } else {
-      window.open(f.url, "_blank", "noopener,noreferrer");
-    }
+    if (f.tipo_abertura === "mesma_aba") window.location.assign(f.url);
+    else window.open(f.url, "_blank", "noopener,noreferrer");
   }
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      key={`${theme}`}
+      className="min-h-screen relative overflow-x-hidden"
       style={
         {
-          backgroundColor: b.cor_fundo,
-          color: b.cor_texto,
-          ["--cp" as any]: b.cor_primaria,
-          ["--cs" as any]: b.cor_secundaria,
-          ["--blob-1" as any]: b.cor_primaria,
-          ["--blob-2" as any]: b.cor_secundaria,
+          backgroundColor: tk.bg,
+          color: tk.text,
+          ["--cp" as any]: tk.primaria,
+          ["--cs" as any]: tk.secundaria,
+          ["--blob-1" as any]: tk.primaria,
+          ["--blob-2" as any]: tk.secundaria,
+          transition: "background-color .5s cubic-bezier(.16,1,.3,1), color .5s",
         } as React.CSSProperties
       }
     >
-      {effects.efeito_blobs_fundo && <div className="fx-blobs" />}
+      {effects.efeito_blobs_fundo && <div className="fx-blobs pointer-events-none" />}
 
-      <header
-        className="relative z-10 px-6 py-4 flex items-center justify-between"
-        style={{ backgroundColor: b.cor_secundaria, color: "#fff" }}
+      {/* Floating nav */}
+      <nav
+        className="fixed top-3 left-1/2 -translate-x-1/2 z-40 px-2 py-1.5 backdrop-blur-md flex items-center gap-1 shadow-lg"
+        style={{
+          backgroundColor: tk.navBg,
+          color: tk.navText,
+          borderRadius: 9999,
+          border: `1px solid ${tk.border}`,
+        }}
       >
-        <div className="flex items-center gap-3 min-w-0">
-          {b.logo_url ? (
-            <img src={b.logo_url} alt={b.nome} className="h-8 w-auto" />
-          ) : (
-            <div className="h-8 w-8 rounded" style={{ backgroundColor: b.cor_primaria }} />
-          )}
-          <div className="min-w-0">
-            <div className="text-sm font-bold truncate">{b.nome}</div>
-            <div className="text-[10px] opacity-70 truncate">Olá, {data.aluno.nome_completo}</div>
-          </div>
-        </div>
+        {sections.map((s) => {
+          const isActive = active === s.key;
+          return (
+            <button
+              key={s.key}
+              onClick={() => {
+                setActive(s.key);
+                document.getElementById(`sec-${s.key}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+              className={`relative px-3 py-1.5 text-[11px] sm:text-xs font-semibold uppercase tracking-wider rounded-full transition-all flex items-center gap-1.5 ${btnLift}`}
+              style={{
+                backgroundColor: isActive ? tk.primaria : "transparent",
+                color: isActive ? "#fff" : tk.navText,
+              }}
+            >
+              {s.icon}
+              <span className="hidden sm:inline">{s.label}</span>
+              {s.count > 0 && (
+                <span
+                  className="ml-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: isActive ? "rgba(255,255,255,.25)" : tk.primaria + "22",
+                    color: isActive ? "#fff" : tk.primaria,
+                  }}
+                >
+                  {s.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Top-right controls */}
+      <div className="fixed top-3 right-3 z-40 flex items-center gap-2">
+        {b.efeito_som_hover && (
+          <IconToggle
+            onClick={() => {
+              const next = !muted;
+              setMuted(next);
+              localStorage.setItem(`amb:${slug}:muted`, next ? "1" : "0");
+            }}
+            tk={tk}
+            title={muted ? "Som desligado" : "Som ligado"}
+          >
+            {muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+          </IconToggle>
+        )}
+        <IconToggle
+          onClick={() => setTheme((t) => (t === "claro" ? "escuro" : "claro"))}
+          tk={tk}
+          title={isDark ? "Tema claro" : "Tema escuro"}
+        >
+          {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+        </IconToggle>
         <button
           onClick={async () => {
             await signOut();
             window.location.assign(`/e/${slug}/login`);
           }}
-          className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-2 ${btnLift}`}
-          style={{ backgroundColor: b.cor_botao, color: "#fff", borderRadius: radius }}
+          className={`inline-flex items-center gap-1 text-[11px] font-semibold px-3 py-2 rounded-full ${btnLift}`}
+          style={{ backgroundColor: tk.botao, color: "#fff" }}
         >
           <LogOut className="h-3 w-3" /> Sair
         </button>
-      </header>
+      </div>
 
-      <main className="relative z-10 mx-auto max-w-6xl px-6 py-8 space-y-10">
-        {/* Banner */}
-        <section
-          className="rounded-2xl p-8 md:p-12 text-white overflow-hidden relative"
-          style={{
-            backgroundImage: b.imagem_capa_url
-              ? `linear-gradient(135deg, rgba(0,0,0,0.55), rgba(0,0,0,0.1)), url(${b.imagem_capa_url})`
-              : `linear-gradient(135deg, ${b.cor_primaria}, ${b.cor_secundaria})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            borderRadius: radius,
-          }}
-        >
-          <div className="text-[10px] uppercase tracking-widest opacity-80">Bem-vindo</div>
-          <h1 className="mt-2 text-3xl md:text-4xl font-black">{b.nome}</h1>
-          {b.descricao && <p className="mt-2 max-w-2xl text-sm md:text-base opacity-90">{b.descricao}</p>}
-        </section>
+      <main className="relative z-10 mx-auto max-w-[1400px] px-5 sm:px-8 pt-24 pb-32 space-y-16">
+        {/* Hero */}
+        <header className="text-center pt-6 sm:pt-12">
+          <div className="inline-flex items-center gap-2 mb-5">
+            {b.logo_url ? (
+              <img src={b.logo_url} alt={b.nome} className="h-9 w-auto" />
+            ) : (
+              <div className="h-9 w-9 rounded-md" style={{ backgroundColor: tk.primaria }} />
+            )}
+          </div>
+          <div
+            className="text-[11px] uppercase tracking-[0.3em] font-bold mb-3"
+            style={{ color: tk.primaria }}
+          >
+            Olá, {data.aluno.nome_completo.split(" ")[0]}
+          </div>
+          <h1
+            className="text-4xl sm:text-6xl font-black leading-[0.95] tracking-tight"
+            style={{
+              backgroundImage: `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
+            {b.nome}
+          </h1>
+          {b.descricao && (
+            <p className="mt-4 mx-auto max-w-xl text-sm sm:text-base opacity-70">{b.descricao}</p>
+          )}
+        </header>
 
         {/* Ferramentas */}
-        {data.ferramentas.length > 0 && (
-          <SectionHeader title="Ferramentas" icon={<Wrench className="h-3.5 w-3.5" />} color={b.cor_secundaria}>
-            <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${enterClass}`}>
-              {data.ferramentas.map((f) => (
-                <EffectCard
-                  key={f.id}
-                  effects={effects}
-                  baseStyle={{ ...cardBase, cursor: f.url ? "pointer" : "default" }}
-                  primaria={b.cor_primaria}
-                  onClick={() => openFerramenta(f)}
-                >
-                  <div className="flex items-start gap-3">
-                    {b.card_exibir_icone &&
-                      (f.icone_url ? (
-                        <img src={f.icone_url} alt="" className="h-10 w-10 rounded object-cover" />
-                      ) : (
-                        <div
-                          className="h-10 w-10 rounded flex items-center justify-center text-white shrink-0"
-                          style={{ backgroundColor: b.cor_primaria }}
-                        >
-                          <Wrench className="h-5 w-5" />
-                        </div>
-                      ))}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <div className="font-bold truncate">{f.nome}</div>
-                        {f.destaque && (
-                          <span
-                            className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded"
-                            style={{ backgroundColor: b.cor_primaria, color: "#fff" }}
-                          >
-                            Destaque
-                          </span>
-                        )}
-                      </div>
-                      {f.descricao && <div className="mt-0.5 text-xs opacity-70 line-clamp-2">{f.descricao}</div>}
-                      {f.categoria && (
-                        <div className="mt-2 inline-block text-[10px] uppercase tracking-wider opacity-60">
-                          {f.categoria}
-                        </div>
-                      )}
-                    </div>
-                    {f.url && <ExternalLink className="h-3.5 w-3.5 opacity-50 shrink-0" />}
-                  </div>
-                </EffectCard>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
-
-        {/* Aulas */}
-        {data.aulas.length > 0 && (
-          <SectionHeader title="Aulas" icon={<GraduationCap className="h-3.5 w-3.5" />} color={b.cor_secundaria}>
-            <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ${enterClass}`}>
-              {data.aulas.map((a) => {
-                const link = a.video_url ?? a.material_url;
-                return (
-                  <EffectCard
-                    key={a.id}
-                    effects={effects}
-                    baseStyle={{ ...cardBase, cursor: link ? "pointer" : "default" }}
-                    primaria={b.cor_primaria}
-                    onClick={() => link && window.open(link, "_blank", "noopener,noreferrer")}
-                  >
-                    {b.card_exibir_imagem && (
+        <Section
+          id="sec-ferramentas"
+          title="Ferramentas"
+          subtitle="Acesse os apps e plataformas do seu programa"
+          tk={tk}
+          empty={data.ferramentas.length === 0}
+          emptyMsg="Nenhuma ferramenta vinculada ainda."
+        >
+          <Carousel enterClass={enterClass}>
+            {data.ferramentas.map((f) => (
+              <EffectCard
+                key={f.id}
+                effects={effects}
+                baseStyle={{ ...cardBase, cursor: f.url ? "pointer" : "default", minWidth: 280, maxWidth: 320 }}
+                primaria={tk.primaria}
+                onClick={() => openFerramenta(f)}
+              >
+                {b.card_exibir_icone && (
+                  <div className="flex items-start justify-between mb-4">
+                    {f.icone_url ? (
+                      <img src={f.icone_url} alt="" className="h-12 w-12 rounded-lg object-cover" />
+                    ) : (
                       <div
-                        className="mb-3 h-32 w-full rounded-md overflow-hidden flex items-center justify-center"
-                        style={{
-                          backgroundImage: a.thumbnail_url
-                            ? `url(${a.thumbnail_url})`
-                            : `linear-gradient(135deg, ${b.cor_primaria}, ${b.cor_secundaria})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          borderRadius: Math.min(parseInt(radius) || 0, 12) + "px",
-                        }}
+                        className="h-12 w-12 rounded-lg flex items-center justify-center text-white"
+                        style={{ backgroundColor: tk.primaria }}
                       >
-                        {!a.thumbnail_url && <PlayCircle className="h-10 w-10 text-white/80" />}
+                        <Wrench className="h-5 w-5" />
                       </div>
                     )}
+                    {f.destaque && (
+                      <span
+                        className="text-[9px] uppercase tracking-wider font-bold px-2 py-1 rounded-full"
+                        style={{ backgroundColor: tk.primaria + "22", color: tk.primaria }}
+                      >
+                        Destaque
+                      </span>
+                    )}
+                  </div>
+                )}
+                {f.categoria && (
+                  <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{f.categoria}</div>
+                )}
+                <div className="font-bold text-lg leading-tight">{f.nome}</div>
+                {f.descricao && (
+                  <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">{f.descricao}</div>
+                )}
+                {f.url && (
+                  <div
+                    className={`mt-5 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                    style={{ backgroundColor: tk.botao, color: "#fff" }}
+                  >
+                    Acessar <ExternalLink className="h-3 w-3" />
+                  </div>
+                )}
+              </EffectCard>
+            ))}
+          </Carousel>
+        </Section>
+
+        {/* Novidades */}
+        <Section
+          id="sec-novidades"
+          title="Novidades"
+          subtitle="O que está acontecendo no mundo da IA"
+          tk={tk}
+          empty={data.novidades.length === 0}
+          emptyMsg="Nenhuma novidade publicada ainda."
+        >
+          <Carousel enterClass={enterClass}>
+            {data.novidades.map((n) => (
+              <EffectCard
+                key={n.id}
+                effects={effects}
+                baseStyle={{ ...cardBase, cursor: n.fonte_url ? "pointer" : "default", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
+                primaria={tk.primaria}
+                onClick={() => n.fonte_url && window.open(n.fonte_url, "_blank", "noopener,noreferrer")}
+              >
+                {b.card_exibir_imagem && (
+                  <div
+                    className="h-40 w-full"
+                    style={{
+                      backgroundImage: n.imagem_url
+                        ? `url(${n.imagem_url})`
+                        : `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                )}
+                <div style={{ padding }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    {n.categoria && (
+                      <span
+                        className="text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: tk.primaria + "22", color: tk.primaria }}
+                      >
+                        {n.categoria}
+                      </span>
+                    )}
+                    {n.destaque && (
+                      <span
+                        className="text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full"
+                        style={{ backgroundColor: tk.primaria, color: "#fff" }}
+                      >
+                        Destaque
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-bold leading-snug line-clamp-2">{n.titulo}</div>
+                  {n.resumo && <div className="mt-1.5 text-xs opacity-70 line-clamp-3">{n.resumo}</div>}
+                  <div className="mt-3 flex items-center justify-between text-[10px] opacity-60">
+                    <span>
+                      {n.publicado_em
+                        ? new Date(n.publicado_em).toLocaleDateString("pt-BR", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : ""}
+                    </span>
+                    {n.fonte_nome && <span>{n.fonte_nome}</span>}
+                  </div>
+                </div>
+              </EffectCard>
+            ))}
+          </Carousel>
+        </Section>
+
+        {/* Aulas */}
+        <Section
+          id="sec-aulas"
+          title="Aulas"
+          subtitle="Conteúdo do seu programa"
+          tk={tk}
+          empty={data.aulas.length === 0}
+          emptyMsg="Nenhuma aula liberada ainda."
+        >
+          <Carousel enterClass={enterClass}>
+            {data.aulas.map((a) => {
+              const link = a.video_url ?? a.material_url;
+              return (
+                <EffectCard
+                  key={a.id}
+                  effects={effects}
+                  baseStyle={{ ...cardBase, cursor: link ? "pointer" : "default", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
+                  primaria={tk.primaria}
+                  onClick={() => link && window.open(link, "_blank", "noopener,noreferrer")}
+                >
+                  {b.card_exibir_imagem && (
+                    <div
+                      className="h-40 w-full flex items-center justify-center"
+                      style={{
+                        backgroundImage: a.thumbnail_url
+                          ? `linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url(${a.thumbnail_url})`
+                          : `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    >
+                      <PlayCircle className="h-12 w-12 text-white/90 drop-shadow" />
+                    </div>
+                  )}
+                  <div style={{ padding }}>
                     {a.modulo && (
                       <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{a.modulo}</div>
                     )}
                     <div className="font-bold leading-snug">{a.titulo}</div>
-                    {a.descricao && <div className="mt-1 text-xs opacity-70 line-clamp-2">{a.descricao}</div>}
-                    <div className="mt-2 flex items-center gap-3 text-[11px] opacity-70">
-                      {a.duracao_minutos && (
-                        <span className="inline-flex items-center gap-1">
-                          <Clock className="h-3 w-3" /> {a.duracao_minutos} min
-                        </span>
-                      )}
+                    {a.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-2">{a.descricao}</div>}
+                    <div className="mt-3 flex items-center gap-3 text-[11px] opacity-70">
+                      {a.duracao_minutos && <span>{a.duracao_minutos} min</span>}
                       {a.tipo_conteudo && <span className="capitalize">{a.tipo_conteudo}</span>}
                       {a.material_url && (
                         <span className="inline-flex items-center gap-1">
@@ -273,114 +463,126 @@ function AmbienteHome() {
                         </span>
                       )}
                     </div>
-                  </EffectCard>
-                );
-              })}
-            </div>
-          </SectionHeader>
-        )}
-
-        {/* Novidades */}
-        {data.novidades.length > 0 && (
-          <SectionHeader title="Novidades" icon={<Newspaper className="h-3.5 w-3.5" />} color={b.cor_secundaria}>
-            <div className={`grid gap-4 sm:grid-cols-2 ${enterClass}`}>
-              {data.novidades.map((n) => (
-                <EffectCard
-                  key={n.id}
-                  effects={effects}
-                  baseStyle={{ ...cardBase, cursor: n.fonte_url ? "pointer" : "default" }}
-                  primaria={b.cor_primaria}
-                  onClick={() => n.fonte_url && window.open(n.fonte_url, "_blank", "noopener,noreferrer")}
-                >
-                  <div className="flex gap-4">
-                    {b.card_exibir_imagem && (
-                      <div
-                        className="h-24 w-24 shrink-0 rounded-md overflow-hidden"
-                        style={{
-                          backgroundImage: n.imagem_url
-                            ? `url(${n.imagem_url})`
-                            : `linear-gradient(135deg, ${b.cor_primaria}, ${b.cor_secundaria})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          borderRadius: Math.min(parseInt(radius) || 0, 12) + "px",
-                        }}
-                      />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        {n.categoria && (
-                          <span className="text-[10px] uppercase tracking-wider opacity-60">{n.categoria}</span>
-                        )}
-                        {n.destaque && (
-                          <span
-                            className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded"
-                            style={{ backgroundColor: b.cor_primaria, color: "#fff" }}
-                          >
-                            Destaque
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-0.5 font-bold leading-snug line-clamp-2">{n.titulo}</div>
-                      {n.resumo && <div className="mt-1 text-xs opacity-70 line-clamp-3">{n.resumo}</div>}
-                      <div className="mt-2 flex items-center justify-between text-[11px] opacity-70">
-                        <span>
-                          {n.publicado_em
-                            ? new Date(n.publicado_em).toLocaleDateString("pt-BR", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })
-                            : ""}
-                        </span>
-                        {n.fonte_nome && (
-                          <span className="inline-flex items-center gap-1">
-                            <LinkIcon className="h-3 w-3" /> {n.fonte_nome}
-                          </span>
-                        )}
-                      </div>
-                    </div>
                   </div>
                 </EffectCard>
-              ))}
-            </div>
-          </SectionHeader>
-        )}
-
-        {data.ferramentas.length === 0 && data.novidades.length === 0 && data.aulas.length === 0 && (
-          <div
-            className="rounded-xl p-10 text-center opacity-80"
-            style={{ border: `1px dashed ${b.cor_borda}` }}
-          >
-            <p className="text-sm">
-              Nenhum conteúdo vinculado a este ambiente ainda. Volte em breve.
-            </p>
-          </div>
-        )}
+              );
+            })}
+          </Carousel>
+        </Section>
       </main>
     </div>
   );
 }
 
-function SectionHeader({
+function IconToggle({
+  onClick,
   title,
-  icon,
-  color,
+  tk,
   children,
 }: {
+  onClick: () => void;
   title: string;
-  icon: React.ReactNode;
-  color: string;
+  tk: { navBg: string; navText: string; border: string };
   children: React.ReactNode;
 }) {
   return (
-    <section>
-      <div
-        className="mb-4 inline-flex items-center gap-1.5 text-xs uppercase tracking-widest font-bold"
-        style={{ color }}
-      >
-        {icon} {title}
-      </div>
+    <button
+      onClick={onClick}
+      title={title}
+      className="h-9 w-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all hover:scale-110"
+      style={{ backgroundColor: tk.navBg, color: tk.navText, border: `1px solid ${tk.border}` }}
+    >
       {children}
+    </button>
+  );
+}
+
+function Section({
+  id,
+  title,
+  subtitle,
+  tk,
+  empty,
+  emptyMsg,
+  children,
+}: {
+  id: string;
+  title: string;
+  subtitle?: string;
+  tk: { primaria: string; secundaria: string; border: string };
+  empty: boolean;
+  emptyMsg: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} className="scroll-mt-28">
+      <div className="flex items-end justify-between mb-5">
+        <div>
+          <div
+            className="text-[10px] uppercase tracking-[0.3em] font-bold mb-1"
+            style={{ color: tk.primaria }}
+          >
+            Seção
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black">{title}</h2>
+          {subtitle && <p className="mt-1 text-sm opacity-70">{subtitle}</p>}
+        </div>
+      </div>
+      {empty ? (
+        <div
+          className="rounded-2xl p-10 text-center text-sm opacity-60"
+          style={{ border: `1px dashed ${tk.border}` }}
+        >
+          {emptyMsg}
+        </div>
+      ) : (
+        children
+      )}
     </section>
   );
 }
+
+function Carousel({ enterClass, children }: { enterClass: string; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const scroll = (dir: 1 | -1) => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * (el.clientWidth * 0.8), behavior: "smooth" });
+  };
+  return (
+    <div className="relative">
+      <button
+        onClick={() => scroll(-1)}
+        className="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-background/80 backdrop-blur border border-border items-center justify-center shadow-md hover:scale-110 transition"
+        aria-label="Anterior"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => scroll(1)}
+        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-background/80 backdrop-blur border border-border items-center justify-center shadow-md hover:scale-110 transition"
+        aria-label="Próximo"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+      <div
+        ref={ref}
+        className={`flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-1 px-1 scrollbar-thin ${enterClass}`}
+        style={{ scrollbarWidth: "thin" }}
+      >
+        {Array.isArray(children) ? (
+          (children as React.ReactNode[]).map((child, i) => (
+            <div key={i} className="snap-start shrink-0">
+              {child}
+            </div>
+          ))
+        ) : (
+          <div className="snap-start shrink-0">{children}</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// `useMemo` import kept for tree-shake safety (no-op).
+void useMemo;

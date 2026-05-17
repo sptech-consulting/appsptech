@@ -30,6 +30,7 @@ export type AmbienteHomeBranding = {
   efeito_som_hover: boolean;
   efeito_som_volume: number;
   efeito_blobs_fundo: boolean;
+  tema: "claro" | "escuro";
 };
 
 export type FerramentaItem = {
@@ -264,6 +265,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       efeito_som_hover: !!amb.efeito_som_hover,
       efeito_som_volume: amb.efeito_som_volume ?? 40,
       efeito_blobs_fundo: !!amb.efeito_blobs_fundo,
+      tema: (amb.tema ?? "claro") as "claro" | "escuro",
     };
 
     return {
