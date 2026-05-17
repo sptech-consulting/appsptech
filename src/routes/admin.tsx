@@ -23,13 +23,13 @@ export const Route = createFileRoute("/admin")({
   component: AdminShell,
 });
 
-const NAV = [
+const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
   { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
   { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
   { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
-] as const;
+];
 
 const NAV_DISABLED = [
   { label: "Alunos", icon: Users, hint: "Fase 3" },
