@@ -184,7 +184,7 @@ function AmbienteHome() {
 
       {/* Floating nav */}
       <nav
-        className="fixed top-3 left-1/2 -translate-x-1/2 z-40 px-2 py-1.5 backdrop-blur-md flex items-center gap-1 shadow-lg"
+        className="fixed bottom-3 left-1/2 -translate-x-1/2 sm:bottom-auto sm:top-3 z-40 px-2 py-1.5 backdrop-blur-md flex items-center gap-1 shadow-lg max-w-[calc(100vw-1.5rem)] overflow-x-auto"
         style={{
           backgroundColor: tk.navBg,
           color: tk.navText,
