@@ -36,7 +36,7 @@ function AdminDashboard() {
     { label: "Ferramentas", icon: Wrench, value: counts.ferramentas, to: "/admin/ferramentas" },
     { label: "Novidades", icon: Newspaper, value: counts.novidades, to: "/admin/novidades" },
     { label: "Aulas", icon: GraduationCap, value: counts.aulas, to: "/admin/aulas" },
-    { label: "Alunos", icon: Users, value: counts.alunos, to: "/admin" },
+    { label: "Alunos", icon: Users, value: counts.alunos, to: "/admin/alunos" },
   ] as const;
 
   return (
