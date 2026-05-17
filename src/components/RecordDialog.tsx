@@ -110,7 +110,7 @@ export function RecordDialog<T extends Record<string, any>>({
                 <MultiSelectField
                   field={f}
                   value={(state[f.name] as string[]) ?? []}
-                  onChange={(v) => setState((s) => ({ ...s, [f.name]: v }))}
+                  onChange={(v: string[]) => setState((s) => ({ ...s, [f.name]: v }))}
                 />
               ) : (
                 <Input
