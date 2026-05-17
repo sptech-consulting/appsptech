@@ -502,6 +502,7 @@ function AulaPlayerPage() {
               />
             </div>
           </aside>
+          </>
         )}
       </div>
     </div>
