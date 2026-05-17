@@ -48,6 +48,11 @@ export function RecordDialog<T extends Record<string, any>>({
   const [state, setState] = useState<Record<string, any>>(initial ?? {});
   const [busy, setBusy] = useState(false);
 
+  useEffect(() => {
+    if (open) setState(initial ?? {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initial]);
+
   return (
     <Dialog
       open={open}
