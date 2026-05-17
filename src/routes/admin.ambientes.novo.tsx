@@ -48,7 +48,10 @@ function NovoAmbiente() {
       .select("id")
       .single();
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Ambiente criado.");
     void navigate({ to: "/admin/ambientes/$id", params: { id: data.id } });
   }
