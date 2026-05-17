@@ -1,16 +1,20 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
 export const Route = createFileRoute("/admin_/login")({
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (data.session) throw redirect({ to: "/admin" });
+  },
   head: () => ({ meta: [{ title: "Login Admin — SPTech" }] }),
   component: AdminLogin,
 });
 
 function AdminLogin() {
-  const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -30,15 +34,18 @@ function AdminLogin() {
         const { error: rpcErr } = await supabase.rpc("claim_super_admin", { _nome: nome || email });
         if (rpcErr && !rpcErr.message.includes("Já existe")) {
           setInfo("Conta criada. Aguarde um admin existente vincular você a um grupo de acesso.");
+          setLoading(false);
           return;
         }
       } else {
         await signIn(email, password);
       }
-      navigate({ to: "/admin" });
+      // Hard redirect garante hidratação limpa da sessão no /admin
+      window.location.assign("/admin");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar");
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   }
 
   return (
