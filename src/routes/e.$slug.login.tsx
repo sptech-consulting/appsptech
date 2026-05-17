@@ -12,7 +12,19 @@ export const Route = createFileRoute("/e/$slug/login")({
   beforeLoad: async ({ params }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/e/$slug", params: { slug: params.slug } });
+    if (!data.session) return;
+
+    const { data: aluno } = await supabase
+      .from("alunos")
+      .select("id, status, ambiente_alunos!inner(ambientes!inner(slug, status), status)")
+      .eq("auth_user_id", data.session.user.id)
+      .eq("status", "ativo")
+      .eq("ambiente_alunos.status", "ativo")
+      .eq("ambiente_alunos.ambientes.slug", params.slug)
+      .eq("ambiente_alunos.ambientes.status", "ativo")
+      .maybeSingle();
+
+    if (aluno) throw redirect({ to: "/e/$slug", params: { slug: params.slug } });
   },
   component: AmbienteLogin,
 });
@@ -46,7 +58,11 @@ function AmbienteLogin() {
       }
 
       // Vincula auth.uid -> alunos.auth_user_id pelo email
-      await linkAluno();
+      const aluno = await linkAluno();
+      if (!aluno) {
+        await signOut();
+        throw new Error("Seu e-mail não está cadastrado como aluno. Procure o administrador.");
+      }
 
       // Confere acesso ao ambiente
       const res = await checkAccess({ data: { slug } });
