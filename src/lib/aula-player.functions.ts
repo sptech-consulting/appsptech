@@ -65,7 +65,10 @@ export type AulaPlayerData = {
     duracao_minutos: number | null;
     tipo_conteudo: string | null;
     concluida: boolean;
+    segundos_assistidos: number;
   };
+  proxima_aula_id: string | null;
+  proxima_aula_titulo: string | null;
   modulos: AulaPlayerModulo[];
   recomendados: AulaPlayerRecomendado[];
   comentarios: AulaPlayerComentario[];
@@ -161,11 +164,23 @@ export const getAulaPlayer = createServerFn({ method: "POST" })
     const { data: progresso } = allAulaIds.length
       ? await supabaseAdmin
           .from("aluno_aula_progresso")
-          .select("aula_id, concluida")
+          .select("aula_id, concluida, segundos_assistidos")
           .eq("aluno_id", aluno.id)
           .in("aula_id", allAulaIds)
-      : { data: [] as { aula_id: string; concluida: boolean }[] };
+      : { data: [] as { aula_id: string; concluida: boolean; segundos_assistidos: number }[] };
     const concluidasSet = new Set((progresso ?? []).filter((p) => p.concluida).map((p) => p.aula_id));
+    const segundosMap = new Map((progresso ?? []).map((p) => [p.aula_id, p.segundos_assistidos ?? 0]));
+
+    // Próxima aula: ordem por módulo->aula no curso, pega o item após a atual
+    const flatOrder: { id: string; titulo: string; modulo_ordem: number; ordem: number }[] = [];
+    for (const m of (mods ?? [])) {
+      for (const a of (todasAulas ?? []).filter((x) => x.modulo_id === m.id)) {
+        flatOrder.push({ id: a.id, titulo: a.titulo, modulo_ordem: m.ordem, ordem: a.ordem });
+      }
+    }
+    flatOrder.sort((a, b) => a.modulo_ordem - b.modulo_ordem || a.ordem - b.ordem);
+    const idx = flatOrder.findIndex((x) => x.id === aula.id);
+    const prox = idx >= 0 && idx < flatOrder.length - 1 ? flatOrder[idx + 1] : null;
 
     const modulos: AulaPlayerModulo[] = (mods ?? []).map((m) => ({
       id: m.id,
@@ -304,7 +319,10 @@ export const getAulaPlayer = createServerFn({ method: "POST" })
         duracao_minutos: aula.duracao_minutos,
         tipo_conteudo: aula.tipo_conteudo,
         concluida: concluidasSet.has(aula.id),
+        segundos_assistidos: segundosMap.get(aula.id) ?? 0,
       },
+      proxima_aula_id: prox?.id ?? null,
+      proxima_aula_titulo: prox?.titulo ?? null,
       modulos,
       recomendados,
       comentarios,
@@ -348,6 +366,16 @@ export const postarComentario = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const { amb, aluno, aula } = await resolveAcesso(data.slug, data.aulaId, context.userId);
+    // Rate limit: máx 5 comentários por aluno por minuto
+    const desdeIso = new Date(Date.now() - 60_000).toISOString();
+    const { count: recentCount } = await supabaseAdmin
+      .from("aula_comentarios")
+      .select("id", { count: "exact", head: true })
+      .eq("aluno_id", aluno.id)
+      .gte("criado_em", desdeIso);
+    if ((recentCount ?? 0) >= 5) {
+      throw new Error("Você está comentando rápido demais. Aguarde alguns segundos.");
+    }
     const { data: inserted, error } = await supabaseAdmin
       .from("aula_comentarios")
       .insert({
@@ -368,6 +396,31 @@ export const postarComentario = createServerFn({ method: "POST" })
       dados_novos: { aula_id: aula.id, aluno_id: aluno.id, parent_id: data.parentId ?? null },
     });
     return { id: inserted.id };
+  });
+
+export const salvarProgressoVideo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: { slug: string; aulaId: string; segundos: number; concluida?: boolean }) => {
+    if (typeof i.segundos !== "number" || i.segundos < 0 || i.segundos > 86400) {
+      throw new Error("Segundos inválidos");
+    }
+    return i;
+  })
+  .handler(async ({ data, context }) => {
+    const { aluno, aula } = await resolveAcesso(data.slug, data.aulaId, context.userId);
+    const { error } = await supabaseAdmin
+      .from("aluno_aula_progresso")
+      .upsert(
+        {
+          aluno_id: aluno.id,
+          aula_id: aula.id,
+          segundos_assistidos: Math.floor(data.segundos),
+          ...(data.concluida ? { concluida: true, concluida_em: new Date().toISOString() } : {}),
+        },
+        { onConflict: "aluno_id,aula_id" },
+      );
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const removerComentario = createServerFn({ method: "POST" })
