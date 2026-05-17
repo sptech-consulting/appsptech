@@ -333,7 +333,7 @@ function AlunoFormDialog({
             <Label className="text-xs font-semibold uppercase tracking-wider text-secondary">E-mail de acesso *</Label>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <p className="mt-1 text-xs text-muted-foreground">
-              O aluno usará este e-mail para definir a senha no primeiro acesso em /e/{slug}/login.
+              O aluno usará este e-mail para definir a senha no primeiro acesso em /e/[slug]/login.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -645,7 +645,7 @@ function ImportCsvDialog({
       await supabase
         .from("importacoes_alunos")
         .update({
-          status: err > 0 ? "concluido_com_erros" : "concluido",
+          status: err > 0 ? "com_erros" : "concluida",
           total_importados: ok,
           total_atualizados: skip,
           total_erros: err,
