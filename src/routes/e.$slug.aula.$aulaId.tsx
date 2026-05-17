@@ -161,12 +161,20 @@ function AulaPlayerPage() {
             <Home className="h-3.5 w-3.5" /> {b.nome}
           </Link>
           <Breadcrumb sep={muted}>
-            <span className="opacity-70">{data.curso.titulo}</span>
-            <span className="opacity-70">{data.modulo_atual.titulo}</span>
-            <span className="font-semibold" style={{ color: b.cor_primaria }}>
+            <span className="opacity-70 hidden sm:inline">{data.curso.titulo}</span>
+            <span className="opacity-70 hidden md:inline">{data.modulo_atual.titulo}</span>
+            <span className="font-semibold truncate" style={{ color: b.cor_primaria }}>
               {data.aula.titulo}
             </span>
           </Breadcrumb>
+          <button
+            onClick={() => setMobileNav(true)}
+            className="ml-auto inline-flex lg:hidden items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold border"
+            style={{ borderColor: border, color: text }}
+            aria-label="Abrir lista de aulas"
+          >
+            <Menu className="h-3.5 w-3.5" /> Aulas
+          </button>
         </div>
       </header>
 
