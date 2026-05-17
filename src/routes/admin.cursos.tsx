@@ -1,10 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { RecordDialog, type FieldDef } from "@/components/RecordDialog";
-import { Plus, Pencil, ChevronRight, BookOpen } from "lucide-react";
+import { RecordDialog } from "@/components/RecordDialog";
+import { Plus, Pencil, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
 type Curso = {
@@ -22,40 +22,12 @@ export const Route = createFileRoute("/admin/cursos")({
   component: CursosPage,
 });
 
-const FIELDS: FieldDef[] = [
-  { name: "titulo", label: "Título", required: true },
-  { name: "descricao", label: "Descrição", type: "textarea" },
-  { name: "categoria", label: "Categoria" },
-  {
-    name: "nivel",
-    label: "Nível",
-    type: "select",
-    options: [
-      ["iniciante", "Iniciante"],
-      ["intermediario", "Intermediário"],
-      ["avancado", "Avançado"],
-    ],
-  },
-  { name: "carga_horaria_minutos", label: "Carga horária (min)", type: "number" },
-  { name: "capa_url", label: "Capa do curso", type: "image", uploadFolder: "cursos/capa", aspect: "aspect-video" },
-  {
-    name: "status",
-    label: "Status",
-    type: "select",
-    options: [
-      ["rascunho", "Rascunho"],
-      ["publicada", "Publicada"],
-      ["arquivada", "Arquivada"],
-    ],
-  },
-];
-
 function CursosPage() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Curso[]>([]);
   const [counts, setCounts] = useState<Record<string, { modulos: number; aulas: number }>>({});
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Curso | null>(null);
 
   async function load() {
     setLoading(true);
@@ -101,27 +73,19 @@ function CursosPage() {
     void load();
   }, []);
 
-  async function save(data: Partial<Curso>) {
+  async function criarRapido(data: Partial<Curso>) {
     const payload = {
       titulo: data.titulo!,
       descricao: data.descricao || null,
-      categoria: data.categoria || null,
-      nivel: data.nivel || null,
-      carga_horaria_minutos: data.carga_horaria_minutos ?? null,
-      capa_url: data.capa_url || null,
-      status: (data.status as any) || "rascunho",
+      status: "rascunho" as const,
     };
-    if (editing) {
-      const { error } = await supabase.from("cursos").update(payload).eq("id", editing.id);
-      if (error) return toast.error(error.message), false;
-      toast.success("Curso atualizado.");
-    } else {
-      const { error } = await supabase.from("cursos").insert(payload);
-      if (error) return toast.error(error.message), false;
-      toast.success("Curso criado.");
+    const { data: novo, error } = await supabase.from("cursos").insert(payload).select("id").single();
+    if (error) {
+      toast.error(error.message);
+      return false;
     }
-    setEditing(null);
-    void load();
+    toast.success("Curso criado. Agora adicione módulos e aulas.");
+    if (novo?.id) navigate({ to: "/admin/cursos/$id", params: { id: novo.id } });
     return true;
   }
 
@@ -129,14 +93,9 @@ function CursosPage() {
     <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       <PageHeader
         title="Cursos"
-        description="Cadastre cursos globais. Adicione módulos e aulas dentro de cada curso. Vincule depois aos ambientes."
+        description="Cadastre cursos globais. Cada curso tem seus próprios módulos e aulas. Vincule depois aos ambientes."
         actions={
-          <Button
-            onClick={() => {
-              setEditing(null);
-              setOpen(true);
-            }}
-          >
+          <Button onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4" /> Novo curso
           </Button>
         }
@@ -166,7 +125,11 @@ function CursosPage() {
               {items.map((it) => {
                 const c = counts[it.id] ?? { modulos: 0, aulas: 0 };
                 return (
-                  <tr key={it.id} className="border-t border-border hover:bg-muted/40">
+                  <tr
+                    key={it.id}
+                    className="border-t border-border hover:bg-muted/40 cursor-pointer"
+                    onClick={() => navigate({ to: "/admin/cursos/$id", params: { id: it.id } })}
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div
@@ -200,24 +163,15 @@ function CursosPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setEditing(it);
-                            setOpen(true);
-                          }}
-                          className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
-                        >
-                          <Pencil className="h-3 w-3" /> Editar
-                        </button>
-                        <Link
-                          to="/admin/cursos/$id"
-                          params={{ id: it.id }}
-                          className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-2 py-1 text-xs font-semibold hover:opacity-90"
-                        >
-                          Estrutura <ChevronRight className="h-3 w-3" />
-                        </Link>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate({ to: "/admin/cursos/$id", params: { id: it.id } });
+                        }}
+                        className="inline-flex items-center gap-1 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-xs font-semibold hover:opacity-90"
+                      >
+                        <Pencil className="h-3 w-3" /> Editar
+                      </button>
                     </td>
                   </tr>
                 );
@@ -228,10 +182,13 @@ function CursosPage() {
       </div>
 
       <RecordDialog
-        title={editing ? "Editar curso" : "Novo curso"}
-        fields={FIELDS}
-        initial={editing ?? { status: "rascunho" }}
-        onSubmit={save}
+        title="Novo curso"
+        fields={[
+          { name: "titulo", label: "Título", required: true },
+          { name: "descricao", label: "Descrição (opcional)", type: "textarea" },
+        ]}
+        initial={{}}
+        onSubmit={criarRapido}
         open={open}
         onOpenChange={setOpen}
       />
