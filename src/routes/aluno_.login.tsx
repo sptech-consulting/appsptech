@@ -1,15 +1,20 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
 export const Route = createFileRoute("/aluno_/login")({
+  beforeLoad: async () => {
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (data.session) throw redirect({ to: "/aluno" });
+  },
   head: () => ({ meta: [{ title: "Acesso do Aluno — SPTech" }] }),
   component: AlunoLogin,
 });
 
 function AlunoLogin() {
-  const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,10 +31,11 @@ function AlunoLogin() {
       } else {
         await signIn(email, password);
       }
-      navigate({ to: "/aluno" });
+      window.location.assign("/aluno");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar");
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   }
 
   return (
