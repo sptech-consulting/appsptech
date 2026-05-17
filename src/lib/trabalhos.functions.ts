@@ -82,3 +82,29 @@ export const obterTrabalhoPublico = createServerFn({ method: "POST" })
       ambiente_slug: string;
     };
   });
+
+export const registrarVisualizacaoTrabalho = createServerFn({ method: "POST" })
+  .inputValidator((input: { codigo: string; trabalhoId: string }) => {
+    if (!input?.codigo || !input?.trabalhoId) throw new Error("Parâmetros inválidos");
+    return { codigo: normCodigo(input.codigo), trabalhoId: input.trabalhoId };
+  })
+  .handler(async ({ data }) => {
+    // valida acesso pelo código antes de incrementar
+    const { data: rows, error: e1 } = await supabaseAdmin.rpc("obter_trabalho_publico", {
+      _codigo: data.codigo,
+      _trabalho_id: data.trabalhoId,
+    });
+    if (e1) throw new Error(e1.message);
+    if (!rows || rows.length === 0) return { ok: false };
+    const { data: cur } = await supabaseAdmin
+      .from("trabalhos")
+      .select("visualizacoes")
+      .eq("id", data.trabalhoId)
+      .single();
+    const atual = cur?.visualizacoes ?? 0;
+    await supabaseAdmin
+      .from("trabalhos")
+      .update({ visualizacoes: atual + 1 })
+      .eq("id", data.trabalhoId);
+    return { ok: true };
+  });
