@@ -428,6 +428,59 @@ function AmbienteHome() {
           </Carousel>
         </Section>
 
+        {/* Playbook */}
+        <Section
+          id="sec-playbook"
+          title="Playbook"
+          subtitle="Baixe os materiais complementares das aulas"
+          tk={tk}
+          empty={aulasComMaterial.length === 0}
+          emptyMsg="Nenhum material disponível para download ainda."
+        >
+          <Carousel enterClass={enterClass}>
+            {aulasComMaterial.map((a) => (
+              <EffectCard
+                key={`pb-${a.id}`}
+                effects={effects}
+                baseStyle={{ ...cardBase, minWidth: 280, maxWidth: 320 }}
+                primaria={tk.primaria}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div
+                    className="h-12 w-12 rounded-lg flex items-center justify-center text-white"
+                    style={{ backgroundColor: tk.primaria }}
+                  >
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                </div>
+                {a.modulo && (
+                  <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{a.modulo}</div>
+                )}
+                <div className="font-bold leading-snug">{a.titulo}</div>
+                {a.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">{a.descricao}</div>}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a
+                    href={a.material_url ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                    style={{ backgroundColor: tk.botao, color: "#fff" }}
+                  >
+                    <Download className="h-3 w-3" /> Baixar material
+                  </a>
+                  <button
+                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.id } })}
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                    style={{ backgroundColor: "transparent", color: tk.text, border: `1px solid ${tk.border}` }}
+                  >
+                    Ver aula <ChevronRight className="h-3 w-3" />
+                  </button>
+                </div>
+              </EffectCard>
+            ))}
+          </Carousel>
+        </Section>
+
         {/* Aulas */}
         <Section
           id="sec-aulas"
