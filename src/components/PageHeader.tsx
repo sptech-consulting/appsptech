@@ -15,10 +15,10 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
+    <div className="mb-6 flex flex-col sm:flex-row sm:flex-wrap sm:items-end sm:justify-between gap-4">
+      <div className="min-w-0">
         {crumbs && crumbs.length > 0 && (
-          <nav className="mb-2 flex items-center gap-1 text-xs text-muted-foreground">
+          <nav className="mb-2 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
             {crumbs.map((c, i) => (
               <span key={i} className="flex items-center gap-1">
                 {c.to ? (
@@ -33,10 +33,10 @@ export function PageHeader({
             ))}
           </nav>
         )}
-        <h1 className="text-2xl md:text-3xl font-black text-secondary">{title}</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-secondary leading-tight">{title}</h1>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="flex gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap gap-2 w-full sm:w-auto">{actions}</div>}
     </div>
   );
 }
