@@ -124,7 +124,7 @@ function TrabalhosPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       <PageHeader
         title="Trabalhos (Mural de Resultados)"
         description="Curadoria dos trabalhos enviados pelos alunos. Publicados aparecem no mural acessado por código do ambiente."

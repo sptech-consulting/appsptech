@@ -66,7 +66,7 @@ function NovoAmbiente() {
   }
 
   return (
-    <div className="p-8 max-w-7xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
       <PageHeader
         title="Novo ambiente"
         description="Defina dados, identidade visual e estilo dos cards. O preview é atualizado em tempo real."

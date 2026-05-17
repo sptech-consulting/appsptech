@@ -29,7 +29,7 @@ function AdminLogs() {
   }, []);
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
         <ScrollText className="h-6 w-6" /> Logs de auditoria
       </h1>

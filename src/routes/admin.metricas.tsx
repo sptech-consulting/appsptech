@@ -51,7 +51,7 @@ function MetricasPage() {
   ];
 
   return (
-    <div className="p-8 max-w-6xl space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl space-y-8">
       <PageHeader
         title="Métricas"
         description="Visão consolidada de engajamento e conteúdo dos últimos 30 dias."

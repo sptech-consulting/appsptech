@@ -101,7 +101,7 @@ function FerramentasPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl">
       <PageHeader
         title="Ferramentas"
         description="Cadastro global. Vincule a cada ambiente na tela do ambiente."
