@@ -64,6 +64,9 @@ function AmbienteLogin() {
     setError(null);
     setLoading(true);
     try {
+      const { data: currentSession } = await supabase.auth.getSession();
+      if (currentSession.session) await signOut();
+
       if (mode === "signup") {
         await signUp(email, password);
         await signIn(email, password);
