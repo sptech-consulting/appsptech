@@ -225,7 +225,7 @@ function FerramentasPage() {
       <RecordDialog
         title={editing ? "Editar ferramenta" : "Nova ferramenta"}
         fields={FIELDS}
-        initial={editing ?? { tipo_abertura: "nova_aba", status: "ativo" }}
+        initial={{ ...(editing ?? { tipo_abertura: "nova_aba", status: "ativo" }), ambiente_ids: editingAmbienteIds }}
         onSubmit={save}
         open={open}
         onOpenChange={setOpen}
