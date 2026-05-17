@@ -832,6 +832,7 @@ export type Database = {
     }
     Functions: {
       aluno_tem_ambiente: { Args: { _ambiente_id: string }; Returns: boolean }
+      claim_super_admin: { Args: { _nome: string }; Returns: string }
       current_admin_id: { Args: never; Returns: string }
       current_aluno_id: { Args: never; Returns: string }
       has_admin_permission: { Args: { _permissao: string }; Returns: boolean }
