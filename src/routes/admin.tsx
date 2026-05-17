@@ -17,8 +17,11 @@ import {
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw redirect({ to: "/admin/login" });
+    // getSession() lê do localStorage — não faz chamada de rede,
+    // evitando race condition e falsos negativos em re-runs do guard.
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/admin/login" });
   },
   component: AdminShell,
 });
