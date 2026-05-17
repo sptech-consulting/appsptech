@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      aluno_aula_progresso: {
+        Row: {
+          aluno_id: string
+          atualizado_em: string
+          aula_id: string
+          concluida: boolean
+          concluida_em: string | null
+          criado_em: string
+          id: string
+          segundos_assistidos: number
+        }
+        Insert: {
+          aluno_id: string
+          atualizado_em?: string
+          aula_id: string
+          concluida?: boolean
+          concluida_em?: string | null
+          criado_em?: string
+          id?: string
+          segundos_assistidos?: number
+        }
+        Update: {
+          aluno_id?: string
+          atualizado_em?: string
+          aula_id?: string
+          concluida?: boolean
+          concluida_em?: string | null
+          criado_em?: string
+          id?: string
+          segundos_assistidos?: number
+        }
+        Relationships: []
+      }
       alunos: {
         Row: {
           atualizado_em: string
@@ -403,6 +436,85 @@ export type Database = {
           tema?: Database["public"]["Enums"]["ambiente_tema"]
         }
         Relationships: []
+      }
+      aula_comentario_curtidas: {
+        Row: {
+          aluno_id: string | null
+          comentario_id: string
+          criado_em: string
+          id: string
+          usuario_admin_id: string | null
+        }
+        Insert: {
+          aluno_id?: string | null
+          comentario_id: string
+          criado_em?: string
+          id?: string
+          usuario_admin_id?: string | null
+        }
+        Update: {
+          aluno_id?: string | null
+          comentario_id?: string
+          criado_em?: string
+          id?: string
+          usuario_admin_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aula_comentario_curtidas_comentario_id_fkey"
+            columns: ["comentario_id"]
+            isOneToOne: false
+            referencedRelation: "aula_comentarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      aula_comentarios: {
+        Row: {
+          aluno_id: string | null
+          ambiente_id: string
+          atualizado_em: string
+          aula_id: string
+          conteudo: string
+          criado_em: string
+          id: string
+          parent_id: string | null
+          status: string
+          usuario_admin_id: string | null
+        }
+        Insert: {
+          aluno_id?: string | null
+          ambiente_id: string
+          atualizado_em?: string
+          aula_id: string
+          conteudo: string
+          criado_em?: string
+          id?: string
+          parent_id?: string | null
+          status?: string
+          usuario_admin_id?: string | null
+        }
+        Update: {
+          aluno_id?: string | null
+          ambiente_id?: string
+          atualizado_em?: string
+          aula_id?: string
+          conteudo?: string
+          criado_em?: string
+          id?: string
+          parent_id?: string | null
+          status?: string
+          usuario_admin_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aula_comentarios_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "aula_comentarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       aulas: {
         Row: {
