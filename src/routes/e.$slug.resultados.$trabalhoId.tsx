@@ -12,6 +12,7 @@ function TrabalhoDetalhe() {
   const { slug, trabalhoId } = Route.useParams();
   const navigate = useNavigate();
   const obter = useServerFn(obterTrabalhoPublico);
+  const registrar = useServerFn(registrarVisualizacaoTrabalho);
   const [t, setT] = useState<Awaited<ReturnType<typeof obterTrabalhoPublico>> | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -22,9 +23,12 @@ function TrabalhoDetalhe() {
       return;
     }
     obter({ data: { codigo, trabalhoId } })
-      .then(setT)
+      .then((res) => {
+        setT(res);
+        void registrar({ data: { codigo, trabalhoId } }).catch(() => {});
+      })
       .catch((e) => setErro(e instanceof Error ? e.message : "Erro"));
-  }, [slug, trabalhoId, navigate, obter]);
+  }, [slug, trabalhoId, navigate, obter, registrar]);
 
   if (erro)
     return (
