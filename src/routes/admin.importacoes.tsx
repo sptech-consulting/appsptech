@@ -60,12 +60,22 @@ function ImportacoesPage() {
     const { data, error } = await supabase
       .from("importacoes_alunos")
       .select(
-        "id,ambiente_id,arquivo_nome,tipo_arquivo,status,total_linhas,total_importados,total_atualizados,total_erros,criado_em,finalizado_em,ambientes(nome,slug)",
+        "id,ambiente_id,arquivo_nome,tipo_arquivo,status,total_linhas,total_importados,total_atualizados,total_erros,criado_em,finalizado_em",
       )
       .order("criado_em", { ascending: false })
       .limit(100);
     if (error) toast.error(error.message);
-    setItems((data as any) ?? []);
+    const rows = (data as any[]) ?? [];
+    const ambIds = Array.from(new Set(rows.map((r) => r.ambiente_id).filter(Boolean)));
+    let ambMap: Record<string, { nome: string; slug: string }> = {};
+    if (ambIds.length > 0) {
+      const { data: ambs } = await supabase
+        .from("ambientes")
+        .select("id,nome,slug")
+        .in("id", ambIds);
+      ambMap = Object.fromEntries((ambs ?? []).map((a) => [a.id, { nome: a.nome, slug: a.slug }]));
+    }
+    setItems(rows.map((r) => ({ ...r, ambientes: ambMap[r.ambiente_id] ?? null })) as Importacao[]);
     setLoading(false);
   }
 
