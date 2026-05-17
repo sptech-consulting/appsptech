@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,8 @@ export const Route = createFileRoute("/aluno_/login")({
 });
 
 function AlunoLogin() {
+  const router = useRouter();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +33,8 @@ function AlunoLogin() {
       } else {
         await signIn(email, password);
       }
-      window.location.assign("/aluno");
+      await router.invalidate();
+      navigate({ to: "/aluno" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar");
       setLoading(false);
