@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,6 +44,7 @@ type SectionKey = "ferramentas" | "novidades" | "aulas";
 
 function AmbienteHome() {
   const { slug } = Route.useParams();
+  const navigate = useNavigate();
   const fetchHome = useServerFn(getAmbienteHome);
   const [data, setData] = useState<AmbienteHomeData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -425,14 +426,13 @@ function AmbienteHome() {
         >
           <Carousel enterClass={enterClass}>
             {data.aulas.map((a) => {
-              const link = a.video_url ?? a.material_url;
               return (
                 <EffectCard
                   key={a.id}
                   effects={effects}
-                  baseStyle={{ ...cardBase, cursor: link ? "pointer" : "default", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
+                  baseStyle={{ ...cardBase, cursor: "pointer", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
                   primaria={tk.primaria}
-                  onClick={() => link && window.open(link, "_blank", "noopener,noreferrer")}
+                  onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.id } })}
                 >
                   {b.card_exibir_imagem && (
                     <div
