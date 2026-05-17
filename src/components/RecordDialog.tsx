@@ -106,6 +106,12 @@ export function RecordDialog<T extends Record<string, any>>({
                     </option>
                   ))}
                 </select>
+              ) : f.type === "multiselect" ? (
+                <MultiSelectField
+                  field={f}
+                  value={(state[f.name] as string[]) ?? []}
+                  onChange={(v) => setState((s) => ({ ...s, [f.name]: v }))}
+                />
               ) : (
                 <Input
                   type={f.type === "url" ? "url" : f.type === "number" ? "number" : "text"}
