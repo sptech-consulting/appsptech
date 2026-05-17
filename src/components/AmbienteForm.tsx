@@ -4,15 +4,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AmbientePreview, type AmbienteVisual } from "./AmbientePreview";
+import { DEFAULT_EFFECTS, EFFECT_PRESETS, playHoverTap, type AmbienteEffects } from "@/lib/ambiente-effects";
 
-export type AmbienteFormState = AmbienteVisual & {
-  slug: string;
-  descricao: string;
-  status: "ativo" | "inativo" | "rascunho" | "arquivado";
-  tema: "claro" | "escuro" | "personalizado";
-  favicon_url: string | null;
-  imagem_login_url: string | null;
-};
+export type AmbienteFormState = AmbienteVisual &
+  AmbienteEffects & {
+    slug: string;
+    descricao: string;
+    status: "ativo" | "inativo" | "rascunho" | "arquivado";
+    tema: "claro" | "escuro" | "personalizado";
+    favicon_url: string | null;
+    imagem_login_url: string | null;
+  };
 
 export const DEFAULT_AMBIENTE: AmbienteFormState = {
   nome: "",
@@ -37,9 +39,10 @@ export const DEFAULT_AMBIENTE: AmbienteFormState = {
   card_sombra: true,
   card_exibir_icone: true,
   card_exibir_imagem: true,
+  ...DEFAULT_EFFECTS,
 };
 
-type Tab = "geral" | "identidade" | "cards";
+type Tab = "geral" | "identidade" | "cards" | "efeitos";
 
 export function AmbienteForm({
   initial,
