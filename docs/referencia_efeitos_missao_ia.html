@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Missão IA — Teste Visual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary-dark: 141 71% 22%;
+      --brand-primary-light: 90 68% 67%;
+      --background: 0 0% 97%;
+      --foreground: 0 0% 20%;
+      --card: 0 0% 100%;
+      --card-foreground: 0 0% 20%;
+      --primary: 141 71% 22%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 90 68% 67%;
+      --secondary-foreground: 0 0% 20%;
+      --muted: 0 0% 96%;
+      --muted-foreground: 0 0% 45%;
+      --accent: 90 68% 67%;
+      --accent-foreground: 0 0% 20%;
+      --border: 0 0% 90%;
+      --radius: .75rem;
+    }
+
+    html.dark {
+      --background: 0 0% 10%;
+      --foreground: 0 0% 98%;
+      --card: 0 0% 12%;
+      --card-foreground: 0 0% 98%;
+      --primary: 141 55% 45%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 90 15% 14%;
+      --secondary-foreground: 0 0% 98%;
+      --muted: 0 0% 15%;
+      --muted-foreground: 0 0% 65%;
+      --accent: 90 30% 30%;
+      --accent-foreground: 0 0% 98%;
+      --border: 0 0% 20%;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      font-family: Sora, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-family: Sora, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      transition: background-color .5s cubic-bezier(.16,1,.3,1), color .5s cubic-bezier(.16,1,.3,1);
+    }
+
+    button { font: inherit; cursor: pointer; }
+
+    .page {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 96px;
+    }
+
+    .page::before,
+    .page::after {
+      content: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .floating-nav {
+      position: fixed;
+      left: 50%;
+      top: 14px;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 40px;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(24px) saturate(1.8);
+      -webkit-backdrop-filter: blur(24px) saturate(1.8);
+      box-shadow: 0 2px 16px 0 rgba(0,0,0,.04), 0 0 0 .5px rgba(255,255,255,.5) inset;
+      animation: fadeInScale .5s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    html.dark .floating-nav {
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 2px 16px 0 rgba(0,0,0,.2), 0 0 0 .5px rgba(255,255,255,.06) inset;
+    }
+
+    .nav-item {
+      border: 0;
+      min-width: 112px;
+      height: 36px;
+      padding: 0 22px;
+      border-radius: 999px;
+      color: hsl(var(--muted-foreground));
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform .25s cubic-bezier(.16,1,.3,1), background-color .25s, color .25s;
+    }
+
+    .nav-item:hover { transform: translateY(-1px); color: hsl(var(--foreground)); background: rgba(0,0,0,.035); }
+    html.dark .nav-item:hover { background: rgba(255,255,255,.08); }
+
+    .nav-item.active {
+      background: hsl(var(--brand-primary-light));
+      color: hsl(var(--brand-primary-dark));
+      box-shadow: 0 8px 28px rgba(167,237,111,.26);
+    }
+
+    .theme-toggle {
+      position: fixed;
+      right: calc(1rem + 10px);
+      top: calc(1rem + 10px);
+      z-index: 60;
+      width: 86px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      padding: 3px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 30%, #053a6f 0 10%, transparent 18%),
+        linear-gradient(135deg, #095c88, #83d36a 60%, #f6d38a);
+      box-shadow: 0 4px 30px rgba(0,0,0,.1);
+      transition: all .5s cubic-bezier(.16,1,.3,1);
+      animation: slideInRight .5s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    html.dark .theme-toggle {
+      background:
+        radial-gradient(circle at 25% 35%, rgba(167,237,111,.45), transparent 18%),
+        linear-gradient(135deg, #06121e, #111 70%);
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 0 16px rgba(0,0,0,.3);
+    }
+
+    .theme-knob {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: #fff;
+      transform: translateX(44px);
+      transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s;
+      box-shadow: 0 8px 20px rgba(0,0,0,.18);
+    }
+
+    html.dark .theme-knob { transform: translateX(0); box-shadow: 0 8px 24px rgba(255,255,255,.08); }
+
+    .sound-panel {
+      position: fixed;
+      right: calc(1rem + 10px);
+      top: calc(1rem + 60px);
+      z-index: 60;
+      height: 36px;
+      border: 1px solid hsl(var(--border));
+      border-radius: 999px;
+      padding: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: hsl(var(--primary));
+      background: rgba(255,255,255,.72);
+      backdrop-filter: blur(18px) saturate(1.8);
+      -webkit-backdrop-filter: blur(18px) saturate(1.8);
+      box-shadow: 0 2px 16px rgba(0,0,0,.04), 0 0 0 .5px rgba(255,255,255,.5) inset;
+      font-size: 12px;
+      font-weight: 500;
+      transition: transform .25s cubic-bezier(.16,1,.3,1), background-color .25s, color .25s;
+      animation: slideInRight .5s cubic-bezier(.16,1,.3,1) .08s both;
+    }
+
+    .sound-toggle {
+      height: 28px;
+      border: 0;
+      border-radius: 999px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: hsl(var(--primary));
+      background: transparent;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background-color .25s, color .25s, transform .25s cubic-bezier(.16,1,.3,1);
+    }
+
+    .sound-toggle:hover { transform: translateY(-1px); background: rgba(0,0,0,.035); }
+    .sound-toggle[data-enabled="true"] { background: hsl(var(--brand-primary-light)); color: hsl(var(--brand-primary-dark)); }
+
+    html.dark .sound-panel {
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.14);
+      color: hsl(var(--foreground));
+      box-shadow: 0 2px 16px rgba(0,0,0,.2), 0 0 0 .5px rgba(255,255,255,.06) inset;
+    }
+    html.dark .sound-toggle { color: hsl(var(--foreground)); }
+    html.dark .sound-toggle:hover { background: rgba(255,255,255,.08); color: hsl(var(--foreground)); }
+    html.dark .sound-toggle[data-enabled="true"] { background: hsl(var(--brand-primary-light)); color: hsl(var(--brand-primary-dark)); }
+
+    .hero {
+      padding-top: 132px;
+      animation: fadeInUp .5s cubic-bezier(.16,1,.3,1) .08s both;
+    }
+
+    .eyebrow-title {
+      font-size: clamp(30px, 3vw, 40px);
+      line-height: 1.15;
+      font-weight: 300;
+      letter-spacing: -.025em;
+      margin: 0;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: hsl(var(--muted-foreground));
+      font-size: 17px;
+      font-weight: 300;
+      letter-spacing: .015em;
+    }
+
+    .section-head {
+      margin-top: 88px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      animation: fadeInUp .5s cubic-bezier(.16,1,.3,1) .16s both;
+    }
+
+    .section-title {
+      font-size: clamp(22px, 2vw, 26px);
+      font-weight: 400;
+      letter-spacing: -.025em;
+      margin: 0;
+    }
+
+    .tools-section {
+      position: relative;
+      overflow: visible;
+      isolation: isolate;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+    }
+
+
+    .carousel-controls { display: flex; gap: 14px; align-items: center; padding-right: 10%; }
+
+    .circle-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid hsl(var(--primary) / .45);
+      display: grid;
+      place-items: center;
+      color: hsl(var(--primary));
+      background: transparent;
+      transition: all .25s cubic-bezier(.16,1,.3,1);
+    }
+
+    html.dark .circle-btn { color: hsl(var(--foreground)); border-color: rgba(255,255,255,.42); }
+    .circle-btn:hover { transform: translateY(-1px) scale(1.04); background: hsl(var(--brand-primary-light) / .2); border-color: hsl(var(--primary)); }
+    html.dark .circle-btn:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.8); }
+
+    .carousel-shell {
+      position: relative;
+      width: calc(100% + 2rem);
+      margin-right: -2rem;
+      overflow: visible;
+      padding: 18px 0 58px;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0;
+    }
+
+    .carousel-shell::before,
+    .carousel-shell::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 22px;
+      overflow: visible !important;
+      padding: 18px 0 58px;
+      margin: 0;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      will-change: transform;
+      transform: translate3d(var(--carousel-x, 0px), 0, 0);
+      transition: transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    .carousel::-webkit-scrollbar { display: none; }
+
+    .tool-card {
+      flex: 0 0 auto;
+      width: 26rem;
+      height: 390px;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.5rem;
+      background: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      border: 1px solid hsl(var(--border));
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      transform-style: preserve-3d;
+      --rx: 0deg;
+      --ry: 0deg;
+      --tx: 0px;
+      --ty: 0px;
+      --s: 1;
+      --shadow-x: 0px;
+      --shadow-y: 18px;
+      transform: perspective(1000px) translate3d(var(--tx), var(--ty), 0) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--s));
+      box-shadow: var(--shadow-x) var(--shadow-y) 42px rgba(0,0,0,.10), 0 18px 42px -22px rgba(0,0,0,.18);
+      transition:
+        transform .06s linear,
+        box-shadow .06s linear,
+        border-color .5s cubic-bezier(.16,1,.3,1),
+        background-color .5s cubic-bezier(.16,1,.3,1);
+      will-change: transform, box-shadow;
+      isolation: isolate;
+      backface-visibility: hidden;
+      animation: cardReveal .5s cubic-bezier(.16,1,.3,1) both;
+    }
+
+    html.dark .tool-card {
+      box-shadow: var(--shadow-x) var(--shadow-y) 46px rgba(0,0,0,.38), 0 18px 42px -22px rgba(0,0,0,.52);
+    }
+
+    .tool-card:nth-child(1) { animation-delay: .22s; }
+    .tool-card:nth-child(2) { animation-delay: .30s; }
+    .tool-card:nth-child(3) { animation-delay: .38s; }
+    .tool-card:nth-child(4) { animation-delay: .46s; }
+    .tool-card:nth-child(5) { animation-delay: .54s; }
+
+    .tool-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .35s ease;
+      background: radial-gradient(380px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,.72), transparent 42%);
+      z-index: 1;
+    }
+
+    .tool-card::after {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .35s ease;
+      background: radial-gradient(240px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0,0,0,.10), transparent 42%);
+      z-index: 0;
+      mix-blend-mode: multiply;
+    }
+
+    html.dark .tool-card::before {
+      background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,.14), transparent 42%);
+    }
+
+    html.dark .tool-card::after {
+      background: radial-gradient(260px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,.10), transparent 42%);
+      mix-blend-mode: screen;
+    }
+
+    .tool-card:hover::before,
+    .tool-card:hover::after { opacity: 1; }
+    .tool-card:hover {
+      border-color: hsl(var(--primary) / .3);
+      box-shadow: 0 8px 40px rgba(0,0,0,.15);
+    }
+    html.dark .tool-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,.48); }
+
+    .card-content {
+      position: relative;
+      z-index: 2;
+      transform: translateZ(26px);
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .badge {
+      align-self: flex-start;
+      border-radius: 999px;
+      background: hsl(var(--brand-primary-light));
+      color: hsl(var(--brand-primary-dark));
+      padding: 4px 11px 5px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    .tool-name {
+      font-size: 26px;
+      line-height: 1.15;
+      font-weight: 400;
+      letter-spacing: -.025em;
+      margin: 0 0 14px;
+    }
+
+    .tool-desc {
+      max-width: 300px;
+      color: hsl(var(--muted-foreground));
+      font-size: 15px;
+      line-height: 1.5;
+      font-weight: 300;
+      margin: 0;
+    }
+
+    .pill-button {
+      margin-top: auto;
+      width: fit-content;
+      height: 38px;
+      border-radius: 999px;
+      padding: 0 18px;
+      border: 1px solid hsl(var(--primary));
+      background: transparent;
+      color: hsl(var(--primary));
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all .25s cubic-bezier(.16,1,.3,1);
+    }
+
+    html.dark .pill-button { color: hsl(var(--foreground)); border-color: rgba(255,255,255,.72); }
+    .pill-button:hover { background: hsl(var(--brand-primary-light) / .2); transform: translateY(-1px); }
+    html.dark .pill-button:hover { background: rgba(255,255,255,.1); }
+    .pill-button svg { transition: transform .25s cubic-bezier(.16,1,.3,1); }
+    .pill-button:hover svg { transform: translateX(4px); }
+
+    .logo-mark {
+      position: absolute;
+      z-index: 0;
+      right: -45px;
+      bottom: -24px;
+      width: 220px;
+      height: 220px;
+      opacity: .96;
+      transition: transform .5s cubic-bezier(.16,1,.3,1), opacity .5s;
+      transform-origin: center;
+    }
+
+    .tool-card:hover .logo-mark { transform: scale(1.01); }
+
+    .gemini-mark {
+      width: 230px;
+      height: 230px;
+      right: -20px;
+      bottom: -50px;
+      background: conic-gradient(from 215deg, #f9c80e, #32d27f, #2d83ff, #ff475e, #f9c80e);
+      clip-path: polygon(50% 0%, 60% 32%, 100% 50%, 61% 67%, 50% 100%, 39% 67%, 0% 50%, 39% 33%);
+      filter: blur(.1px) saturate(1.2);
+    }
+
+    .openai-mark {
+      right: -58px;
+      bottom: -44px;
+      width: 238px;
+      height: 238px;
+    }
+    .openai-mark svg { width: 100%; height: 100%; stroke: #75ad9e; opacity: .98; }
+
+    .claude-mark {
+      right: -44px;
+      bottom: -42px;
+      width: 230px;
+      height: 230px;
+    }
+    .claude-mark span {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 24px; height: 104px;
+      background: #df7955;
+      border-radius: 999px;
+      transform-origin: center 10px;
+    }
+    .claude-mark span:nth-child(1) { transform: translate(-50%, -10px) rotate(0deg); }
+    .claude-mark span:nth-child(2) { transform: translate(-50%, -10px) rotate(40deg); }
+    .claude-mark span:nth-child(3) { transform: translate(-50%, -10px) rotate(80deg); }
+    .claude-mark span:nth-child(4) { transform: translate(-50%, -10px) rotate(120deg); }
+    .claude-mark span:nth-child(5) { transform: translate(-50%, -10px) rotate(160deg); }
+    .claude-mark span:nth-child(6) { transform: translate(-50%, -10px) rotate(200deg); }
+    .claude-mark span:nth-child(7) { transform: translate(-50%, -10px) rotate(240deg); }
+    .claude-mark span:nth-child(8) { transform: translate(-50%, -10px) rotate(280deg); }
+    .claude-mark span:nth-child(9) { transform: translate(-50%, -10px) rotate(320deg); }
+
+    .notebook-mark {
+      right: -70px;
+      bottom: -66px;
+      width: 245px;
+      height: 245px;
+      border-radius: 999px;
+      border: 32px solid #000;
+    }
+    .notebook-mark::before,
+    .notebook-mark::after {
+      content: "";
+      position: absolute;
+      inset: 30px;
+      border-radius: inherit;
+      border: 24px solid #000;
+      border-left-color: transparent;
+      border-bottom-color: transparent;
+      transform: rotate(14deg);
+    }
+    .notebook-mark::after { inset: 76px; border-width: 18px; }
+    html.dark .notebook-mark,
+    html.dark .notebook-mark::before,
+    html.dark .notebook-mark::after { border-color: rgba(255,255,255,.84); border-left-color: transparent; border-bottom-color: transparent; }
+    html.dark .notebook-mark { border-color: rgba(255,255,255,.84); }
+
+    .perplexity-mark {
+      right: -42px;
+      bottom: -42px;
+      width: 220px;
+      height: 220px;
+      color: #28a9a1;
+    }
+    .perplexity-mark svg { width: 100%; height: 100%; stroke: currentColor; }
+
+    @keyframes cardReveal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: translateX(-50%) scale(.96); }
+      to { opacity: 1; transform: translateX(-50%) scale(1); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes swimWide1 {
+      0% { transform: translate(0) scale(1); }
+      20% { transform: translate(40vw,-20vh) scale(1.15); }
+      40% { transform: translate(-15vw,25vh) scale(.85); }
+      60% { transform: translate(30vw,35vh) scale(1.2); }
+      80% { transform: translate(-25vw,-10vh) scale(.95); }
+      100% { transform: translate(0) scale(1); }
+    }
+
+    @keyframes swimWide2 {
+      0% { transform: translate(0) scale(1); }
+      25% { transform: translate(-35vw,30vh) scale(1.1); }
+      50% { transform: translate(20vw,-25vh) scale(.9); }
+      75% { transform: translate(-10vw,-35vh) scale(1.25); }
+      100% { transform: translate(0) scale(1); }
+    }
+
+    @media (min-width: 1500px) {
+      .carousel-shell { width: calc(100vw - 160px); }
+      .tool-card { width: 28rem; }
+    }
+
+    @media (max-width: 900px) {
+      .floating-nav { top: 12px; max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
+      .floating-nav::-webkit-scrollbar { display: none; }
+      .nav-item { min-width: auto; padding: 0 16px; }
+      .theme-toggle { width: 72px; height: 36px; right: 16px; top: 72px; }
+      .sound-panel { right: 16px; top: 116px; }
+      .theme-knob { width: 30px; height: 30px; transform: translateX(36px); }
+      html.dark .theme-knob { transform: translateX(0); }
+      .container { padding: 0 24px; }
+      .hero { padding-top: 142px; }
+      .section-head { margin-top: 70px; align-items: flex-start; }
+      .carousel-controls { padding-right: 0; }
+      .carousel-shell { width: calc(100% + 24px); margin-right: -24px; padding: 18px 0 48px; }
+      .tool-card { width: 84vw; max-width: 26rem; }
+      .logo-mark { transform: scale(.92); }
+      .tool-card:hover .logo-mark { transform: scale(.93); }
+    }
+
+    @media (max-width: 640px) {
+      .floating-nav { left: 16px; right: 16px; transform: none; justify-content: flex-start; }
+      .section-head { flex-direction: column; gap: 18px; margin-bottom: 22px; }
+      .carousel-controls { align-self: flex-end; }
+      .tool-card { height: 390px; padding: 1.5rem; border-radius: 1.5rem; }
+      .tool-name { font-size: 24px; }
+      .tool-desc { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="floating-nav" aria-label="Navegação principal">
+      <button class="nav-item active">Ferramentas</button>
+      <button class="nav-item">Novidades</button>
+      <button class="nav-item">Playbook</button>
+      <button class="nav-item">Resultados</button>
+    </nav>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema claro e escuro">
+      <div class="theme-knob"></div>
+    </button>
+
+    <div class="sound-panel" aria-label="Configurações de som">
+      <button class="sound-toggle" id="soundToggle" data-enabled="false" aria-label="Ativar som nos cards">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 9v6h4l5 4V5L8 9H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+          <path d="M16 9.5c.8.7 1.2 1.5 1.2 2.5s-.4 1.8-1.2 2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        Som
+      </button>    </div>
+
+    <main class="container">
+      <header class="hero">
+        <h1 class="eyebrow-title">Missão IA</h1>
+        <p class="subtitle">Um guia de mão para o futuro</p>
+      </header>
+
+      <section class="tools-section" aria-labelledby="section-tools">
+        <div class="section-head">
+          <h2 id="section-tools" class="section-title">Modelos de Linguagem Conversacional</h2>
+          <div class="carousel-controls" aria-label="Controles do carrossel">
+            <button class="circle-btn" id="prevBtn" aria-label="Anterior">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="circle-btn" id="nextBtn" aria-label="Próximo">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="carousel-shell">
+          <div class="carousel" id="carousel">
+            <article class="tool-card">
+              <div class="logo-mark gemini-mark" aria-hidden="true"></div>
+              <div class="card-content">
+                <span class="badge">Google</span>
+                <h3 class="tool-name">Gemini</h3>
+                <p class="tool-desc">Ferramenta de busca inteligente integrada ao ecossistema Google para respostas atualizadas.</p>
+                <button class="pill-button">Mostrar mais <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </article>
+
+            <article class="tool-card">
+              <div class="logo-mark openai-mark" aria-hidden="true">
+                <svg viewBox="0 0 200 200" fill="none">
+                  <path d="M99 21c24-13 54 4 57 31 25 7 38 36 25 59 13 24-4 54-31 57-7 25-36 38-59 25-24 13-54-4-57-31-25-7-38-36-25-59-13-24 4-54 31-57 7-25 36-38 59-25Z" stroke-width="13" stroke-linejoin="round"/>
+                  <path d="M64 64l72 42M136 64l-72 42M100 36v84M52 132l72-42M148 132L76 90M100 164V80" stroke-width="13" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="card-content">
+                <span class="badge">OpenAI</span>
+                <h3 class="tool-name">ChatGPT</h3>
+                <p class="tool-desc">A IA da OpenAI pra conversar, criar textos, imagens e vídeos.</p>
+                <button class="pill-button">Mostrar mais <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </article>
+
+            <article class="tool-card">
+              <div class="logo-mark claude-mark" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="card-content">
+                <span class="badge">Anthropic</span>
+                <h3 class="tool-name">Claude</h3>
+                <p class="tool-desc">Especialista em leitura profunda, análise e interpretação de documentos extensos e complexos.</p>
+                <button class="pill-button">Mostrar mais <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </article>
+
+            <article class="tool-card">
+              <div class="logo-mark notebook-mark" aria-hidden="true"></div>
+              <div class="card-content">
+                <span class="badge">Google</span>
+                <h3 class="tool-name">NotebookLM</h3>
+                <p class="tool-desc">Organização e análise de grandes volumes de conteúdo a partir dos seus próprios arquivos.</p>
+                <button class="pill-button">Mostrar mais <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </article>
+
+            <article class="tool-card">
+              <div class="logo-mark perplexity-mark" aria-hidden="true">
+                <svg viewBox="0 0 200 200" fill="none">
+                  <path d="M50 28h100v48H50zM50 124h100v48H50z" stroke-width="12"/>
+                  <path d="M50 76l50 48 50-48M50 124l50-48 50 48M100 28v144" stroke-width="12" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="card-content">
+                <span class="badge">Perplexity</span>
+                <h3 class="tool-name">Perplexity</h3>
+                <p class="tool-desc">Busca conversacional com respostas contextualizadas, fontes visíveis e navegação orientada por pesquisa.</p>
+                <button class="pill-button">Mostrar mais <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const carousel = document.getElementById('carousel');
+    const soundToggle = document.getElementById('soundToggle');
+    const next = document.getElementById('nextBtn');
+    const prev = document.getElementById('prevBtn');
+    const cards = document.querySelectorAll('.tool-card');
+
+    const savedTheme = localStorage.getItem('missao-theme');
+    if (savedTheme === 'dark') html.classList.add('dark');
+
+    toggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      localStorage.setItem('missao-theme', html.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    let soundEnabled = localStorage.getItem('missao-sound') === 'on';
+    let audioCtx = null;
+    let lastHoverSoundAt = 0;
+
+    soundToggle.dataset.enabled = String(soundEnabled);
+
+    const ensureAudio = async () => {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+    };
+
+    const playCardTap = () => {
+      if (!soundEnabled || !audioCtx) return;
+
+      const nowMs = performance.now();
+      if (nowMs - lastHoverSoundAt < 100) return;
+      lastHoverSoundAt = nowMs;
+
+      const now = audioCtx.currentTime;
+      const master = audioCtx.createGain();
+      const noiseBuffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * 0.045), audioCtx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      const noise = audioCtx.createBufferSource();
+      const filter = audioCtx.createBiquadFilter();
+
+      for (let i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+      }
+
+      noise.buffer = noiseBuffer;
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(520, now);
+      filter.Q.setValueAtTime(1.8, now);
+
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.045, now + 0.004);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+
+      noise.connect(filter);
+      filter.connect(master);
+      master.connect(audioCtx.destination);
+
+      noise.start(now);
+      noise.stop(now + 0.045);
+    };
+
+    soundToggle.addEventListener('click', async () => {
+      soundEnabled = !soundEnabled;
+      soundToggle.dataset.enabled = String(soundEnabled);
+      localStorage.setItem('missao-sound', soundEnabled ? 'on' : 'off');
+
+      if (soundEnabled) {
+        await ensureAudio();
+        playCardTap();
+      }
+    });
+
+    window.addEventListener('pointerdown', () => {
+      if (soundEnabled) ensureAudio();
+    });
+
+    let carouselIndex = 0;
+
+    const getStep = () => {
+      const card = carousel.querySelector('.tool-card');
+      return card.offsetWidth + 22;
+    };
+
+    const getMaxIndex = () => {
+      const cardsTotal = carousel.querySelectorAll('.tool-card').length;
+      const shellWidth = document.querySelector('.carousel-shell').offsetWidth;
+      const visibleCards = Math.max(1, Math.floor(shellWidth / getStep()));
+      return Math.max(0, cardsTotal - visibleCards);
+    };
+
+    const updateCarousel = () => {
+      const maxIndex = getMaxIndex();
+      carouselIndex = Math.max(0, Math.min(carouselIndex, maxIndex));
+      carousel.style.setProperty('--carousel-x', `${-carouselIndex * getStep()}px`);
+    };
+
+    next.addEventListener('click', () => {
+      carouselIndex += 1;
+      updateCarousel();
+    });
+
+    prev.addEventListener('click', () => {
+      carouselIndex -= 1;
+      updateCarousel();
+    });
+
+    window.addEventListener('resize', updateCarousel);
+
+    cards.forEach((card, index) => {
+      const resetCard = () => {
+        card.classList.add('is-resetting');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--tx', '0px');
+        card.style.setProperty('--ty', '0px');
+        card.style.setProperty('--s', '1');
+        card.style.setProperty('--shadow-x', '0px');
+        card.style.setProperty('--shadow-y', '16px');
+        card.style.setProperty('--mouse-x', '50%');
+        card.style.setProperty('--mouse-y', '50%');
+      };
+
+      card.addEventListener('pointerenter', () => {
+        playCardTap();
+      });
+
+      card.addEventListener('pointermove', (event) => {
+        card.classList.remove('is-resetting');
+        const rect = card.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const px = x / rect.width;
+        const py = y / rect.height;
+
+        // Movimento invertido, agora bem mais perceptível.
+        const rotateY = (.5 - px) * 22;
+        const rotateX = (py - .5) * 17;
+        const translateX = (.5 - px) * 28;
+        const translateY = (.5 - py) * 22 - 10;
+        const shadowX = (.5 - px) * 34;
+        const shadowY = (.5 - py) * 22 + 18;
+
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+        card.style.setProperty('--rx', `${rotateX}deg`);
+        card.style.setProperty('--ry', `${rotateY + (index === 0 ? -2 : 0)}deg`);
+        card.style.setProperty('--tx', `${translateX}px`);
+        card.style.setProperty('--ty', `${translateY}px`);
+        card.style.setProperty('--s', '1.035');
+        card.style.setProperty('--shadow-x', `${shadowX}px`);
+        card.style.setProperty('--shadow-y', `${shadowY}px`);
+      });
+
+      card.addEventListener('pointerleave', resetCard);
+      card.addEventListener('pointercancel', resetCard);
+      resetCard();
+    });
+  </script>
+</body>
+</html>
