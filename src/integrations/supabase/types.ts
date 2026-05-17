@@ -153,6 +153,50 @@ export type Database = {
           },
         ]
       }
+      ambiente_cursos: {
+        Row: {
+          ambiente_id: string
+          criado_em: string
+          curso_id: string
+          data_liberacao: string | null
+          destaque: boolean | null
+          id: string
+          liberado: boolean | null
+          ordem: number
+          status: Database["public"]["Enums"]["generic_status"]
+        }
+        Insert: {
+          ambiente_id: string
+          criado_em?: string
+          curso_id: string
+          data_liberacao?: string | null
+          destaque?: boolean | null
+          id?: string
+          liberado?: boolean | null
+          ordem?: number
+          status?: Database["public"]["Enums"]["generic_status"]
+        }
+        Update: {
+          ambiente_id?: string
+          criado_em?: string
+          curso_id?: string
+          data_liberacao?: string | null
+          destaque?: boolean | null
+          id?: string
+          liberado?: boolean | null
+          ordem?: number
+          status?: Database["public"]["Enums"]["generic_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ambiente_cursos_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ambiente_ferramentas: {
         Row: {
           ambiente_id: string
@@ -370,6 +414,8 @@ export type Database = {
           id: string
           material_url: string | null
           modulo: string | null
+          modulo_id: string | null
+          ordem: number
           status: Database["public"]["Enums"]["publicacao_status"]
           thumbnail_url: string | null
           tipo_conteudo: Database["public"]["Enums"]["aula_tipo"] | null
@@ -385,6 +431,8 @@ export type Database = {
           id?: string
           material_url?: string | null
           modulo?: string | null
+          modulo_id?: string | null
+          ordem?: number
           status?: Database["public"]["Enums"]["publicacao_status"]
           thumbnail_url?: string | null
           tipo_conteudo?: Database["public"]["Enums"]["aula_tipo"] | null
@@ -400,13 +448,23 @@ export type Database = {
           id?: string
           material_url?: string | null
           modulo?: string | null
+          modulo_id?: string | null
+          ordem?: number
           status?: Database["public"]["Enums"]["publicacao_status"]
           thumbnail_url?: string | null
           tipo_conteudo?: Database["public"]["Enums"]["aula_tipo"] | null
           titulo?: string
           video_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "aulas_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "modulos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       configuracoes_ambiente: {
         Row: {
@@ -442,6 +500,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cursos: {
+        Row: {
+          atualizado_em: string
+          capa_url: string | null
+          carga_horaria_minutos: number | null
+          categoria: string | null
+          criado_em: string
+          criado_por: string | null
+          descricao: string | null
+          id: string
+          nivel: string | null
+          status: Database["public"]["Enums"]["publicacao_status"]
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          capa_url?: string | null
+          carga_horaria_minutos?: number | null
+          categoria?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string | null
+          id?: string
+          nivel?: string | null
+          status?: Database["public"]["Enums"]["publicacao_status"]
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          capa_url?: string | null
+          carga_horaria_minutos?: number | null
+          categoria?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          descricao?: string | null
+          id?: string
+          nivel?: string | null
+          status?: Database["public"]["Enums"]["publicacao_status"]
+          titulo?: string
+        }
+        Relationships: []
       }
       ferramentas: {
         Row: {
@@ -692,6 +792,47 @@ export type Database = {
           usuario_admin_id?: string | null
         }
         Relationships: []
+      }
+      modulos: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          curso_id: string
+          descricao: string | null
+          id: string
+          ordem: number
+          status: Database["public"]["Enums"]["generic_status"]
+          titulo: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          curso_id: string
+          descricao?: string | null
+          id?: string
+          ordem?: number
+          status?: Database["public"]["Enums"]["generic_status"]
+          titulo: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          curso_id?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number
+          status?: Database["public"]["Enums"]["generic_status"]
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "modulos_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       novidades: {
         Row: {
