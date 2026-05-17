@@ -21,6 +21,8 @@ import {
   Sparkles,
   Settings,
   Eye,
+  Menu,
+  X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
