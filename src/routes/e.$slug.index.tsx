@@ -248,6 +248,14 @@ function AmbienteHome() {
           {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
         </IconToggle>
         <button
+          onClick={() => navigate({ to: "/e/$slug/resultados", params: { slug } })}
+          className={`inline-flex items-center gap-1 text-[11px] font-semibold px-3 py-2 rounded-full ${btnLift}`}
+          style={{ backgroundColor: tk.primaria, color: "#fff" }}
+          title="Mural de Resultados"
+        >
+          <Sparkles className="h-3 w-3" /> Resultados
+        </button>
+        <button
           onClick={async () => {
             await signOut();
             window.location.assign(`/e/${slug}/login`);
