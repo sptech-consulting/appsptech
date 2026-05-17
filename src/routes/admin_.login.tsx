@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,8 @@ export const Route = createFileRoute("/admin_/login")({
 });
 
 function AdminLogin() {
+  const router = useRouter();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +32,6 @@ function AdminLogin() {
       if (mode === "signup") {
         await signUp(email, password);
         await signIn(email, password);
-        // Tenta reivindicar super admin (primeiro signup)
         const { error: rpcErr } = await supabase.rpc("claim_super_admin", { _nome: nome || email });
         if (rpcErr && !rpcErr.message.includes("Já existe")) {
           setInfo("Conta criada. Aguarde um admin existente vincular você a um grupo de acesso.");
@@ -40,8 +41,8 @@ function AdminLogin() {
       } else {
         await signIn(email, password);
       }
-      // Hard redirect garante hidratação limpa da sessão no /admin
-      window.location.assign("/admin");
+      await router.invalidate();
+      navigate({ to: "/admin" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao autenticar");
       setLoading(false);
