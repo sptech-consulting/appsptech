@@ -84,7 +84,7 @@ export function AmbienteForm({
       >
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="flex border-b border-border text-sm">
-            {(["geral", "identidade", "cards"] as Tab[]).map((t) => (
+            {(["geral", "identidade", "cards", "efeitos"] as Tab[]).map((t) => (
               <button
                 key={t}
                 type="button"
