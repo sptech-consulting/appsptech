@@ -33,11 +33,11 @@ const NAV: { to: string; label: string; icon: typeof LayoutDashboard; exact?: bo
   { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
   { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
   { to: "/admin/aulas", label: "Aulas", icon: GraduationCap },
+  { to: "/admin/usuarios", label: "Usuários admin", icon: Users },
+  { to: "/admin/grupos", label: "Grupos & permissões", icon: Shield },
 ];
 
-const NAV_DISABLED = [
-  { label: "Usuários & Permissões", icon: Shield, hint: "Fase 4" },
-] as const;
+const NAV_DISABLED: { label: string; icon: typeof Shield; hint: string }[] = [];
 
 function AdminShell() {
   const navigate = useNavigate();
