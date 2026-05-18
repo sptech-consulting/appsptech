@@ -432,53 +432,108 @@ function AmbienteHome() {
         <Section
           id="sec-playbook"
           title="Playbook"
-          subtitle="Baixe os materiais complementares das aulas"
+          subtitle={hasPlaybook ? "O playbook deste ambiente e materiais complementares" : "Baixe os materiais complementares das aulas"}
           tk={tk}
-          empty={aulasComMaterial.length === 0}
+          empty={playbookCount === 0}
           emptyMsg="Nenhum material disponível para download ainda."
         >
-          <Carousel enterClass={enterClass}>
-            {aulasComMaterial.map((a) => (
-              <EffectCard
-                key={`pb-${a.id}`}
-                effects={effects}
-                baseStyle={{ ...cardBase, minWidth: 280, maxWidth: 320 }}
-                primaria={tk.primaria}
+          {hasPlaybook && (
+            <div className="mb-5">
+              <div
+                className="relative overflow-hidden rounded-2xl border"
+                style={{
+                  borderColor: tk.border,
+                  backgroundColor: tk.card,
+                  backgroundImage: data.branding.playbook_capa_url
+                    ? `url(${data.branding.playbook_capa_url})`
+                    : `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  minHeight: 280,
+                }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div
-                    className="h-12 w-12 rounded-lg flex items-center justify-center text-white"
-                    style={{ backgroundColor: tk.primaria }}
-                  >
-                    <BookOpen className="h-5 w-5" />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.15) 100%)",
+                  }}
+                />
+                <div className="relative p-6 sm:p-8 lg:p-10 flex flex-col justify-between min-h-[280px] text-white">
+                  <div className="max-w-2xl">
+                    <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold bg-white/15 backdrop-blur rounded-full px-3 py-1 mb-3">
+                      <BookOpen className="h-3 w-3" /> Playbook
+                    </div>
+                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight">
+                      {data.branding.playbook_titulo ?? `Playbook · ${data.branding.nome}`}
+                    </h3>
+                    {data.branding.playbook_descricao && (
+                      <p className="mt-2 text-sm sm:text-base opacity-90 max-w-xl">
+                        {data.branding.playbook_descricao}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <a
+                      href={data.branding.playbook_arquivo_url ?? "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      download
+                      className={`inline-flex items-center gap-2 text-sm font-bold px-5 py-3 rounded-full ${btnLift}`}
+                      style={{ backgroundColor: tk.botao, color: "#fff" }}
+                    >
+                      <Download className="h-4 w-4" /> Baixar Playbook
+                    </a>
                   </div>
                 </div>
-                {a.modulo && (
-                  <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{a.modulo}</div>
-                )}
-                <div className="font-bold leading-snug">{a.titulo}</div>
-                {a.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">{a.descricao}</div>}
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <a
-                    href={a.material_url ?? "#"}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
-                    style={{ backgroundColor: tk.botao, color: "#fff" }}
-                  >
-                    <Download className="h-3 w-3" /> Baixar material
-                  </a>
-                  <button
-                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.slug ?? a.id } })}
-                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
-                    style={{ backgroundColor: "transparent", color: tk.text, border: `1px solid ${tk.border}` }}
-                  >
-                    Ver aula <ChevronRight className="h-3 w-3" />
-                  </button>
-                </div>
-              </EffectCard>
-            ))}
-          </Carousel>
+              </div>
+            </div>
+          )}
+
+          {aulasComMaterial.length > 0 && (
+            <Carousel enterClass={enterClass}>
+              {aulasComMaterial.map((a) => (
+                <EffectCard
+                  key={`pb-${a.id}`}
+                  effects={effects}
+                  baseStyle={{ ...cardBase, minWidth: 280, maxWidth: 320 }}
+                  primaria={tk.primaria}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div
+                      className="h-12 w-12 rounded-lg flex items-center justify-center text-white"
+                      style={{ backgroundColor: tk.primaria }}
+                    >
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                  </div>
+                  {a.modulo && (
+                    <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{a.modulo}</div>
+                  )}
+                  <div className="font-bold leading-snug">{a.titulo}</div>
+                  {a.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">{a.descricao}</div>}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <a
+                      href={a.material_url ?? "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                      style={{ backgroundColor: tk.botao, color: "#fff" }}
+                    >
+                      <Download className="h-3 w-3" /> Baixar material
+                    </a>
+                    <button
+                      onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.slug ?? a.id } })}
+                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                      style={{ backgroundColor: "transparent", color: tk.text, border: `1px solid ${tk.border}` }}
+                    >
+                      Ver aula <ChevronRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </EffectCard>
+              ))}
+            </Carousel>
+          )}
         </Section>
 
         {/* Cursos */}
