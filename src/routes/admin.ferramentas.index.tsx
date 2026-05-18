@@ -17,7 +17,7 @@ type Ferramenta = {
   status: "ativo" | "inativo";
 };
 
-export const Route = createFileRoute("/admin/ferramentas")({
+export const Route = createFileRoute("/admin/ferramentas/")({
   component: FerramentasPage,
 });
 
