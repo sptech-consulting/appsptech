@@ -373,7 +373,7 @@ function AmbienteHome() {
                 effects={effects}
                 baseStyle={{ ...cardBase, cursor: "pointer", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
                 primaria={tk.primaria}
-                onClick={() => navigate({ to: "/e/$slug/novidade/$novidadeId", params: { slug, novidadeId: n.id } })}
+                onClick={() => navigate({ to: "/e/$slug/novidade/$novidadeId", params: { slug, novidadeId: n.slug ?? n.id } })}
               >
                 {b.card_exibir_imagem && (
                   <div
