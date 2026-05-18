@@ -29,7 +29,7 @@ export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/admin/login" });
+    if (!data.session) throw redirect({ to: "/admin/entrar" });
 
     // Sessão compartilhada pode pertencer a um aluno — só libera /admin se o
     // auth_user_id estiver vinculado a um usuário admin ativo.
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/admin")({
       .eq("auth_user_id", data.session.user.id)
       .eq("status", "ativo")
       .maybeSingle();
-    if (!admin) throw redirect({ to: "/admin/login" });
+    if (!admin) throw redirect({ to: "/admin/entrar" });
   },
   component: AdminShell,
 });
@@ -117,7 +117,7 @@ function AdminShell() {
           <button
             onClick={async () => {
               await signOut();
-              navigate({ to: "/admin/login" });
+              navigate({ to: "/admin/entrar" });
             }}
             className="mt-6 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
           >

@@ -8,7 +8,7 @@ import { ensureAlunoAuthLink, checkAlunoAmbienteAccess } from "@/lib/aluno.funct
 
 type Branding = Awaited<ReturnType<typeof getAmbienteBranding>>;
 
-export const Route = createFileRoute("/e/$slug/login")({
+export const Route = createFileRoute("/e/$slug/entrar")({
   beforeLoad: async ({ params }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
@@ -210,7 +210,7 @@ function AmbienteLogin() {
             >
               {mode === "signin" ? "Primeiro acesso? Definir senha" : "Já tenho senha — entrar"}
             </button>
-            <a href="/forgot-password" className="hover:opacity-100" style={{ color: corPrim }}>
+            <a href="/esqueci-senha" className="hover:opacity-100" style={{ color: corPrim }}>
               Esqueci minha senha
             </a>
           </div>
