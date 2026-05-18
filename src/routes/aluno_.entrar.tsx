@@ -4,7 +4,7 @@ import { signIn, signUp, signOut } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
-export const Route = createFileRoute("/aluno_/login")({
+export const Route = createFileRoute("/aluno_/entrar")({
   beforeLoad: async () => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
