@@ -102,22 +102,22 @@ export const registrarVisualizacaoTrabalho = createServerFn({ method: "POST" })
     return { codigo: normCodigo(input.codigo), trabalhoId: input.trabalhoId };
   })
   .handler(async ({ data }) => {
-    // valida acesso pelo código antes de incrementar
+    const trabalhoId = await resolverTrabalhoId(data.trabalhoId);
     const { data: rows, error: e1 } = await supabaseAdmin.rpc("obter_trabalho_publico", {
       _codigo: data.codigo,
-      _trabalho_id: data.trabalhoId,
+      _trabalho_id: trabalhoId,
     });
     if (e1) throw new Error(e1.message);
     if (!rows || rows.length === 0) return { ok: false };
     const { data: cur } = await supabaseAdmin
       .from("trabalhos")
       .select("visualizacoes")
-      .eq("id", data.trabalhoId)
+      .eq("id", trabalhoId)
       .single();
     const atual = cur?.visualizacoes ?? 0;
     await supabaseAdmin
       .from("trabalhos")
       .update({ visualizacoes: atual + 1 })
-      .eq("id", data.trabalhoId);
+      .eq("id", trabalhoId);
     return { ok: true };
   });
