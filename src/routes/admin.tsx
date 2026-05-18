@@ -8,7 +8,7 @@ import {
   LayoutDashboard,
   Layers,
   Wrench,
-  Newspaper,
+  
   GraduationCap,
   BookOpen,
   Users,
@@ -61,7 +61,6 @@ const GROUPS: NavGroup[] = [
       { to: "/admin/ambientes", label: "Ambientes", icon: Layers },
       { to: "/admin/alunos", label: "Alunos", icon: Users },
       { to: "/admin/ferramentas", label: "Ferramentas", icon: Wrench },
-      { to: "/admin/novidades", label: "Novidades", icon: Newspaper },
     ],
   },
   {

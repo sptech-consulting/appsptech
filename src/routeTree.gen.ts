@@ -20,7 +20,6 @@ import { Route as AlunoLoginRouteImport } from './routes/aluno_.login'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminTrabalhosRouteImport } from './routes/admin.trabalhos'
-import { Route as AdminNovidadesRouteImport } from './routes/admin.novidades'
 import { Route as AdminMetricasRouteImport } from './routes/admin.metricas'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminImportacoesRouteImport } from './routes/admin.importacoes'
@@ -93,11 +92,6 @@ const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
 const AdminTrabalhosRoute = AdminTrabalhosRouteImport.update({
   id: '/trabalhos',
   path: '/trabalhos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminNovidadesRoute = AdminNovidadesRouteImport.update({
-  id: '/novidades',
-  path: '/novidades',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMetricasRoute = AdminMetricasRouteImport.update({
@@ -206,7 +200,6 @@ export interface FileRoutesByFullPath {
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/metricas': typeof AdminMetricasRoute
-  '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/trabalhos': typeof AdminTrabalhosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/login': typeof AdminLoginRoute
@@ -236,7 +229,6 @@ export interface FileRoutesByTo {
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/metricas': typeof AdminMetricasRoute
-  '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/trabalhos': typeof AdminTrabalhosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/login': typeof AdminLoginRoute
@@ -269,7 +261,6 @@ export interface FileRoutesById {
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/metricas': typeof AdminMetricasRoute
-  '/admin/novidades': typeof AdminNovidadesRoute
   '/admin/trabalhos': typeof AdminTrabalhosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin_/login': typeof AdminLoginRoute
@@ -303,7 +294,6 @@ export interface FileRouteTypes {
     | '/admin/importacoes'
     | '/admin/logs'
     | '/admin/metricas'
-    | '/admin/novidades'
     | '/admin/trabalhos'
     | '/admin/usuarios'
     | '/admin/login'
@@ -333,7 +323,6 @@ export interface FileRouteTypes {
     | '/admin/importacoes'
     | '/admin/logs'
     | '/admin/metricas'
-    | '/admin/novidades'
     | '/admin/trabalhos'
     | '/admin/usuarios'
     | '/admin/login'
@@ -365,7 +354,6 @@ export interface FileRouteTypes {
     | '/admin/importacoes'
     | '/admin/logs'
     | '/admin/metricas'
-    | '/admin/novidades'
     | '/admin/trabalhos'
     | '/admin/usuarios'
     | '/admin_/login'
@@ -475,13 +463,6 @@ declare module '@tanstack/react-router' {
       path: '/trabalhos'
       fullPath: '/admin/trabalhos'
       preLoaderRoute: typeof AdminTrabalhosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/novidades': {
-      id: '/admin/novidades'
-      path: '/novidades'
-      fullPath: '/admin/novidades'
-      preLoaderRoute: typeof AdminNovidadesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/metricas': {
@@ -622,7 +603,6 @@ interface AdminRouteChildren {
   AdminImportacoesRoute: typeof AdminImportacoesRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMetricasRoute: typeof AdminMetricasRoute
-  AdminNovidadesRoute: typeof AdminNovidadesRoute
   AdminTrabalhosRoute: typeof AdminTrabalhosRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -642,7 +622,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminImportacoesRoute: AdminImportacoesRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMetricasRoute: AdminMetricasRoute,
-  AdminNovidadesRoute: AdminNovidadesRoute,
   AdminTrabalhosRoute: AdminTrabalhosRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -693,3 +672,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
