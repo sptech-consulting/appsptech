@@ -31,6 +31,10 @@ export type AmbienteHomeBranding = {
   efeito_som_volume: number;
   efeito_blobs_fundo: boolean;
   tema: "claro" | "escuro";
+  playbook_titulo: string | null;
+  playbook_descricao: string | null;
+  playbook_capa_url: string | null;
+  playbook_arquivo_url: string | null;
 };
 
 export type FerramentaItem = {
