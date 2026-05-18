@@ -124,7 +124,7 @@ function ResultadosPage() {
               <Link
                 key={t.id}
                 to="/e/$slug/resultados/$trabalhoId"
-                params={{ slug, trabalhoId: t.id }}
+                params={{ slug, trabalhoId: t.slug ?? t.id }}
                 className="group rounded-2xl overflow-hidden border bg-white shadow-sm hover:shadow-xl transition"
                 style={{ borderColor: "rgba(0,0,0,0.08)" }}
               >
