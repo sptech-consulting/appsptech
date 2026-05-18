@@ -8,7 +8,15 @@ export const Route = createFileRoute("/admin_/login")({
   beforeLoad: async () => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/admin" });
+    if (!data.session) return;
+    // Só redireciona se a sessão atual já for um admin ativo.
+    const { data: admin } = await supabase
+      .from("usuarios_admin")
+      .select("id")
+      .eq("auth_user_id", data.session.user.id)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (admin) throw redirect({ to: "/admin" });
   },
   head: () => ({ meta: [{ title: "Login Admin — SPTech" }] }),
   component: AdminLogin,
@@ -29,6 +37,10 @@ function AdminLogin() {
     e.preventDefault();
     setError(null); setInfo(null); setLoading(true);
     try {
+      // Encerra qualquer sessão prévia (ex.: aluno) antes de entrar como admin.
+      const { data: current } = await supabase.auth.getSession();
+      if (current.session) await supabase.auth.signOut();
+
       if (mode === "signup") {
         await signUp(email, password);
         await signIn(email, password);

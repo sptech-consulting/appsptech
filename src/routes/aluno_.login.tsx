@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { signIn, signUp } from "@/lib/auth";
+import { signIn, signUp, signOut } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
@@ -8,7 +8,17 @@ export const Route = createFileRoute("/aluno_/login")({
   beforeLoad: async () => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/aluno" });
+    if (!data.session) return;
+    // Só redireciona automaticamente se a sessão atual já for um aluno ativo.
+    // Caso contrário (admin logado no mesmo navegador), mostra a tela de login
+    // para permitir trocar de conta sem deslogar o admin sem aviso.
+    const { data: aluno } = await supabase
+      .from("alunos")
+      .select("id")
+      .eq("auth_user_id", data.session.user.id)
+      .eq("status", "ativo")
+      .maybeSingle();
+    if (aluno) throw redirect({ to: "/aluno" });
   },
   head: () => ({ meta: [{ title: "Acesso do Aluno — SPTech" }] }),
   component: AlunoLogin,
@@ -27,6 +37,10 @@ function AlunoLogin() {
     e.preventDefault();
     setError(null); setLoading(true);
     try {
+      // Encerra qualquer sessão pré-existente (ex.: admin) antes de entrar como aluno.
+      const { data: current } = await supabase.auth.getSession();
+      if (current.session) await signOut();
+
       if (mode === "signup") {
         await signUp(email, password);
         await signIn(email, password);
