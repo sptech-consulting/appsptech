@@ -18,7 +18,7 @@ type Curso = {
   status: "rascunho" | "publicada" | "arquivada";
 };
 
-export const Route = createFileRoute("/admin/cursos")({
+export const Route = createFileRoute("/admin/cursos/")({
   component: CursosPage,
 });
 
