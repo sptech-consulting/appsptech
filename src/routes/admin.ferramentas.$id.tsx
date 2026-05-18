@@ -143,6 +143,8 @@ function FerramentaDetalhePage() {
         <GeralTab f={f} setF={setF} saving={saving} onSave={saveGeral} />
       )}
 
+      {tab === "ambientes" && <AmbientesTab ferramentaId={f.id} />}
+
       {tab === "casos_uso" && (
         <CasosUsoTab ferramentaId={f.id} items={casosUso} setItems={setCasosUso} reload={load} />
       )}
