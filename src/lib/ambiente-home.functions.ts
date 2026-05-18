@@ -232,7 +232,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       if (modIds.length) {
         const { data: au } = await supabaseAdmin
           .from("aulas")
-          .select("id, titulo, descricao, modulo, modulo_id, ordem, video_url, material_url, thumbnail_url, duracao_minutos, tipo_conteudo, status")
+          .select("id, slug, titulo, descricao, modulo, modulo_id, ordem, video_url, material_url, thumbnail_url, duracao_minutos, tipo_conteudo, status")
           .in("modulo_id", modIds)
           .eq("status", "publicada");
 
@@ -243,6 +243,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
             const mOrd = m?.ordem ?? 0;
             return {
               id: a.id,
+              slug: (a as { slug: string | null }).slug ?? null,
               titulo: a.titulo,
               descricao: a.descricao,
               modulo: a.modulo ?? m?.titulo ?? null,
