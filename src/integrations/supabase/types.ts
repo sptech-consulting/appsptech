@@ -313,6 +313,10 @@ export type Database = {
           layout_home: Json | null
           logo_url: string | null
           nome: string
+          playbook_arquivo_url: string | null
+          playbook_capa_url: string | null
+          playbook_descricao: string | null
+          playbook_titulo: string | null
           slug: string
           status: Database["public"]["Enums"]["ambiente_status"]
           tema: Database["public"]["Enums"]["ambiente_tema"]
@@ -352,6 +356,10 @@ export type Database = {
           layout_home?: Json | null
           logo_url?: string | null
           nome: string
+          playbook_arquivo_url?: string | null
+          playbook_capa_url?: string | null
+          playbook_descricao?: string | null
+          playbook_titulo?: string | null
           slug: string
           status?: Database["public"]["Enums"]["ambiente_status"]
           tema?: Database["public"]["Enums"]["ambiente_tema"]
@@ -391,6 +399,10 @@ export type Database = {
           layout_home?: Json | null
           logo_url?: string | null
           nome?: string
+          playbook_arquivo_url?: string | null
+          playbook_capa_url?: string | null
+          playbook_descricao?: string | null
+          playbook_titulo?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["ambiente_status"]
           tema?: Database["public"]["Enums"]["ambiente_tema"]

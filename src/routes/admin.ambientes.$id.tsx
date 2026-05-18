@@ -59,6 +59,10 @@ function EditAmbiente() {
         efeito_som_hover: (data as any).efeito_som_hover ?? false,
         efeito_som_volume: (data as any).efeito_som_volume ?? 40,
         efeito_blobs_fundo: (data as any).efeito_blobs_fundo ?? false,
+        playbook_titulo: (data as any).playbook_titulo ?? null,
+        playbook_descricao: (data as any).playbook_descricao ?? null,
+        playbook_capa_url: (data as any).playbook_capa_url ?? null,
+        playbook_arquivo_url: (data as any).playbook_arquivo_url ?? null,
       });
     })();
   }, [id]);
@@ -99,6 +103,10 @@ function EditAmbiente() {
         efeito_som_hover: state.efeito_som_hover,
         efeito_som_volume: state.efeito_som_volume,
         efeito_blobs_fundo: state.efeito_blobs_fundo,
+        playbook_titulo: state.playbook_titulo,
+        playbook_descricao: state.playbook_descricao,
+        playbook_capa_url: state.playbook_capa_url,
+        playbook_arquivo_url: state.playbook_arquivo_url,
       } as any)
       .eq("id", id);
     setSaving(false);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,6 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { AmbientePreview, type AmbienteVisual } from "./AmbientePreview";
 import { DEFAULT_EFFECTS, EFFECT_PRESETS, playHoverTap, type AmbienteEffects } from "@/lib/ambiente-effects";
 import { ImageUpload } from "@/components/ImageUpload";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Upload, FileText, X, Loader2, Download } from "lucide-react";
 
 export type AmbienteFormState = AmbienteVisual &
   AmbienteEffects & {
@@ -16,6 +19,10 @@ export type AmbienteFormState = AmbienteVisual &
     favicon_url: string | null;
     imagem_login_url: string | null;
     codigo_acesso_resultados: string | null;
+    playbook_titulo: string | null;
+    playbook_descricao: string | null;
+    playbook_capa_url: string | null;
+    playbook_arquivo_url: string | null;
   };
 
 export function gerarCodigoAcesso(len = 6): string {
@@ -55,10 +62,14 @@ export const DEFAULT_AMBIENTE: AmbienteFormState = {
   card_exibir_icone: true,
   card_exibir_imagem: true,
   codigo_acesso_resultados: null,
+  playbook_titulo: null,
+  playbook_descricao: null,
+  playbook_capa_url: null,
+  playbook_arquivo_url: null,
   ...DEFAULT_EFFECTS,
 };
 
-type Tab = "geral" | "identidade" | "cards" | "efeitos";
+type Tab = "geral" | "identidade" | "cards" | "efeitos" | "playbook";
 
 export function AmbienteForm({
   initial,
@@ -100,7 +111,7 @@ export function AmbienteForm({
       >
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="flex border-b border-border text-sm">
-            {(["geral", "identidade", "cards", "efeitos"] as Tab[]).map((t) => (
+            {(["geral", "identidade", "cards", "efeitos", "playbook"] as Tab[]).map((t) => (
               <button
                 key={t}
                 type="button"
@@ -109,7 +120,15 @@ export function AmbienteForm({
                   tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                 }`}
               >
-                {t === "geral" ? "Dados gerais" : t === "identidade" ? "Identidade visual" : t === "cards" ? "Cards" : "Efeitos"}
+                {t === "geral"
+                  ? "Dados gerais"
+                  : t === "identidade"
+                    ? "Identidade visual"
+                    : t === "cards"
+                      ? "Cards"
+                      : t === "efeitos"
+                        ? "Efeitos"
+                        : "Playbook"}
               </button>
             ))}
           </div>
@@ -383,6 +402,46 @@ export function AmbienteForm({
                 </div>
               </>
             )}
+
+            {tab === "playbook" && (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Cadastre o Playbook deste ambiente. A capa e o botão de download aparecem para os alunos vinculados na home do ambiente.
+                </p>
+                <Field label="Título" hint="Ex.: Playbook de IA para Executivos">
+                  <Input
+                    value={state.playbook_titulo ?? ""}
+                    onChange={(e) => set("playbook_titulo", e.target.value || null)}
+                    placeholder="Título do Playbook"
+                  />
+                </Field>
+                <Field label="Descrição curta" hint="Aparece sob o título no card do aluno.">
+                  <Textarea
+                    rows={2}
+                    value={state.playbook_descricao ?? ""}
+                    onChange={(e) => set("playbook_descricao", e.target.value || null)}
+                    placeholder="Um guia prático para líderes…"
+                  />
+                </Field>
+                <ImageUpload
+                  label="Capa do Playbook"
+                  value={state.playbook_capa_url}
+                  onChange={(url) => set("playbook_capa_url", url)}
+                  folder="ambientes/playbooks/capas"
+                  aspect="aspect-video"
+                  helper="Imagem destaque (até 5 MB). Recomendado 16:9."
+                />
+                <FileUpload
+                  label="Arquivo do Playbook (PDF)"
+                  value={state.playbook_arquivo_url}
+                  onChange={(url) => set("playbook_arquivo_url", url)}
+                  folder="ambientes/playbooks/arquivos"
+                  accept="application/pdf"
+                  maxMB={50}
+                  helper="PDF até 50 MB. O aluno baixa direto pelo botão na home."
+                />
+              </>
+            )}
           </div>
         </div>
 
@@ -472,5 +531,124 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 accent-primary" />
       <span className="text-secondary">{label}</span>
     </label>
+  );
+}
+
+function FileUpload({
+  label,
+  value,
+  onChange,
+  folder,
+  accept = "application/pdf",
+  maxMB = 50,
+  helper,
+}: {
+  label: string;
+  value: string | null | undefined;
+  onChange: (url: string | null) => void;
+  folder: string;
+  accept?: string;
+  maxMB?: number;
+  helper?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  async function handleFile(file: File) {
+    if (file.size > maxMB * 1024 * 1024) {
+      toast.error(`Arquivo maior que ${maxMB} MB.`);
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+      const safeFolder = folder.replace(/^\/+|\/+$/g, "");
+      const path = `${safeFolder}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("plataforma")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("plataforma").getPublicUrl(path);
+      onChange(data.publicUrl);
+      setFileName(file.name);
+      toast.success("Arquivo enviado.");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Falha no upload.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  const displayName = fileName ?? (value ? value.split("/").pop() : null);
+
+  return (
+    <div className="space-y-1.5">
+      <Label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-secondary">{label}</Label>
+      <div className="rounded-md border border-border bg-card p-3 flex items-center gap-3">
+        <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center shrink-0">
+          <FileText className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="flex-1 min-w-0">
+          {value ? (
+            <>
+              <div className="text-sm font-semibold text-secondary truncate">{displayName}</div>
+              <a
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+              >
+                <Download className="h-3 w-3" /> Abrir/baixar
+              </a>
+            </>
+          ) : (
+            <div className="text-xs text-muted-foreground">Nenhum arquivo enviado.</div>
+          )}
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-muted disabled:opacity-50"
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Enviando…
+              </>
+            ) : (
+              <>
+                <Upload className="h-3 w-3" /> {value ? "Trocar" : "Enviar"}
+              </>
+            )}
+          </button>
+          {value && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange(null);
+                setFileName(null);
+              }}
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleFile(f);
+          }}
+        />
+      </div>
+      {helper && <div className="text-[11px] text-muted-foreground">{helper}</div>}
+    </div>
   );
 }

@@ -53,6 +53,10 @@ function NovoAmbiente() {
         efeito_som_hover: state.efeito_som_hover,
         efeito_som_volume: state.efeito_som_volume,
         efeito_blobs_fundo: state.efeito_blobs_fundo,
+        playbook_titulo: state.playbook_titulo,
+        playbook_descricao: state.playbook_descricao,
+        playbook_capa_url: state.playbook_capa_url,
+        playbook_arquivo_url: state.playbook_arquivo_url,
       })
       .select("id")
       .single();
