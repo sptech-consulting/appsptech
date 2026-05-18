@@ -360,5 +360,6 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       ferramentas,
       novidades,
       aulas,
+      cursos,
     };
   });
