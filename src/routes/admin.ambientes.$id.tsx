@@ -144,7 +144,7 @@ function EditAmbiente() {
 }
 
 function AccessLinkCard({ slug }: { slug: string }) {
-  const url = typeof window !== "undefined" ? `${window.location.origin}/e/${slug}/login` : `/e/${slug}/login`;
+  const url = typeof window !== "undefined" ? `${window.location.origin}/e/${slug}/entrar` : `/e/${slug}/entrar`;
   return (
     <div className="mb-4 rounded-xl border border-border bg-card p-4 flex items-center gap-3">
       <Link2 className="h-4 w-4 text-primary" />
@@ -163,7 +163,7 @@ function AccessLinkCard({ slug }: { slug: string }) {
         <Link2 className="h-3 w-3" /> Copiar
       </Button>
       <a
-        href={`/e/${slug}/login`}
+        href={`/e/${slug}/entrar`}
         target="_blank"
         rel="noreferrer"
         className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"

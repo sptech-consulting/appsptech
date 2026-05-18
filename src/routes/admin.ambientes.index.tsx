@@ -99,7 +99,7 @@ function AmbientesList() {
                     <div className="inline-flex gap-1">
                       <button
                         onClick={() => {
-                          const url = `${window.location.origin}/e/${a.slug}/login`;
+                          const url = `${window.location.origin}/e/${a.slug}/entrar`;
                           void navigator.clipboard.writeText(url);
                           toast.success("Link copiado", { description: url });
                         }}
@@ -109,7 +109,7 @@ function AmbientesList() {
                         <Link2 className="h-3 w-3" /> Copiar link
                       </button>
                       <a
-                        href={`/e/${a.slug}/login`}
+                        href={`/e/${a.slug}/entrar`}
                         target="_blank"
                         rel="noreferrer"
                         title="Abrir link de acesso"
