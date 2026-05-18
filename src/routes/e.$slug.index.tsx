@@ -159,7 +159,7 @@ function AmbienteHome() {
   ];
 
   function openFerramenta(f: FerramentaItem) {
-    navigate({ to: "/e/$slug/ferramenta/$ferramentaId", params: { slug, ferramentaId: f.id } });
+    navigate({ to: "/e/$slug/ferramenta/$ferramentaId", params: { slug, ferramentaId: f.slug ?? f.id } });
   }
 
   return (
@@ -373,7 +373,7 @@ function AmbienteHome() {
                 effects={effects}
                 baseStyle={{ ...cardBase, cursor: "pointer", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
                 primaria={tk.primaria}
-                onClick={() => navigate({ to: "/e/$slug/novidade/$novidadeId", params: { slug, novidadeId: n.id } })}
+                onClick={() => navigate({ to: "/e/$slug/novidade/$novidadeId", params: { slug, novidadeId: n.slug ?? n.id } })}
               >
                 {b.card_exibir_imagem && (
                   <div
@@ -467,7 +467,7 @@ function AmbienteHome() {
                     <Download className="h-3 w-3" /> Baixar material
                   </a>
                   <button
-                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.id } })}
+                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.slug ?? a.id } })}
                     className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
                     style={{ backgroundColor: "transparent", color: tk.text, border: `1px solid ${tk.border}` }}
                   >
@@ -498,7 +498,7 @@ function AmbienteHome() {
                   primaria={tk.primaria}
                   onClick={() => {
                     if (c.primeira_aula_id) {
-                      navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: c.primeira_aula_id } });
+                      navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: c.primeira_aula_slug ?? c.primeira_aula_id } });
                     }
                   }}
                 >
