@@ -53,7 +53,7 @@ export const listarTrabalhosPublicos = createServerFn({ method: "POST" })
       _codigo: data.codigo,
     });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as Array<{
+    const list = (rows ?? []) as Array<{
       id: string;
       titulo: string;
       resumo: string | null;
@@ -64,6 +64,14 @@ export const listarTrabalhosPublicos = createServerFn({ method: "POST" })
       destaque: boolean;
       publicado_em: string | null;
     }>;
+    if (list.length === 0) return [] as Array<typeof list[number] & { slug: string | null }>;
+    const ids = list.map((t) => t.id);
+    const { data: slugs } = await supabaseAdmin
+      .from("trabalhos")
+      .select("id, slug")
+      .in("id", ids);
+    const slugById = new Map((slugs ?? []).map((s) => [s.id, (s as { slug: string | null }).slug ?? null]));
+    return list.map((t) => ({ ...t, slug: slugById.get(t.id) ?? null }));
   });
 
 export const obterTrabalhoPublico = createServerFn({ method: "POST" })
