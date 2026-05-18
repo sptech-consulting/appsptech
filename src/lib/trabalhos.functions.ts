@@ -1,8 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { isUuid } from "@/lib/slug";
 
 function normCodigo(c: string) {
   return (c || "").toUpperCase().replace(/\s+/g, "");
+}
+
+async function resolverTrabalhoId(refOrId: string): Promise<string> {
+  if (isUuid(refOrId)) return refOrId;
+  const { data } = await supabaseAdmin
+    .from("trabalhos")
+    .select("id")
+    .eq("slug", refOrId)
+    .maybeSingle();
+  if (!data) throw new Error("Trabalho não encontrado.");
+  return data.id;
 }
 
 export const resolverAmbientePorCodigo = createServerFn({ method: "POST" })
