@@ -533,3 +533,122 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
     </label>
   );
 }
+
+function FileUpload({
+  label,
+  value,
+  onChange,
+  folder,
+  accept = "application/pdf",
+  maxMB = 50,
+  helper,
+}: {
+  label: string;
+  value: string | null | undefined;
+  onChange: (url: string | null) => void;
+  folder: string;
+  accept?: string;
+  maxMB?: number;
+  helper?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  async function handleFile(file: File) {
+    if (file.size > maxMB * 1024 * 1024) {
+      toast.error(`Arquivo maior que ${maxMB} MB.`);
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+      const safeFolder = folder.replace(/^\/+|\/+$/g, "");
+      const path = `${safeFolder}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("plataforma")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("plataforma").getPublicUrl(path);
+      onChange(data.publicUrl);
+      setFileName(file.name);
+      toast.success("Arquivo enviado.");
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Falha no upload.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  const displayName = fileName ?? (value ? value.split("/").pop() : null);
+
+  return (
+    <div className="space-y-1.5">
+      <Label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-secondary">{label}</Label>
+      <div className="rounded-md border border-border bg-card p-3 flex items-center gap-3">
+        <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center shrink-0">
+          <FileText className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="flex-1 min-w-0">
+          {value ? (
+            <>
+              <div className="text-sm font-semibold text-secondary truncate">{displayName}</div>
+              <a
+                href={value}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline"
+              >
+                <Download className="h-3 w-3" /> Abrir/baixar
+              </a>
+            </>
+          ) : (
+            <div className="text-xs text-muted-foreground">Nenhum arquivo enviado.</div>
+          )}
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:bg-muted disabled:opacity-50"
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Enviando…
+              </>
+            ) : (
+              <>
+                <Upload className="h-3 w-3" /> {value ? "Trocar" : "Enviar"}
+              </>
+            )}
+          </button>
+          {value && (
+            <button
+              type="button"
+              onClick={() => {
+                onChange(null);
+                setFileName(null);
+              }}
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-card px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleFile(f);
+          }}
+        />
+      </div>
+      {helper && <div className="text-[11px] text-muted-foreground">{helper}</div>}
+    </div>
+  );
+}
