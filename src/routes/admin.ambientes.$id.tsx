@@ -163,7 +163,7 @@ function AccessLinkCard({ slug }: { slug: string }) {
         <Link2 className="h-3 w-3" /> Copiar
       </Button>
       <a
-        href={`/e/${slug}/login`}
+        href={`/e/${slug}/entrar`}
         target="_blank"
         rel="noreferrer"
         className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
