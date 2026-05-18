@@ -32,10 +32,11 @@ type Bloco = { id: string; titulo: string; conteudo: string; ordem: number };
 type Funcionalidade = { id: string; titulo: string; descricao: string | null; imagem_url: string | null; ordem: number };
 type CasoTeste = { id: string; titulo: string; badge: string | null; prompt_exemplo: string | null; explicacao: string | null; ordem: number };
 
-type TabKey = "geral" | "casos_uso" | "tags" | "blocos" | "funcionalidades" | "casos_teste";
+type TabKey = "geral" | "ambientes" | "casos_uso" | "tags" | "blocos" | "funcionalidades" | "casos_teste";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "geral", label: "Geral" },
+  { key: "ambientes", label: "Ambientes" },
   { key: "casos_uso", label: "Casos de uso" },
   { key: "tags", label: "Tags" },
   { key: "blocos", label: "Blocos" },
@@ -141,6 +142,8 @@ function FerramentaDetalhePage() {
       {tab === "geral" && (
         <GeralTab f={f} setF={setF} saving={saving} onSave={saveGeral} />
       )}
+
+      {tab === "ambientes" && <AmbientesTab ferramentaId={f.id} />}
 
       {tab === "casos_uso" && (
         <CasosUsoTab ferramentaId={f.id} items={casosUso} setItems={setCasosUso} reload={load} />
@@ -693,5 +696,135 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">{label}</span>
       {children}
     </label>
+  );
+}
+
+/* ---------- AMBIENTES (vínculos) ---------- */
+type AmbienteLite = { id: string; nome: string; slug: string; status: string };
+type Vinculo = { id: string; ambiente_id: string; ordem: number; destaque: boolean; status: "ativo" | "inativo" };
+
+function AmbientesTab({ ferramentaId }: { ferramentaId: string }) {
+  const [loading, setLoading] = useState(true);
+  const [ambientes, setAmbientes] = useState<AmbienteLite[]>([]);
+  const [vinculos, setVinculos] = useState<Vinculo[]>([]);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const [amb, vin] = await Promise.all([
+      supabase.from("ambientes").select("id,nome,slug,status").order("nome"),
+      supabase.from("ambiente_ferramentas").select("id,ambiente_id,ordem,destaque,status").eq("ferramenta_id", ferramentaId),
+    ]);
+    if (amb.error) toast.error(amb.error.message);
+    if (vin.error) toast.error(vin.error.message);
+    setAmbientes((amb.data as AmbienteLite[]) ?? []);
+    setVinculos((vin.data as Vinculo[]) ?? []);
+    setLoading(false);
+  }, [ferramentaId]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const byAmbiente = new Map(vinculos.map((v) => [v.ambiente_id, v]));
+
+  async function toggle(ambienteId: string, checked: boolean) {
+    const existing = byAmbiente.get(ambienteId);
+    if (checked && !existing) {
+      const { error } = await supabase.from("ambiente_ferramentas").insert({
+        ambiente_id: ambienteId,
+        ferramenta_id: ferramentaId,
+        ordem: vinculos.length,
+        destaque: false,
+        status: "ativo",
+      });
+      if (error) return toast.error(error.message);
+    } else if (!checked && existing) {
+      const { error } = await supabase.from("ambiente_ferramentas").delete().eq("id", existing.id);
+      if (error) return toast.error(error.message);
+    } else if (existing && existing.status !== "ativo" && checked) {
+      const { error } = await supabase.from("ambiente_ferramentas").update({ status: "ativo" }).eq("id", existing.id);
+      if (error) return toast.error(error.message);
+    }
+    await load();
+  }
+
+  async function setDestaque(ambienteId: string, destaque: boolean) {
+    const existing = byAmbiente.get(ambienteId);
+    if (!existing) return;
+    const { error } = await supabase.from("ambiente_ferramentas").update({ destaque }).eq("id", existing.id);
+    if (error) return toast.error(error.message);
+    await load();
+  }
+
+  async function setOrdem(ambienteId: string, ordem: number) {
+    const existing = byAmbiente.get(ambienteId);
+    if (!existing) return;
+    const { error } = await supabase.from("ambiente_ferramentas").update({ ordem }).eq("id", existing.id);
+    if (error) return toast.error(error.message);
+    setVinculos((vs) => vs.map((v) => (v.id === existing.id ? { ...v, ordem } : v)));
+  }
+
+  if (loading) return <div className="text-sm text-muted-foreground">Carregando…</div>;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        Marque os ambientes em que esta ferramenta deve aparecer. Use destaque para fixar no topo do grid do aluno.
+      </p>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        {ambientes.length === 0 ? (
+          <div className="p-6 text-sm text-muted-foreground">Nenhum ambiente cadastrado.</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="bg-muted text-secondary">
+              <tr className="text-left">
+                <th className="px-4 py-2 font-semibold">Vincular</th>
+                <th className="px-4 py-2 font-semibold">Ambiente</th>
+                <th className="px-4 py-2 font-semibold">Destaque</th>
+                <th className="px-4 py-2 font-semibold w-24">Ordem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ambientes.map((a) => {
+                const v = byAmbiente.get(a.id);
+                const vinculado = !!v && v.status === "ativo";
+                return (
+                  <tr key={a.id} className="border-t border-border">
+                    <td className="px-4 py-2">
+                      <input
+                        type="checkbox"
+                        checked={vinculado}
+                        onChange={(e) => void toggle(a.id, e.target.checked)}
+                        className="h-4 w-4 accent-primary"
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="font-semibold text-secondary">{a.nome}</div>
+                      <div className="text-xs text-muted-foreground">/{a.slug} · {a.status}</div>
+                    </td>
+                    <td className="px-4 py-2">
+                      <input
+                        type="checkbox"
+                        disabled={!vinculado}
+                        checked={!!v?.destaque}
+                        onChange={(e) => void setDestaque(a.id, e.target.checked)}
+                        className="h-4 w-4 accent-primary disabled:opacity-40"
+                      />
+                    </td>
+                    <td className="px-4 py-2">
+                      <input
+                        type="number"
+                        disabled={!vinculado}
+                        value={v?.ordem ?? 0}
+                        onChange={(e) => void setOrdem(a.id, Number(e.target.value) || 0)}
+                        className="w-20 rounded-md border border-border bg-background px-2 py-1 text-sm disabled:opacity-40"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
   );
 }
