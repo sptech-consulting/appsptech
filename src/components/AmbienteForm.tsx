@@ -402,6 +402,46 @@ export function AmbienteForm({
                 </div>
               </>
             )}
+
+            {tab === "playbook" && (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  Cadastre o Playbook deste ambiente. A capa e o botão de download aparecem para os alunos vinculados na home do ambiente.
+                </p>
+                <Field label="Título" hint="Ex.: Playbook de IA para Executivos">
+                  <Input
+                    value={state.playbook_titulo ?? ""}
+                    onChange={(e) => set("playbook_titulo", e.target.value || null)}
+                    placeholder="Título do Playbook"
+                  />
+                </Field>
+                <Field label="Descrição curta" hint="Aparece sob o título no card do aluno.">
+                  <Textarea
+                    rows={2}
+                    value={state.playbook_descricao ?? ""}
+                    onChange={(e) => set("playbook_descricao", e.target.value || null)}
+                    placeholder="Um guia prático para líderes…"
+                  />
+                </Field>
+                <ImageUpload
+                  label="Capa do Playbook"
+                  value={state.playbook_capa_url}
+                  onChange={(url) => set("playbook_capa_url", url)}
+                  folder="ambientes/playbooks/capas"
+                  aspect="aspect-video"
+                  helper="Imagem destaque (até 5 MB). Recomendado 16:9."
+                />
+                <FileUpload
+                  label="Arquivo do Playbook (PDF)"
+                  value={state.playbook_arquivo_url}
+                  onChange={(url) => set("playbook_arquivo_url", url)}
+                  folder="ambientes/playbooks/arquivos"
+                  accept="application/pdf"
+                  maxMB={50}
+                  helper="PDF até 50 MB. O aluno baixa direto pelo botão na home."
+                />
+              </>
+            )}
           </div>
         </div>
 
