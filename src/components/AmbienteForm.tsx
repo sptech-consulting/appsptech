@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,6 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { AmbientePreview, type AmbienteVisual } from "./AmbientePreview";
 import { DEFAULT_EFFECTS, EFFECT_PRESETS, playHoverTap, type AmbienteEffects } from "@/lib/ambiente-effects";
 import { ImageUpload } from "@/components/ImageUpload";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Upload, FileText, X, Loader2, Download } from "lucide-react";
 
 export type AmbienteFormState = AmbienteVisual &
   AmbienteEffects & {
@@ -16,6 +19,10 @@ export type AmbienteFormState = AmbienteVisual &
     favicon_url: string | null;
     imagem_login_url: string | null;
     codigo_acesso_resultados: string | null;
+    playbook_titulo: string | null;
+    playbook_descricao: string | null;
+    playbook_capa_url: string | null;
+    playbook_arquivo_url: string | null;
   };
 
 export function gerarCodigoAcesso(len = 6): string {
