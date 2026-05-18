@@ -159,9 +159,7 @@ function AmbienteHome() {
   ];
 
   function openFerramenta(f: FerramentaItem) {
-    if (!f.url) return;
-    if (f.tipo_abertura === "mesma_aba") window.location.assign(f.url);
-    else window.open(f.url, "_blank", "noopener,noreferrer");
+    navigate({ to: "/e/$slug/ferramenta/$ferramentaId", params: { slug, ferramentaId: f.id } });
   }
 
   return (
