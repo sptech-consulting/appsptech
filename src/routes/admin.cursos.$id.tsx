@@ -177,11 +177,14 @@ function CursoDetalhe() {
       </div>
 
       {tab === "curso" && (
-        <CursoForm
-          curso={curso}
-          onSaved={(c) => setCurso(c)}
-          onDeleted={() => navigate({ to: "/admin/cursos" })}
-        />
+        <div className="space-y-5">
+          <CursoForm
+            curso={curso}
+            onSaved={(c) => setCurso(c)}
+            onDeleted={() => navigate({ to: "/admin/cursos" })}
+          />
+          <AmbientesVinculados cursoId={id} />
+        </div>
       )}
 
       {tab === "modulos" && (
