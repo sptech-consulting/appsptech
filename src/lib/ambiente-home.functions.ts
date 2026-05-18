@@ -261,12 +261,12 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
           .sort((a, b) => a.modulo_ordem - b.modulo_ordem || a.ordem - b.ordem);
 
         // Calcula total de aulas e primeira aula por curso
-        const aulasOrdenadasPorCurso = new Map<string, { id: string; ordem: number; modulo_ordem: number }[]>();
+        const aulasOrdenadasPorCurso = new Map<string, { id: string; slug: string | null; ordem: number; modulo_ordem: number }[]>();
         for (const a of aulas as (AulaItem & { _curso_id?: string | null })[]) {
           const cid = a._curso_id;
           if (!cid) continue;
           const list = aulasOrdenadasPorCurso.get(cid) ?? [];
-          list.push({ id: a.id, ordem: a.ordem, modulo_ordem: a.modulo_ordem });
+          list.push({ id: a.id, slug: a.slug, ordem: a.ordem, modulo_ordem: a.modulo_ordem });
           aulasOrdenadasPorCurso.set(cid, list);
         }
 
@@ -282,6 +282,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
               nivel: c.nivel,
               total_aulas: list.length,
               primeira_aula_id: list[0]?.id ?? null,
+              primeira_aula_slug: list[0]?.slug ?? null,
               ordem: cursoOrdem.get(c.id) ?? 0,
               destaque: cursoDestaque.get(c.id) ?? false,
             };
@@ -303,6 +304,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
           nivel: c.nivel,
           total_aulas: 0,
           primeira_aula_id: null,
+          primeira_aula_slug: null,
           ordem: cursoOrdem.get(c.id) ?? 0,
           destaque: cursoDestaque.get(c.id) ?? false,
         })).sort((a, b) => a.ordem - b.ordem);
