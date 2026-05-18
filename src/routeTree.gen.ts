@@ -9,15 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
+import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as AlunoRouteImport } from './routes/aluno'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlunoIndexRouteImport } from './routes/aluno.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AlunoLoginRouteImport } from './routes/aluno_.login'
-import { Route as AdminLoginRouteImport } from './routes/admin_.login'
+import { Route as AlunoEntrarRouteImport } from './routes/aluno_.entrar'
+import { Route as AdminEntrarRouteImport } from './routes/admin_.entrar'
 import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as AdminTrabalhosRouteImport } from './routes/admin.trabalhos'
 import { Route as AdminMetricasRouteImport } from './routes/admin.metricas'
@@ -32,7 +32,7 @@ import { Route as ESlugIndexRouteImport } from './routes/e.$slug.index'
 import { Route as AdminCursosIndexRouteImport } from './routes/admin.cursos.index'
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
 import { Route as ESlugResultadosRouteImport } from './routes/e.$slug.resultados'
-import { Route as ESlugLoginRouteImport } from './routes/e.$slug.login'
+import { Route as ESlugEntrarRouteImport } from './routes/e.$slug.entrar'
 import { Route as AdminFerramentasIdRouteImport } from './routes/admin.ferramentas.$id'
 import { Route as AdminCursosIdRouteImport } from './routes/admin.cursos.$id'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
@@ -43,14 +43,14 @@ import { Route as ESlugFerramentaFerramentaIdRouteImport } from './routes/e.$slu
 import { Route as ESlugAulaAulaIdRouteImport } from './routes/e.$slug.aula.$aulaId'
 import { Route as ApiPublicNovidadesWebhookTokenRouteImport } from './routes/api/public/novidades/webhook/$token'
 
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
+const EsqueciSenhaRoute = EsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AlunoRoute = AlunoRouteImport.update({
@@ -78,14 +78,14 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const AlunoLoginRoute = AlunoLoginRouteImport.update({
-  id: '/aluno_/login',
-  path: '/aluno/login',
+const AlunoEntrarRoute = AlunoEntrarRouteImport.update({
+  id: '/aluno_/entrar',
+  path: '/aluno/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin_/login',
-  path: '/admin/login',
+const AdminEntrarRoute = AdminEntrarRouteImport.update({
+  id: '/admin_/entrar',
+  path: '/admin/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
@@ -158,9 +158,9 @@ const ESlugResultadosRoute = ESlugResultadosRouteImport.update({
   path: '/e/$slug/resultados',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ESlugLoginRoute = ESlugLoginRouteImport.update({
-  id: '/e/$slug/login',
-  path: '/e/$slug/login',
+const ESlugEntrarRoute = ESlugEntrarRouteImport.update({
+  id: '/e/$slug/entrar',
+  path: '/e/$slug/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminFerramentasIdRoute = AdminFerramentasIdRouteImport.update({
@@ -216,8 +216,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/reset-password': typeof ResetPasswordRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
@@ -228,15 +228,15 @@ export interface FileRoutesByFullPath {
   '/admin/metricas': typeof AdminMetricasRoute
   '/admin/trabalhos': typeof AdminTrabalhosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/aluno/login': typeof AlunoLoginRoute
+  '/admin/entrar': typeof AdminEntrarRoute
+  '/aluno/entrar': typeof AlunoEntrarRoute
   '/admin/': typeof AdminIndexRoute
   '/aluno/': typeof AlunoIndexRoute
   '/admin/ambientes/$id': typeof AdminAmbientesIdRoute
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
-  '/e/$slug/login': typeof ESlugLoginRoute
+  '/e/$slug/entrar': typeof ESlugEntrarRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/admin/cursos/': typeof AdminCursosIndexRoute
@@ -249,8 +249,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/reset-password': typeof ResetPasswordRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
@@ -261,15 +261,15 @@ export interface FileRoutesByTo {
   '/admin/metricas': typeof AdminMetricasRoute
   '/admin/trabalhos': typeof AdminTrabalhosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/aluno/login': typeof AlunoLoginRoute
+  '/admin/entrar': typeof AdminEntrarRoute
+  '/aluno/entrar': typeof AlunoEntrarRoute
   '/admin': typeof AdminIndexRoute
   '/aluno': typeof AlunoIndexRoute
   '/admin/ambientes/$id': typeof AdminAmbientesIdRoute
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
-  '/e/$slug/login': typeof ESlugLoginRoute
+  '/e/$slug/entrar': typeof ESlugEntrarRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
   '/admin/cursos': typeof AdminCursosIndexRoute
@@ -285,8 +285,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/aluno': typeof AlunoRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/reset-password': typeof ResetPasswordRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
@@ -297,15 +297,15 @@ export interface FileRoutesById {
   '/admin/metricas': typeof AdminMetricasRoute
   '/admin/trabalhos': typeof AdminTrabalhosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
-  '/admin_/login': typeof AdminLoginRoute
-  '/aluno_/login': typeof AlunoLoginRoute
+  '/admin_/entrar': typeof AdminEntrarRoute
+  '/aluno_/entrar': typeof AlunoEntrarRoute
   '/admin/': typeof AdminIndexRoute
   '/aluno/': typeof AlunoIndexRoute
   '/admin/ambientes/$id': typeof AdminAmbientesIdRoute
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
-  '/e/$slug/login': typeof ESlugLoginRoute
+  '/e/$slug/entrar': typeof ESlugEntrarRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/admin/cursos/': typeof AdminCursosIndexRoute
@@ -322,8 +322,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/aluno'
-    | '/forgot-password'
-    | '/reset-password'
+    | '/esqueci-senha'
+    | '/redefinir-senha'
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
@@ -334,15 +334,15 @@ export interface FileRouteTypes {
     | '/admin/metricas'
     | '/admin/trabalhos'
     | '/admin/usuarios'
-    | '/admin/login'
-    | '/aluno/login'
+    | '/admin/entrar'
+    | '/aluno/entrar'
     | '/admin/'
     | '/aluno/'
     | '/admin/ambientes/$id'
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/admin/ferramentas/$id'
-    | '/e/$slug/login'
+    | '/e/$slug/entrar'
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/admin/cursos/'
@@ -355,8 +355,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/forgot-password'
-    | '/reset-password'
+    | '/esqueci-senha'
+    | '/redefinir-senha'
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
@@ -367,15 +367,15 @@ export interface FileRouteTypes {
     | '/admin/metricas'
     | '/admin/trabalhos'
     | '/admin/usuarios'
-    | '/admin/login'
-    | '/aluno/login'
+    | '/admin/entrar'
+    | '/aluno/entrar'
     | '/admin'
     | '/aluno'
     | '/admin/ambientes/$id'
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/admin/ferramentas/$id'
-    | '/e/$slug/login'
+    | '/e/$slug/entrar'
     | '/e/$slug/resultados'
     | '/admin/ambientes'
     | '/admin/cursos'
@@ -390,8 +390,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/aluno'
-    | '/forgot-password'
-    | '/reset-password'
+    | '/esqueci-senha'
+    | '/redefinir-senha'
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
@@ -402,15 +402,15 @@ export interface FileRouteTypes {
     | '/admin/metricas'
     | '/admin/trabalhos'
     | '/admin/usuarios'
-    | '/admin_/login'
-    | '/aluno_/login'
+    | '/admin_/entrar'
+    | '/aluno_/entrar'
     | '/admin/'
     | '/aluno/'
     | '/admin/ambientes/$id'
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/admin/ferramentas/$id'
-    | '/e/$slug/login'
+    | '/e/$slug/entrar'
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/admin/cursos/'
@@ -426,11 +426,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AlunoRoute: typeof AlunoRouteWithChildren
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
-  AdminLoginRoute: typeof AdminLoginRoute
-  AlunoLoginRoute: typeof AlunoLoginRoute
-  ESlugLoginRoute: typeof ESlugLoginRoute
+  EsqueciSenhaRoute: typeof EsqueciSenhaRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
+  AdminEntrarRoute: typeof AdminEntrarRoute
+  AlunoEntrarRoute: typeof AlunoEntrarRoute
+  ESlugEntrarRoute: typeof ESlugEntrarRoute
   ESlugResultadosRoute: typeof ESlugResultadosRouteWithChildren
   ESlugIndexRoute: typeof ESlugIndexRoute
   ESlugAulaAulaIdRoute: typeof ESlugAulaAulaIdRoute
@@ -441,18 +441,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
+    '/esqueci-senha': {
+      id: '/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/esqueci-senha'
+      preLoaderRoute: typeof EsqueciSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/aluno': {
@@ -490,18 +490,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/aluno_/login': {
-      id: '/aluno_/login'
-      path: '/aluno/login'
-      fullPath: '/aluno/login'
-      preLoaderRoute: typeof AlunoLoginRouteImport
+    '/aluno_/entrar': {
+      id: '/aluno_/entrar'
+      path: '/aluno/entrar'
+      fullPath: '/aluno/entrar'
+      preLoaderRoute: typeof AlunoEntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin_/login': {
-      id: '/admin_/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
+    '/admin_/entrar': {
+      id: '/admin_/entrar'
+      path: '/admin/entrar'
+      fullPath: '/admin/entrar'
+      preLoaderRoute: typeof AdminEntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/usuarios': {
@@ -602,11 +602,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugResultadosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/e/$slug/login': {
-      id: '/e/$slug/login'
-      path: '/e/$slug/login'
-      fullPath: '/e/$slug/login'
-      preLoaderRoute: typeof ESlugLoginRouteImport
+    '/e/$slug/entrar': {
+      id: '/e/$slug/entrar'
+      path: '/e/$slug/entrar'
+      fullPath: '/e/$slug/entrar'
+      preLoaderRoute: typeof ESlugEntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/ferramentas/$id': {
@@ -752,11 +752,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AlunoRoute: AlunoRouteWithChildren,
-  ForgotPasswordRoute: ForgotPasswordRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  AdminLoginRoute: AdminLoginRoute,
-  AlunoLoginRoute: AlunoLoginRoute,
-  ESlugLoginRoute: ESlugLoginRoute,
+  EsqueciSenhaRoute: EsqueciSenhaRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
+  AdminEntrarRoute: AdminEntrarRoute,
+  AlunoEntrarRoute: AlunoEntrarRoute,
+  ESlugEntrarRoute: ESlugEntrarRoute,
   ESlugResultadosRoute: ESlugResultadosRouteWithChildren,
   ESlugIndexRoute: ESlugIndexRoute,
   ESlugAulaAulaIdRoute: ESlugAulaAulaIdRoute,

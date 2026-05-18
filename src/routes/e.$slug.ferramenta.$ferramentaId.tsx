@@ -11,7 +11,7 @@ export const Route = createFileRoute("/e/$slug/ferramenta/$ferramentaId")({
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      throw redirect({ to: "/e/$slug/login", params: { slug: params.slug } });
+      throw redirect({ to: "/e/$slug/entrar", params: { slug: params.slug } });
     }
   },
   component: FerramentaPage,

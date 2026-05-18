@@ -185,7 +185,7 @@ function AlunosPage() {
                             const res = await fnConvidar({
                               data: {
                                 aluno_id: a.id,
-                                redirect_to: `${window.location.origin}/reset-password`,
+                                redirect_to: `${window.location.origin}/redefinir-senha`,
                               },
                             });
                             if (res.action_link) {

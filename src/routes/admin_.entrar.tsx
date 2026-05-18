@@ -4,7 +4,7 @@ import { signIn, signUp } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
-export const Route = createFileRoute("/admin_/login")({
+export const Route = createFileRoute("/admin_/entrar")({
   beforeLoad: async () => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
@@ -106,7 +106,7 @@ function AdminLogin() {
             >
               {mode === "signin" ? "Primeiro acesso? Criar conta admin" : "Já tenho conta — entrar"}
             </button>
-            <Link to="/forgot-password" className="text-primary hover:underline">Esqueci minha senha</Link>
+            <Link to="/esqueci-senha" className="text-primary hover:underline">Esqueci minha senha</Link>
           </div>
         </div>
         <p className="mt-4 text-center text-xs text-muted-foreground">

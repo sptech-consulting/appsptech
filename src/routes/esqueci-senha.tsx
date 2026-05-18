@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 
-export const Route = createFileRoute("/forgot-password")({
+export const Route = createFileRoute("/esqueci-senha")({
   head: () => ({ meta: [{ title: "Recuperar senha — SPTech" }] }),
   component: ForgotPassword,
 });
@@ -20,7 +20,7 @@ function ForgotPassword() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/redefinir-senha`,
       });
       if (error) throw error;
       setSent(true);
@@ -67,7 +67,7 @@ function ForgotPassword() {
             </form>
           )}
           <div className="mt-4 text-center text-xs text-muted-foreground">
-            <Link to="/admin/login" className="hover:text-secondary">← voltar ao login</Link>
+            <Link to="/admin/entrar" className="hover:text-secondary">← voltar ao login</Link>
           </div>
         </div>
       </div>

@@ -74,13 +74,13 @@ function Index() {
           <SptechLogo />
           <nav className="flex items-center gap-2 text-sm">
             <Link
-              to="/aluno/login"
+              to="/aluno/entrar"
               className="hidden sm:inline-flex rounded-md px-3 py-2 text-secondary hover:bg-muted"
             >
               Sou aluno
             </Link>
             <Link
-              to="/admin/login"
+              to="/admin/entrar"
               className="rounded-md bg-secondary px-4 py-2 text-secondary-foreground font-semibold hover:opacity-90"
             >
               Entrar como Admin
@@ -116,13 +116,13 @@ function Index() {
 
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
-                to="/admin/login"
+                to="/admin/entrar"
                 className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
               >
                 Entrar como Admin <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/aluno/login"
+                to="/aluno/entrar"
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-5 py-3 text-sm font-semibold hover:bg-muted"
               >
                 Sou aluno
@@ -240,13 +240,13 @@ function Index() {
 
               <div className="mt-6 grid gap-2">
                 <Link
-                  to="/admin/login"
+                  to="/admin/entrar"
                   className="inline-flex justify-center rounded-md bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground hover:opacity-90"
                 >
                   Acessar painel administrativo
                 </Link>
                 <Link
-                  to="/aluno/login"
+                  to="/aluno/entrar"
                   className="inline-flex justify-center rounded-md border border-border px-4 py-2.5 text-sm font-semibold hover:bg-muted"
                 >
                   Entrar como aluno
@@ -261,8 +261,8 @@ function Index() {
         <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <div>© SPTech — São Paulo Tech School</div>
           <div className="flex gap-4">
-            <Link to="/admin/login" className="hover:text-secondary">Admin</Link>
-            <Link to="/aluno/login" className="hover:text-secondary">Aluno</Link>
+            <Link to="/admin/entrar" className="hover:text-secondary">Admin</Link>
+            <Link to="/aluno/entrar" className="hover:text-secondary">Aluno</Link>
           </div>
         </div>
       </footer>

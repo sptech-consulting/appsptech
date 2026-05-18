@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SptechLogo } from "@/components/SptechLogo";
 import { validarSenhaForte, forcaSenha } from "@/lib/password";
 
-export const Route = createFileRoute("/reset-password")({
+export const Route = createFileRoute("/redefinir-senha")({
   head: () => ({ meta: [{ title: "Nova senha — SPTech" }] }),
   component: ResetPassword,
 });
@@ -47,7 +47,7 @@ function ResetPassword() {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/admin/login" }), 1500);
+      setTimeout(() => navigate({ to: "/admin/entrar" }), 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao atualizar senha");
     } finally {

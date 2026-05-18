@@ -6,7 +6,7 @@ export const Route = createFileRoute("/aluno")({
   beforeLoad: async () => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
-    if (!data.session) throw redirect({ to: "/aluno/login" });
+    if (!data.session) throw redirect({ to: "/aluno/entrar" });
 
     // Sessão pode pertencer a um admin logado no mesmo navegador.
     // Só liberamos a área do aluno se o auth_user_id estiver vinculado a um aluno ativo.
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/aluno")({
       .eq("auth_user_id", data.session.user.id)
       .eq("status", "ativo")
       .maybeSingle();
-    if (!aluno) throw redirect({ to: "/aluno/login" });
+    if (!aluno) throw redirect({ to: "/aluno/entrar" });
   },
   component: AlunoShell,
 });
