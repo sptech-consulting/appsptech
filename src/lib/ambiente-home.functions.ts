@@ -150,7 +150,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
     if (ferrIds.length) {
       const { data: ferr } = await supabaseAdmin
         .from("ferramentas")
-        .select("id, nome, descricao, url, icone_url, categoria, tipo_abertura, status")
+        .select("id, slug, nome, descricao, url, icone_url, categoria, tipo_abertura, status")
         .in("id", ferrIds)
         .eq("status", "ativo");
       const byId = new Map((ferr ?? []).map((f) => [f.id, f]));
@@ -161,6 +161,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
           const f = byId.get(l.ferramenta_id)!;
           return {
             id: f.id,
+            slug: (f as { slug: string | null }).slug ?? null,
             nome: f.nome,
             descricao: f.descricao,
             url: f.url,
