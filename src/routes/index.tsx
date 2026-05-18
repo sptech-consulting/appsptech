@@ -114,6 +114,22 @@ function Index() {
               e um mural público para mostrar os resultados dos alunos.
             </p>
 
+            <div className="mt-8 max-w-3xl">
+              <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary mb-3">
+                Passo a passo · Como usar a plataforma
+              </div>
+              <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-lg aspect-video">
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src="https://www.youtube.com/embed/vW9CfJHIiaI"
+                  title="SPTech — Passo a passo de como usar a plataforma"
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 to="/admin/entrar"
