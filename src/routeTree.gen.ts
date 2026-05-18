@@ -39,6 +39,7 @@ import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes
 import { Route as AdminAmbientesIdRouteImport } from './routes/admin.ambientes.$id'
 import { Route as ESlugResultadosTrabalhoIdRouteImport } from './routes/e.$slug.resultados.$trabalhoId'
 import { Route as ESlugNovidadeNovidadeIdRouteImport } from './routes/e.$slug.novidade.$novidadeId'
+import { Route as ESlugFerramentaFerramentaIdRouteImport } from './routes/e.$slug.ferramenta.$ferramentaId'
 import { Route as ESlugAulaAulaIdRouteImport } from './routes/e.$slug.aula.$aulaId'
 import { Route as ApiPublicNovidadesWebhookTokenRouteImport } from './routes/api/public/novidades/webhook/$token'
 
@@ -193,6 +194,12 @@ const ESlugNovidadeNovidadeIdRoute = ESlugNovidadeNovidadeIdRouteImport.update({
   path: '/e/$slug/novidade/$novidadeId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ESlugFerramentaFerramentaIdRoute =
+  ESlugFerramentaFerramentaIdRouteImport.update({
+    id: '/e/$slug/ferramenta/$ferramentaId',
+    path: '/e/$slug/ferramenta/$ferramentaId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ESlugAulaAulaIdRoute = ESlugAulaAulaIdRouteImport.update({
   id: '/e/$slug/aula/$aulaId',
   path: '/e/$slug/aula/$aulaId',
@@ -235,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/admin/cursos/': typeof AdminCursosIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
   '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/admin/cursos': typeof AdminCursosIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
   '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
@@ -302,6 +311,7 @@ export interface FileRoutesById {
   '/admin/cursos/': typeof AdminCursosIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
   '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/admin/cursos/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/ferramenta/$ferramentaId'
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
     | '/api/public/novidades/webhook/$token'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/admin/cursos'
     | '/e/$slug'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/ferramenta/$ferramentaId'
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
     | '/api/public/novidades/webhook/$token'
@@ -404,6 +416,7 @@ export interface FileRouteTypes {
     | '/admin/cursos/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/ferramenta/$ferramentaId'
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
     | '/api/public/novidades/webhook/$token'
@@ -421,6 +434,7 @@ export interface RootRouteChildren {
   ESlugResultadosRoute: typeof ESlugResultadosRouteWithChildren
   ESlugIndexRoute: typeof ESlugIndexRoute
   ESlugAulaAulaIdRoute: typeof ESlugAulaAulaIdRoute
+  ESlugFerramentaFerramentaIdRoute: typeof ESlugFerramentaFerramentaIdRoute
   ESlugNovidadeNovidadeIdRoute: typeof ESlugNovidadeNovidadeIdRoute
   ApiPublicNovidadesWebhookTokenRoute: typeof ApiPublicNovidadesWebhookTokenRoute
 }
@@ -637,6 +651,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugNovidadeNovidadeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/e/$slug/ferramenta/$ferramentaId': {
+      id: '/e/$slug/ferramenta/$ferramentaId'
+      path: '/e/$slug/ferramenta/$ferramentaId'
+      fullPath: '/e/$slug/ferramenta/$ferramentaId'
+      preLoaderRoute: typeof ESlugFerramentaFerramentaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/e/$slug/aula/$aulaId': {
       id: '/e/$slug/aula/$aulaId'
       path: '/e/$slug/aula/$aulaId'
@@ -739,6 +760,7 @@ const rootRouteChildren: RootRouteChildren = {
   ESlugResultadosRoute: ESlugResultadosRouteWithChildren,
   ESlugIndexRoute: ESlugIndexRoute,
   ESlugAulaAulaIdRoute: ESlugAulaAulaIdRoute,
+  ESlugFerramentaFerramentaIdRoute: ESlugFerramentaFerramentaIdRoute,
   ESlugNovidadeNovidadeIdRoute: ESlugNovidadeNovidadeIdRoute,
   ApiPublicNovidadesWebhookTokenRoute: ApiPublicNovidadesWebhookTokenRoute,
 }
