@@ -29,7 +29,9 @@ function AlunoHome() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
-      {!profile ? (
+      {loading ? (
+        <div className="text-sm text-muted-foreground">Carregando…</div>
+      ) : !profile ? (
         <div className="rounded-xl border border-border bg-card p-8 text-center">
           <h1 className="text-xl font-black text-secondary">Aluno não cadastrado</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -41,9 +43,7 @@ function AlunoHome() {
           <h1 className="text-3xl font-black text-secondary">Olá, {profile.nome_completo}</h1>
           <p className="mt-1 text-sm text-muted-foreground">Selecione um ambiente para entrar.</p>
 
-          {loading ? (
-            <div className="mt-6 text-sm text-muted-foreground">Carregando ambientes...</div>
-          ) : ambientes.length === 0 ? (
+          {ambientes.length === 0 ? (
             <div className="mt-6 rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
               Você ainda não está vinculado a nenhum ambiente ativo.
             </div>
