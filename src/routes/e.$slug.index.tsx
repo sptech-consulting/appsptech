@@ -467,7 +467,7 @@ function AmbienteHome() {
                     <Download className="h-3 w-3" /> Baixar material
                   </a>
                   <button
-                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.id } })}
+                    onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.slug ?? a.id } })}
                     className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
                     style={{ backgroundColor: "transparent", color: tk.text, border: `1px solid ${tk.border}` }}
                   >
