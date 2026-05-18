@@ -37,7 +37,9 @@ import { Route as AdminCursosIdRouteImport } from './routes/admin.cursos.$id'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
 import { Route as AdminAmbientesIdRouteImport } from './routes/admin.ambientes.$id'
 import { Route as ESlugResultadosTrabalhoIdRouteImport } from './routes/e.$slug.resultados.$trabalhoId'
+import { Route as ESlugNovidadeNovidadeIdRouteImport } from './routes/e.$slug.novidade.$novidadeId'
 import { Route as ESlugAulaAulaIdRouteImport } from './routes/e.$slug.aula.$aulaId'
+import { Route as ApiPublicNovidadesWebhookTokenRouteImport } from './routes/api/public/novidades/webhook/$token'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -180,11 +182,22 @@ const ESlugResultadosTrabalhoIdRoute =
     path: '/$trabalhoId',
     getParentRoute: () => ESlugResultadosRoute,
   } as any)
+const ESlugNovidadeNovidadeIdRoute = ESlugNovidadeNovidadeIdRouteImport.update({
+  id: '/e/$slug/novidade/$novidadeId',
+  path: '/e/$slug/novidade/$novidadeId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ESlugAulaAulaIdRoute = ESlugAulaAulaIdRouteImport.update({
   id: '/e/$slug/aula/$aulaId',
   path: '/e/$slug/aula/$aulaId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicNovidadesWebhookTokenRoute =
+  ApiPublicNovidadesWebhookTokenRouteImport.update({
+    id: '/api/public/novidades/webhook/$token',
+    path: '/api/public/novidades/webhook/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -215,7 +228,9 @@ export interface FileRoutesByFullPath {
   '/admin/cursos/': typeof AdminCursosIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
+  '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -244,7 +259,9 @@ export interface FileRoutesByTo {
   '/admin/cursos': typeof AdminCursosIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
+  '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -276,7 +293,9 @@ export interface FileRoutesById {
   '/admin/cursos/': typeof AdminCursosIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
+  '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
+  '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -309,7 +328,9 @@ export interface FileRouteTypes {
     | '/admin/cursos/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
+    | '/api/public/novidades/webhook/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -338,7 +359,9 @@ export interface FileRouteTypes {
     | '/admin/cursos'
     | '/e/$slug'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
+    | '/api/public/novidades/webhook/$token'
   id:
     | '__root__'
     | '/'
@@ -369,7 +392,9 @@ export interface FileRouteTypes {
     | '/admin/cursos/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
+    | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
+    | '/api/public/novidades/webhook/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -384,6 +409,8 @@ export interface RootRouteChildren {
   ESlugResultadosRoute: typeof ESlugResultadosRouteWithChildren
   ESlugIndexRoute: typeof ESlugIndexRoute
   ESlugAulaAulaIdRoute: typeof ESlugAulaAulaIdRoute
+  ESlugNovidadeNovidadeIdRoute: typeof ESlugNovidadeNovidadeIdRoute
+  ApiPublicNovidadesWebhookTokenRoute: typeof ApiPublicNovidadesWebhookTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -584,11 +611,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugResultadosTrabalhoIdRouteImport
       parentRoute: typeof ESlugResultadosRoute
     }
+    '/e/$slug/novidade/$novidadeId': {
+      id: '/e/$slug/novidade/$novidadeId'
+      path: '/e/$slug/novidade/$novidadeId'
+      fullPath: '/e/$slug/novidade/$novidadeId'
+      preLoaderRoute: typeof ESlugNovidadeNovidadeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/e/$slug/aula/$aulaId': {
       id: '/e/$slug/aula/$aulaId'
       path: '/e/$slug/aula/$aulaId'
       fullPath: '/e/$slug/aula/$aulaId'
       preLoaderRoute: typeof ESlugAulaAulaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/novidades/webhook/$token': {
+      id: '/api/public/novidades/webhook/$token'
+      path: '/api/public/novidades/webhook/$token'
+      fullPath: '/api/public/novidades/webhook/$token'
+      preLoaderRoute: typeof ApiPublicNovidadesWebhookTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -668,7 +709,19 @@ const rootRouteChildren: RootRouteChildren = {
   ESlugResultadosRoute: ESlugResultadosRouteWithChildren,
   ESlugIndexRoute: ESlugIndexRoute,
   ESlugAulaAulaIdRoute: ESlugAulaAulaIdRoute,
+  ESlugNovidadeNovidadeIdRoute: ESlugNovidadeNovidadeIdRoute,
+  ApiPublicNovidadesWebhookTokenRoute: ApiPublicNovidadesWebhookTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
