@@ -70,13 +70,28 @@ export type AulaItem = {
   ordem: number;
 };
 
+export type CursoItem = {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  capa_url: string | null;
+  categoria: string | null;
+  nivel: string | null;
+  total_aulas: number;
+  primeira_aula_id: string | null;
+  ordem: number;
+  destaque: boolean;
+};
+
 export type AmbienteHomeData = {
   branding: AmbienteHomeBranding;
   aluno: { id: string; nome_completo: string; email_acesso: string };
   ferramentas: FerramentaItem[];
   novidades: NovidadeItem[];
   aulas: AulaItem[];
+  cursos: CursoItem[];
 };
+
 
 export const getAmbienteHome = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
