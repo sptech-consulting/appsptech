@@ -144,7 +144,7 @@ function EditAmbiente() {
 }
 
 function AccessLinkCard({ slug }: { slug: string }) {
-  const url = typeof window !== "undefined" ? `${window.location.origin}/e/${slug}/login` : `/e/${slug}/login`;
+  const url = typeof window !== "undefined" ? `${window.location.origin}/e/${slug}/entrar` : `/e/${slug}/entrar`;
   return (
     <div className="mb-4 rounded-xl border border-border bg-card p-4 flex items-center gap-3">
       <Link2 className="h-4 w-4 text-primary" />
