@@ -278,51 +278,6 @@ export type Database = {
           },
         ]
       }
-      ambiente_novidades: {
-        Row: {
-          ambiente_id: string
-          criado_em: string
-          destaque: boolean | null
-          id: string
-          novidade_id: string
-          ordem: number | null
-          status: Database["public"]["Enums"]["generic_status"]
-        }
-        Insert: {
-          ambiente_id: string
-          criado_em?: string
-          destaque?: boolean | null
-          id?: string
-          novidade_id: string
-          ordem?: number | null
-          status?: Database["public"]["Enums"]["generic_status"]
-        }
-        Update: {
-          ambiente_id?: string
-          criado_em?: string
-          destaque?: boolean | null
-          id?: string
-          novidade_id?: string
-          ordem?: number | null
-          status?: Database["public"]["Enums"]["generic_status"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ambiente_novidades_ambiente_id_fkey"
-            columns: ["ambiente_id"]
-            isOneToOne: false
-            referencedRelation: "ambientes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ambiente_novidades_novidade_id_fkey"
-            columns: ["novidade_id"]
-            isOneToOne: false
-            referencedRelation: "novidades"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       ambientes: {
         Row: {
           atualizado_em: string
@@ -361,6 +316,7 @@ export type Database = {
           slug: string
           status: Database["public"]["Enums"]["ambiente_status"]
           tema: Database["public"]["Enums"]["ambiente_tema"]
+          webhook_token: string
         }
         Insert: {
           atualizado_em?: string
@@ -399,6 +355,7 @@ export type Database = {
           slug: string
           status?: Database["public"]["Enums"]["ambiente_status"]
           tema?: Database["public"]["Enums"]["ambiente_tema"]
+          webhook_token?: string
         }
         Update: {
           atualizado_em?: string
@@ -437,6 +394,7 @@ export type Database = {
           slug?: string
           status?: Database["public"]["Enums"]["ambiente_status"]
           tema?: Database["public"]["Enums"]["ambiente_tema"]
+          webhook_token?: string
         }
         Relationships: []
       }
@@ -951,6 +909,7 @@ export type Database = {
       }
       novidades: {
         Row: {
+          ambiente_id: string
           atualizado_em: string
           categoria: string | null
           conteudo: string | null
@@ -967,6 +926,7 @@ export type Database = {
           titulo: string
         }
         Insert: {
+          ambiente_id: string
           atualizado_em?: string
           categoria?: string | null
           conteudo?: string | null
@@ -983,6 +943,7 @@ export type Database = {
           titulo: string
         }
         Update: {
+          ambiente_id?: string
           atualizado_em?: string
           categoria?: string | null
           conteudo?: string | null
@@ -998,7 +959,15 @@ export type Database = {
           tags?: string[] | null
           titulo?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "novidades_ambiente_id_fkey"
+            columns: ["ambiente_id"]
+            isOneToOne: false
+            referencedRelation: "ambientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permissoes: {
         Row: {

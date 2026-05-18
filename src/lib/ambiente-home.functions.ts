@@ -169,46 +169,26 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
         });
     }
 
-    // 4) Novidades publicadas e vinculadas
-    const { data: novLinks } = await supabaseAdmin
-      .from("ambiente_novidades")
-      .select("novidade_id, ordem, destaque, status")
+    // 4) Novidades publicadas do ambiente (recebidas via webhook n8n)
+    const { data: novRows } = await supabaseAdmin
+      .from("novidades")
+      .select("id, titulo, resumo, imagem_url, fonte_nome, fonte_url, categoria, publicado_em")
       .eq("ambiente_id", amb.id)
-      .eq("status", "ativo");
+      .eq("status", "publicada")
+      .order("publicado_em", { ascending: false, nullsFirst: false })
+      .order("criado_em", { ascending: false });
 
-    const novIds = (novLinks ?? []).map((l) => l.novidade_id);
-    let novidades: NovidadeItem[] = [];
-    if (novIds.length) {
-      const { data: nov } = await supabaseAdmin
-        .from("novidades")
-        .select("id, titulo, resumo, imagem_url, fonte_nome, fonte_url, categoria, publicado_em, status")
-        .in("id", novIds)
-        .eq("status", "publicada");
-      const byId = new Map((nov ?? []).map((n) => [n.id, n]));
-      novidades = (novLinks ?? [])
-        .filter((l) => byId.has(l.novidade_id))
-        .sort((a, b) => {
-          const na = byId.get(a.novidade_id)!;
-          const nb = byId.get(b.novidade_id)!;
-          const da = na.publicado_em ? new Date(na.publicado_em).getTime() : 0;
-          const db = nb.publicado_em ? new Date(nb.publicado_em).getTime() : 0;
-          return db - da;
-        })
-        .map((l) => {
-          const n = byId.get(l.novidade_id)!;
-          return {
-            id: n.id,
-            titulo: n.titulo,
-            resumo: n.resumo,
-            imagem_url: n.imagem_url,
-            fonte_nome: n.fonte_nome,
-            fonte_url: n.fonte_url,
-            categoria: n.categoria,
-            publicado_em: n.publicado_em,
-            destaque: !!l.destaque,
-          };
-        });
-    }
+    const novidades: NovidadeItem[] = (novRows ?? []).map((n) => ({
+      id: n.id,
+      titulo: n.titulo,
+      resumo: n.resumo,
+      imagem_url: n.imagem_url,
+      fonte_nome: n.fonte_nome,
+      fonte_url: n.fonte_url,
+      categoria: n.categoria,
+      publicado_em: n.publicado_em,
+      destaque: false,
+    }));
 
     // 5) Aulas via cursos vinculados ao ambiente → módulos → aulas
     const now = new Date().toISOString();
