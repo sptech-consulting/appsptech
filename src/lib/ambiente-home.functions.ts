@@ -345,6 +345,10 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       efeito_som_volume: amb.efeito_som_volume ?? 40,
       efeito_blobs_fundo: !!amb.efeito_blobs_fundo,
       tema: (amb.tema ?? "claro") as "claro" | "escuro",
+      playbook_titulo: (amb as { playbook_titulo: string | null }).playbook_titulo ?? null,
+      playbook_descricao: (amb as { playbook_descricao: string | null }).playbook_descricao ?? null,
+      playbook_capa_url: (amb as { playbook_capa_url: string | null }).playbook_capa_url ?? null,
+      playbook_arquivo_url: (amb as { playbook_arquivo_url: string | null }).playbook_arquivo_url ?? null,
     };
 
     return {
