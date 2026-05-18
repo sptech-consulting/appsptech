@@ -195,46 +195,60 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
         });
     }
 
-    // 5) Aulas publicadas, liberadas e dentro da data
+    // 5) Aulas via cursos vinculados ao ambiente → módulos → aulas
     const now = new Date().toISOString();
-    const { data: aulaLinks } = await supabaseAdmin
-      .from("ambiente_aulas")
-      .select("aula_id, ordem, modulo_ordem, liberado, data_liberacao, status")
+    const { data: cursoLinks } = await supabaseAdmin
+      .from("ambiente_cursos")
+      .select("curso_id, ordem, liberado, data_liberacao, status")
       .eq("ambiente_id", amb.id)
       .eq("status", "ativo")
       .eq("liberado", true);
 
-    const aulaIds = (aulaLinks ?? [])
+    const cursoIds = (cursoLinks ?? [])
       .filter((l) => !l.data_liberacao || l.data_liberacao <= now)
-      .map((l) => l.aula_id);
+      .map((l) => l.curso_id);
 
     let aulas: AulaItem[] = [];
-    if (aulaIds.length) {
-      const { data: au } = await supabaseAdmin
-        .from("aulas")
-        .select("id, titulo, descricao, modulo, video_url, material_url, thumbnail_url, duracao_minutos, tipo_conteudo, status")
-        .in("id", aulaIds)
-        .eq("status", "publicada");
-      const byId = new Map((au ?? []).map((a) => [a.id, a]));
-      aulas = (aulaLinks ?? [])
-        .filter((l) => byId.has(l.aula_id))
-        .sort((a, b) => (a.modulo_ordem ?? 0) - (b.modulo_ordem ?? 0) || (a.ordem ?? 0) - (b.ordem ?? 0))
-        .map((l) => {
-          const a = byId.get(l.aula_id)!;
-          return {
-            id: a.id,
-            titulo: a.titulo,
-            descricao: a.descricao,
-            modulo: a.modulo,
-            video_url: a.video_url,
-            material_url: a.material_url,
-            thumbnail_url: a.thumbnail_url,
-            duracao_minutos: a.duracao_minutos,
-            tipo_conteudo: a.tipo_conteudo,
-            modulo_ordem: l.modulo_ordem ?? 0,
-            ordem: l.ordem ?? 0,
-          };
-        });
+    if (cursoIds.length) {
+      const cursoOrdem = new Map((cursoLinks ?? []).map((l) => [l.curso_id, l.ordem ?? 0]));
+
+      const { data: mods } = await supabaseAdmin
+        .from("modulos")
+        .select("id, titulo, ordem, curso_id, status")
+        .in("curso_id", cursoIds)
+        .eq("status", "ativo");
+
+      const modById = new Map((mods ?? []).map((m) => [m.id, m]));
+      const modIds = (mods ?? []).map((m) => m.id);
+
+      if (modIds.length) {
+        const { data: au } = await supabaseAdmin
+          .from("aulas")
+          .select("id, titulo, descricao, modulo, modulo_id, ordem, video_url, material_url, thumbnail_url, duracao_minutos, tipo_conteudo, status")
+          .in("modulo_id", modIds)
+          .eq("status", "publicada");
+
+        aulas = (au ?? [])
+          .map((a) => {
+            const m = a.modulo_id ? modById.get(a.modulo_id) : null;
+            const cOrd = m ? (cursoOrdem.get(m.curso_id) ?? 0) : 0;
+            const mOrd = m?.ordem ?? 0;
+            return {
+              id: a.id,
+              titulo: a.titulo,
+              descricao: a.descricao,
+              modulo: a.modulo ?? m?.titulo ?? null,
+              video_url: a.video_url,
+              material_url: a.material_url,
+              thumbnail_url: a.thumbnail_url,
+              duracao_minutos: a.duracao_minutos,
+              tipo_conteudo: a.tipo_conteudo,
+              modulo_ordem: cOrd * 1000 + mOrd,
+              ordem: a.ordem ?? 0,
+            };
+          })
+          .sort((a, b) => a.modulo_ordem - b.modulo_ordem || a.ordem - b.ordem);
+      }
     }
 
     const branding: AmbienteHomeBranding = {
