@@ -62,10 +62,14 @@ export const DEFAULT_AMBIENTE: AmbienteFormState = {
   card_exibir_icone: true,
   card_exibir_imagem: true,
   codigo_acesso_resultados: null,
+  playbook_titulo: null,
+  playbook_descricao: null,
+  playbook_capa_url: null,
+  playbook_arquivo_url: null,
   ...DEFAULT_EFFECTS,
 };
 
-type Tab = "geral" | "identidade" | "cards" | "efeitos";
+type Tab = "geral" | "identidade" | "cards" | "efeitos" | "playbook";
 
 export function AmbienteForm({
   initial,
