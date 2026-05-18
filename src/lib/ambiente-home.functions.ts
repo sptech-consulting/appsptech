@@ -35,6 +35,7 @@ export type AmbienteHomeBranding = {
 
 export type FerramentaItem = {
   id: string;
+  slug: string | null;
   nome: string;
   descricao: string | null;
   url: string | null;
@@ -46,6 +47,7 @@ export type FerramentaItem = {
 
 export type NovidadeItem = {
   id: string;
+  slug: string | null;
   titulo: string;
   resumo: string | null;
   imagem_url: string | null;
@@ -58,6 +60,7 @@ export type NovidadeItem = {
 
 export type AulaItem = {
   id: string;
+  slug: string | null;
   titulo: string;
   descricao: string | null;
   modulo: string | null;
