@@ -176,7 +176,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
     // 4) Novidades publicadas do ambiente (recebidas via webhook n8n)
     const { data: novRows } = await supabaseAdmin
       .from("novidades")
-      .select("id, titulo, resumo, imagem_url, fonte_nome, fonte_url, categoria, publicado_em")
+      .select("id, slug, titulo, resumo, imagem_url, fonte_nome, fonte_url, categoria, publicado_em")
       .eq("ambiente_id", amb.id)
       .eq("status", "publicada")
       .order("publicado_em", { ascending: false, nullsFirst: false })
@@ -184,6 +184,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
 
     const novidades: NovidadeItem[] = (novRows ?? []).map((n) => ({
       id: n.id,
+      slug: (n as { slug: string | null }).slug ?? null,
       titulo: n.titulo,
       resumo: n.resumo,
       imagem_url: n.imagem_url,
