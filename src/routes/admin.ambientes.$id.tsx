@@ -183,14 +183,6 @@ function VinculosManager({ ambienteId }: { ambienteId: string }) {
         />
         <LinkSection
           ambienteId={ambienteId}
-          title="Novidades"
-          sourceTable="novidades"
-          linkTable="ambiente_novidades"
-          itemFkColumn="novidade_id"
-          labelField="titulo"
-        />
-        <LinkSection
-          ambienteId={ambienteId}
           title="Cursos"
           sourceTable="cursos"
           linkTable="ambiente_cursos"
@@ -198,6 +190,7 @@ function VinculosManager({ ambienteId }: { ambienteId: string }) {
           labelField="titulo"
         />
       </div>
+      <NovidadesPanel ambienteId={ambienteId} />
     </div>
   );
 }
