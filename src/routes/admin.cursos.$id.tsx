@@ -177,11 +177,14 @@ function CursoDetalhe() {
       </div>
 
       {tab === "curso" && (
-        <CursoForm
-          curso={curso}
-          onSaved={(c) => setCurso(c)}
-          onDeleted={() => navigate({ to: "/admin/cursos" })}
-        />
+        <div className="space-y-5">
+          <CursoForm
+            curso={curso}
+            onSaved={(c) => setCurso(c)}
+            onDeleted={() => navigate({ to: "/admin/cursos" })}
+          />
+          <AmbientesVinculados cursoId={id} />
+        </div>
       )}
 
       {tab === "modulos" && (
@@ -354,6 +357,90 @@ function CapaUpload({ value, onChange }: { value: string | null; onChange: (u: s
       folder="cursos/capa"
       aspect="aspect-video"
     />
+  );
+}
+
+// ===================== Ambientes vinculados =====================
+
+function AmbientesVinculados({ cursoId }: { cursoId: string }) {
+  const [ambientes, setAmbientes] = useState<{ id: string; nome: string }[]>([]);
+  const [linked, setLinked] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  async function load() {
+    setLoading(true);
+    const [{ data: amb }, { data: links }] = await Promise.all([
+      supabase.from("ambientes").select("id,nome").order("nome"),
+      supabase.from("ambiente_cursos").select("ambiente_id").eq("curso_id", cursoId),
+    ]);
+    setAmbientes((amb as any) ?? []);
+    setLinked(new Set(((links as any[]) ?? []).map((l) => l.ambiente_id)));
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cursoId]);
+
+  async function toggle(ambId: string, isLinked: boolean) {
+    if (isLinked) {
+      const { error } = await supabase
+        .from("ambiente_cursos")
+        .delete()
+        .eq("ambiente_id", ambId)
+        .eq("curso_id", cursoId);
+      if (error) return toast.error(error.message);
+    } else {
+      const { error } = await supabase
+        .from("ambiente_cursos")
+        .insert({ ambiente_id: ambId, curso_id: cursoId });
+      if (error) return toast.error(error.message);
+    }
+    void load();
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5 sm:p-6 max-w-3xl">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-secondary">
+            Ambientes vinculados
+          </h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Marque os ambientes em que este curso deve aparecer para os alunos.
+          </p>
+        </div>
+        <span className="text-xs text-muted-foreground">{linked.size} vinculado(s)</span>
+      </div>
+      {loading ? (
+        <div className="text-xs text-muted-foreground">Carregando…</div>
+      ) : ambientes.length === 0 ? (
+        <div className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">
+          Nenhum ambiente cadastrado ainda.
+        </div>
+      ) : (
+        <div className="max-h-64 overflow-auto rounded-md border border-border divide-y divide-border">
+          {ambientes.map((a) => {
+            const isLinked = linked.has(a.id);
+            return (
+              <label
+                key={a.id}
+                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={isLinked}
+                  onChange={() => toggle(a.id, isLinked)}
+                  className="h-4 w-4 accent-primary"
+                />
+                <span className="text-secondary">{a.nome}</span>
+              </label>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
