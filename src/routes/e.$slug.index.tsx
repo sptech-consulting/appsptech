@@ -43,7 +43,7 @@ const RADII = {
 
 const PAD = { compacto: "14px", medio: "20px", grande: "26px" } as const;
 
-type SectionKey = "ferramentas" | "novidades" | "playbook" | "aulas";
+type SectionKey = "ferramentas" | "novidades" | "playbook" | "cursos";
 
 function AmbienteHome() {
   const { slug } = Route.useParams();
