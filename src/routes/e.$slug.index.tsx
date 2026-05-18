@@ -440,27 +440,19 @@ function AmbienteHome() {
           {hasPlaybook && (
             <div className="mb-5">
               <div
-                className="relative overflow-hidden rounded-2xl border"
-                style={{
-                  borderColor: tk.border,
-                  backgroundColor: tk.card,
-                  backgroundImage: data.branding.playbook_capa_url
-                    ? `url(${data.branding.playbook_capa_url})`
-                    : `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  minHeight: 280,
-                }}
+                className="relative overflow-hidden rounded-2xl border grid grid-cols-1 lg:grid-cols-[1fr_1.2fr]"
+                style={{ borderColor: tk.border, backgroundColor: tk.card }}
               >
+                {/* Texto + CTA */}
                 <div
-                  className="absolute inset-0"
+                  className="relative p-6 sm:p-8 lg:p-10 flex flex-col justify-between order-2 lg:order-1"
                   style={{
-                    background:
-                      "linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.15) 100%)",
+                    background: `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
+                    color: "#fff",
+                    minHeight: 240,
                   }}
-                />
-                <div className="relative p-6 sm:p-8 lg:p-10 flex flex-col justify-between min-h-[280px] text-white">
-                  <div className="max-w-2xl">
+                >
+                  <div>
                     <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-bold bg-white/15 backdrop-blur rounded-full px-3 py-1 mb-3">
                       <BookOpen className="h-3 w-3" /> Playbook
                     </div>
@@ -468,7 +460,7 @@ function AmbienteHome() {
                       {data.branding.playbook_titulo ?? `Playbook · ${data.branding.nome}`}
                     </h3>
                     {data.branding.playbook_descricao && (
-                      <p className="mt-2 text-sm sm:text-base opacity-90 max-w-xl">
+                      <p className="mt-3 text-sm sm:text-base opacity-90 max-w-md">
                         {data.branding.playbook_descricao}
                       </p>
                     )}
@@ -486,6 +478,17 @@ function AmbienteHome() {
                     </a>
                   </div>
                 </div>
+
+                {/* Capa 16:9 */}
+                <div
+                  className="relative order-1 lg:order-2 aspect-[16/9] lg:aspect-auto lg:min-h-full bg-center bg-cover"
+                  style={{
+                    backgroundImage: data.branding.playbook_capa_url
+                      ? `url(${data.branding.playbook_capa_url})`
+                      : `linear-gradient(135deg, ${tk.secundaria}, ${tk.primaria})`,
+                  }}
+                  aria-hidden
+                />
               </div>
             </div>
           )}
