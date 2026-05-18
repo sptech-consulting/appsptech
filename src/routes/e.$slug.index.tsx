@@ -155,7 +155,7 @@ function AmbienteHome() {
     { key: "ferramentas", label: "Ferramentas", icon: <Wrench className="h-3.5 w-3.5" />, count: data.ferramentas.length },
     { key: "novidades", label: "Novidades", icon: <Newspaper className="h-3.5 w-3.5" />, count: data.novidades.length },
     { key: "playbook", label: "Playbook", icon: <BookOpen className="h-3.5 w-3.5" />, count: aulasComMaterial.length },
-    { key: "aulas", label: "Aulas", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.aulas.length },
+    { key: "cursos", label: "Cursos", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.cursos.length },
   ];
 
   function openFerramenta(f: FerramentaItem) {
