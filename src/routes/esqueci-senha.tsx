@@ -20,7 +20,7 @@ function ForgotPassword() {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}/redefinir-senha`,
       });
       if (error) throw error;
       setSent(true);
