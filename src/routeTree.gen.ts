@@ -26,11 +26,11 @@ import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminImportacoesRouteImport } from './routes/admin.importacoes'
 import { Route as AdminGruposRouteImport } from './routes/admin.grupos'
 import { Route as AdminFerramentasRouteImport } from './routes/admin.ferramentas'
-import { Route as AdminCursosRouteImport } from './routes/admin.cursos'
 import { Route as AdminComentariosRouteImport } from './routes/admin.comentarios'
 import { Route as AdminAulasRouteImport } from './routes/admin.aulas'
 import { Route as AdminAlunosRouteImport } from './routes/admin.alunos'
 import { Route as ESlugIndexRouteImport } from './routes/e.$slug.index'
+import { Route as AdminCursosIndexRouteImport } from './routes/admin.cursos.index'
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
 import { Route as ESlugResultadosRouteImport } from './routes/e.$slug.resultados'
 import { Route as ESlugLoginRouteImport } from './routes/e.$slug.login'
@@ -125,11 +125,6 @@ const AdminFerramentasRoute = AdminFerramentasRouteImport.update({
   path: '/ferramentas',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminCursosRoute = AdminCursosRouteImport.update({
-  id: '/cursos',
-  path: '/cursos',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminComentariosRoute = AdminComentariosRouteImport.update({
   id: '/comentarios',
   path: '/comentarios',
@@ -150,6 +145,11 @@ const ESlugIndexRoute = ESlugIndexRouteImport.update({
   path: '/e/$slug/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCursosIndexRoute = AdminCursosIndexRouteImport.update({
+  id: '/cursos/',
+  path: '/cursos/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAmbientesIndexRoute = AdminAmbientesIndexRouteImport.update({
   id: '/ambientes/',
   path: '/ambientes/',
@@ -166,9 +166,9 @@ const ESlugLoginRoute = ESlugLoginRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCursosIdRoute = AdminCursosIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AdminCursosRoute,
+  id: '/cursos/$id',
+  path: '/cursos/$id',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAmbientesNovoRoute = AdminAmbientesNovoRouteImport.update({
   id: '/ambientes/novo',
@@ -201,7 +201,6 @@ export interface FileRoutesByFullPath {
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
-  '/admin/cursos': typeof AdminCursosRouteWithChildren
   '/admin/ferramentas': typeof AdminFerramentasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
@@ -220,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/e/$slug/login': typeof ESlugLoginRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
+  '/admin/cursos/': typeof AdminCursosIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
@@ -231,7 +231,6 @@ export interface FileRoutesByTo {
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
-  '/admin/cursos': typeof AdminCursosRouteWithChildren
   '/admin/ferramentas': typeof AdminFerramentasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
@@ -250,6 +249,7 @@ export interface FileRoutesByTo {
   '/e/$slug/login': typeof ESlugLoginRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
+  '/admin/cursos': typeof AdminCursosIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
@@ -264,7 +264,6 @@ export interface FileRoutesById {
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
-  '/admin/cursos': typeof AdminCursosRouteWithChildren
   '/admin/ferramentas': typeof AdminFerramentasRoute
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
@@ -283,6 +282,7 @@ export interface FileRoutesById {
   '/e/$slug/login': typeof ESlugLoginRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
+  '/admin/cursos/': typeof AdminCursosIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
@@ -298,7 +298,6 @@ export interface FileRouteTypes {
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
-    | '/admin/cursos'
     | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
@@ -317,6 +316,7 @@ export interface FileRouteTypes {
     | '/e/$slug/login'
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
+    | '/admin/cursos/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
     | '/e/$slug/resultados/$trabalhoId'
@@ -328,7 +328,6 @@ export interface FileRouteTypes {
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
-    | '/admin/cursos'
     | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
@@ -347,6 +346,7 @@ export interface FileRouteTypes {
     | '/e/$slug/login'
     | '/e/$slug/resultados'
     | '/admin/ambientes'
+    | '/admin/cursos'
     | '/e/$slug'
     | '/e/$slug/aula/$aulaId'
     | '/e/$slug/resultados/$trabalhoId'
@@ -360,7 +360,6 @@ export interface FileRouteTypes {
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
-    | '/admin/cursos'
     | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
@@ -379,6 +378,7 @@ export interface FileRouteTypes {
     | '/e/$slug/login'
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
+    | '/admin/cursos/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
     | '/e/$slug/resultados/$trabalhoId'
@@ -519,13 +519,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFerramentasRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/cursos': {
-      id: '/admin/cursos'
-      path: '/cursos'
-      fullPath: '/admin/cursos'
-      preLoaderRoute: typeof AdminCursosRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/comentarios': {
       id: '/admin/comentarios'
       path: '/comentarios'
@@ -554,6 +547,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/cursos/': {
+      id: '/admin/cursos/'
+      path: '/cursos'
+      fullPath: '/admin/cursos/'
+      preLoaderRoute: typeof AdminCursosIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ambientes/': {
       id: '/admin/ambientes/'
       path: '/ambientes'
@@ -577,10 +577,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/cursos/$id': {
       id: '/admin/cursos/$id'
-      path: '/$id'
+      path: '/cursos/$id'
       fullPath: '/admin/cursos/$id'
       preLoaderRoute: typeof AdminCursosIdRouteImport
-      parentRoute: typeof AdminCursosRoute
+      parentRoute: typeof AdminRoute
     }
     '/admin/ambientes/novo': {
       id: '/admin/ambientes/novo'
@@ -613,23 +613,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminCursosRouteChildren {
-  AdminCursosIdRoute: typeof AdminCursosIdRoute
-}
-
-const AdminCursosRouteChildren: AdminCursosRouteChildren = {
-  AdminCursosIdRoute: AdminCursosIdRoute,
-}
-
-const AdminCursosRouteWithChildren = AdminCursosRoute._addFileChildren(
-  AdminCursosRouteChildren,
-)
-
 interface AdminRouteChildren {
   AdminAlunosRoute: typeof AdminAlunosRoute
   AdminAulasRoute: typeof AdminAulasRoute
   AdminComentariosRoute: typeof AdminComentariosRoute
-  AdminCursosRoute: typeof AdminCursosRouteWithChildren
   AdminFerramentasRoute: typeof AdminFerramentasRoute
   AdminGruposRoute: typeof AdminGruposRoute
   AdminImportacoesRoute: typeof AdminImportacoesRoute
@@ -641,14 +628,15 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAmbientesIdRoute: typeof AdminAmbientesIdRoute
   AdminAmbientesNovoRoute: typeof AdminAmbientesNovoRoute
+  AdminCursosIdRoute: typeof AdminCursosIdRoute
   AdminAmbientesIndexRoute: typeof AdminAmbientesIndexRoute
+  AdminCursosIndexRoute: typeof AdminCursosIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlunosRoute: AdminAlunosRoute,
   AdminAulasRoute: AdminAulasRoute,
   AdminComentariosRoute: AdminComentariosRoute,
-  AdminCursosRoute: AdminCursosRouteWithChildren,
   AdminFerramentasRoute: AdminFerramentasRoute,
   AdminGruposRoute: AdminGruposRoute,
   AdminImportacoesRoute: AdminImportacoesRoute,
@@ -660,7 +648,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminAmbientesIdRoute: AdminAmbientesIdRoute,
   AdminAmbientesNovoRoute: AdminAmbientesNovoRoute,
+  AdminCursosIdRoute: AdminCursosIdRoute,
   AdminAmbientesIndexRoute: AdminAmbientesIndexRoute,
+  AdminCursosIndexRoute: AdminCursosIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -703,3 +693,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
