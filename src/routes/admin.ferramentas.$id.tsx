@@ -32,10 +32,11 @@ type Bloco = { id: string; titulo: string; conteudo: string; ordem: number };
 type Funcionalidade = { id: string; titulo: string; descricao: string | null; imagem_url: string | null; ordem: number };
 type CasoTeste = { id: string; titulo: string; badge: string | null; prompt_exemplo: string | null; explicacao: string | null; ordem: number };
 
-type TabKey = "geral" | "casos_uso" | "tags" | "blocos" | "funcionalidades" | "casos_teste";
+type TabKey = "geral" | "ambientes" | "casos_uso" | "tags" | "blocos" | "funcionalidades" | "casos_teste";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "geral", label: "Geral" },
+  { key: "ambientes", label: "Ambientes" },
   { key: "casos_uso", label: "Casos de uso" },
   { key: "tags", label: "Tags" },
   { key: "blocos", label: "Blocos" },
