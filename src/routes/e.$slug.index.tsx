@@ -151,10 +151,12 @@ function AmbienteHome() {
   const btnLift = effects.efeito_botao_lift ? "fx-btn-lift" : "";
 
   const aulasComMaterial = data.aulas.filter((a) => !!a.material_url);
+  const hasPlaybook = !!data.branding.playbook_arquivo_url;
+  const playbookCount = (hasPlaybook ? 1 : 0) + aulasComMaterial.length;
   const sections: { key: SectionKey; label: string; icon: React.ReactNode; count: number }[] = [
     { key: "ferramentas", label: "Ferramentas", icon: <Wrench className="h-3.5 w-3.5" />, count: data.ferramentas.length },
     { key: "novidades", label: "Novidades", icon: <Newspaper className="h-3.5 w-3.5" />, count: data.novidades.length },
-    { key: "playbook", label: "Playbook", icon: <BookOpen className="h-3.5 w-3.5" />, count: aulasComMaterial.length },
+    { key: "playbook", label: "Playbook", icon: <BookOpen className="h-3.5 w-3.5" />, count: playbookCount },
     { key: "cursos", label: "Cursos", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.cursos.length },
   ];
 
