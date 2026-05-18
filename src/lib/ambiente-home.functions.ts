@@ -70,13 +70,28 @@ export type AulaItem = {
   ordem: number;
 };
 
+export type CursoItem = {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  capa_url: string | null;
+  categoria: string | null;
+  nivel: string | null;
+  total_aulas: number;
+  primeira_aula_id: string | null;
+  ordem: number;
+  destaque: boolean;
+};
+
 export type AmbienteHomeData = {
   branding: AmbienteHomeBranding;
   aluno: { id: string; nome_completo: string; email_acesso: string };
   ferramentas: FerramentaItem[];
   novidades: NovidadeItem[];
   aulas: AulaItem[];
+  cursos: CursoItem[];
 };
+
 
 export const getAmbienteHome = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -209,8 +224,16 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       .map((l) => l.curso_id);
 
     let aulas: AulaItem[] = [];
+    let cursos: CursoItem[] = [];
     if (cursoIds.length) {
       const cursoOrdem = new Map((cursoLinks ?? []).map((l) => [l.curso_id, l.ordem ?? 0]));
+      const cursoDestaque = new Map((cursoLinks ?? []).map((l) => [l.curso_id, !!(l as { destaque?: boolean }).destaque]));
+
+      const { data: cursosRows } = await supabaseAdmin
+        .from("cursos")
+        .select("id, titulo, descricao, capa_url, categoria, nivel, status")
+        .in("id", cursoIds)
+        .eq("status", "publicada");
 
       const { data: mods } = await supabaseAdmin
         .from("modulos")
@@ -245,11 +268,60 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
               tipo_conteudo: a.tipo_conteudo,
               modulo_ordem: cOrd * 1000 + mOrd,
               ordem: a.ordem ?? 0,
-            };
+              _curso_id: m?.curso_id ?? null,
+            } as AulaItem & { _curso_id: string | null };
           })
           .sort((a, b) => a.modulo_ordem - b.modulo_ordem || a.ordem - b.ordem);
+
+        // Calcula total de aulas e primeira aula por curso
+        const aulasOrdenadasPorCurso = new Map<string, { id: string; ordem: number; modulo_ordem: number }[]>();
+        for (const a of aulas as (AulaItem & { _curso_id?: string | null })[]) {
+          const cid = a._curso_id;
+          if (!cid) continue;
+          const list = aulasOrdenadasPorCurso.get(cid) ?? [];
+          list.push({ id: a.id, ordem: a.ordem, modulo_ordem: a.modulo_ordem });
+          aulasOrdenadasPorCurso.set(cid, list);
+        }
+
+        cursos = (cursosRows ?? [])
+          .map((c) => {
+            const list = aulasOrdenadasPorCurso.get(c.id) ?? [];
+            return {
+              id: c.id,
+              titulo: c.titulo,
+              descricao: c.descricao,
+              capa_url: c.capa_url,
+              categoria: c.categoria,
+              nivel: c.nivel,
+              total_aulas: list.length,
+              primeira_aula_id: list[0]?.id ?? null,
+              ordem: cursoOrdem.get(c.id) ?? 0,
+              destaque: cursoDestaque.get(c.id) ?? false,
+            };
+          })
+          .sort((a, b) => a.ordem - b.ordem);
+
+        // Limpa campo auxiliar
+        aulas = aulas.map((a) => {
+          const { _curso_id, ...rest } = a as AulaItem & { _curso_id?: string | null };
+          return rest;
+        });
+      } else {
+        cursos = (cursosRows ?? []).map((c) => ({
+          id: c.id,
+          titulo: c.titulo,
+          descricao: c.descricao,
+          capa_url: c.capa_url,
+          categoria: c.categoria,
+          nivel: c.nivel,
+          total_aulas: 0,
+          primeira_aula_id: null,
+          ordem: cursoOrdem.get(c.id) ?? 0,
+          destaque: cursoDestaque.get(c.id) ?? false,
+        })).sort((a, b) => a.ordem - b.ordem);
       }
     }
+
 
     const branding: AmbienteHomeBranding = {
       id: amb.id,
@@ -288,5 +360,6 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
       ferramentas,
       novidades,
       aulas,
+      cursos,
     };
   });

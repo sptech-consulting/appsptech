@@ -43,7 +43,7 @@ const RADII = {
 
 const PAD = { compacto: "14px", medio: "20px", grande: "26px" } as const;
 
-type SectionKey = "ferramentas" | "novidades" | "playbook" | "aulas";
+type SectionKey = "ferramentas" | "novidades" | "playbook" | "cursos";
 
 function AmbienteHome() {
   const { slug } = Route.useParams();
@@ -155,7 +155,7 @@ function AmbienteHome() {
     { key: "ferramentas", label: "Ferramentas", icon: <Wrench className="h-3.5 w-3.5" />, count: data.ferramentas.length },
     { key: "novidades", label: "Novidades", icon: <Newspaper className="h-3.5 w-3.5" />, count: data.novidades.length },
     { key: "playbook", label: "Playbook", icon: <BookOpen className="h-3.5 w-3.5" />, count: aulasComMaterial.length },
-    { key: "aulas", label: "Aulas", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.aulas.length },
+    { key: "cursos", label: "Cursos", icon: <GraduationCap className="h-3.5 w-3.5" />, count: data.cursos.length },
   ];
 
   function openFerramenta(f: FerramentaItem) {
@@ -481,53 +481,54 @@ function AmbienteHome() {
           </Carousel>
         </Section>
 
-        {/* Aulas */}
+        {/* Cursos */}
         <Section
-          id="sec-aulas"
-          title="Aulas"
+          id="sec-cursos"
+          title="Cursos"
           subtitle="Conteúdo do seu programa"
           tk={tk}
-          empty={data.aulas.length === 0}
-          emptyMsg="Nenhuma aula liberada ainda."
+          empty={data.cursos.length === 0}
+          emptyMsg="Nenhum curso liberado ainda."
         >
           <Carousel enterClass={enterClass}>
-            {data.aulas.map((a) => {
+            {data.cursos.map((c) => {
               return (
                 <EffectCard
-                  key={a.id}
+                  key={c.id}
                   effects={effects}
-                  baseStyle={{ ...cardBase, cursor: "pointer", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
+                  baseStyle={{ ...cardBase, cursor: c.primeira_aula_id ? "pointer" : "default", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden", opacity: c.primeira_aula_id ? 1 : 0.7 }}
                   primaria={tk.primaria}
-                  onClick={() => navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: a.id } })}
+                  onClick={() => {
+                    if (c.primeira_aula_id) {
+                      navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: c.primeira_aula_id } });
+                    }
+                  }}
                 >
                   {b.card_exibir_imagem && (
                     <div
                       className="h-40 w-full flex items-center justify-center"
                       style={{
-                        backgroundImage: a.thumbnail_url
-                          ? `linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url(${a.thumbnail_url})`
+                        backgroundImage: c.capa_url
+                          ? `linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4)), url(${c.capa_url})`
                           : `linear-gradient(135deg, ${tk.primaria}, ${tk.secundaria})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                       }}
                     >
-                      <PlayCircle className="h-12 w-12 text-white/90 drop-shadow" />
+                      <GraduationCap className="h-12 w-12 text-white/90 drop-shadow" />
                     </div>
                   )}
                   <div style={{ padding }}>
-                    {a.modulo && (
-                      <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{a.modulo}</div>
+                    {c.categoria && (
+                      <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{c.categoria}</div>
                     )}
-                    <div className="font-bold leading-snug">{a.titulo}</div>
-                    {a.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-2">{a.descricao}</div>}
+                    <div className="font-bold leading-snug">{c.titulo}</div>
+                    {c.descricao && <div className="mt-1.5 text-xs opacity-70 line-clamp-2">{c.descricao}</div>}
                     <div className="mt-3 flex items-center gap-3 text-[11px] opacity-70">
-                      {a.duracao_minutos && <span>{a.duracao_minutos} min</span>}
-                      {a.tipo_conteudo && <span className="capitalize">{a.tipo_conteudo}</span>}
-                      {a.material_url && (
-                        <span className="inline-flex items-center gap-1">
-                          <FileText className="h-3 w-3" /> Material
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1">
+                        <PlayCircle className="h-3 w-3" /> {c.total_aulas} aula{c.total_aulas === 1 ? "" : "s"}
+                      </span>
+                      {c.nivel && <span className="capitalize">{c.nivel}</span>}
                     </div>
                   </div>
                 </EffectCard>

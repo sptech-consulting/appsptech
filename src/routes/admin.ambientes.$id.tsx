@@ -197,14 +197,6 @@ function VinculosManager({ ambienteId }: { ambienteId: string }) {
           itemFkColumn="curso_id"
           labelField="titulo"
         />
-        <LinkSection
-          ambienteId={ambienteId}
-          title="Aulas avulsas"
-          sourceTable="aulas"
-          linkTable="ambiente_aulas"
-          itemFkColumn="aula_id"
-          labelField="titulo"
-        />
       </div>
     </div>
   );
