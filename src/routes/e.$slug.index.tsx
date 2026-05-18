@@ -498,7 +498,7 @@ function AmbienteHome() {
                   primaria={tk.primaria}
                   onClick={() => {
                     if (c.primeira_aula_id) {
-                      navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: c.primeira_aula_id } });
+                      navigate({ to: "/e/$slug/aula/$aulaId", params: { slug, aulaId: c.primeira_aula_slug ?? c.primeira_aula_id } });
                     }
                   }}
                 >
