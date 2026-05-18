@@ -72,9 +72,10 @@ export const obterTrabalhoPublico = createServerFn({ method: "POST" })
     return { codigo: normCodigo(input.codigo), trabalhoId: input.trabalhoId };
   })
   .handler(async ({ data }) => {
+    const trabalhoId = await resolverTrabalhoId(data.trabalhoId);
     const { data: rows, error } = await supabaseAdmin.rpc("obter_trabalho_publico", {
       _codigo: data.codigo,
-      _trabalho_id: data.trabalhoId,
+      _trabalho_id: trabalhoId,
     });
     if (error) throw new Error(error.message);
     const row = (rows ?? [])[0];
