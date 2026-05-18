@@ -616,6 +616,187 @@ export type Database = {
         }
         Relationships: []
       }
+      ferramenta_blocos: {
+        Row: {
+          conteudo: string
+          criado_em: string
+          ferramenta_id: string
+          id: string
+          ordem: number
+          titulo: string
+        }
+        Insert: {
+          conteudo: string
+          criado_em?: string
+          ferramenta_id: string
+          id?: string
+          ordem?: number
+          titulo: string
+        }
+        Update: {
+          conteudo?: string
+          criado_em?: string
+          ferramenta_id?: string
+          id?: string
+          ordem?: number
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferramenta_blocos_ferramenta_id_fkey"
+            columns: ["ferramenta_id"]
+            isOneToOne: false
+            referencedRelation: "ferramentas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferramenta_casos_teste: {
+        Row: {
+          badge: string | null
+          criado_em: string
+          explicacao: string | null
+          ferramenta_id: string
+          id: string
+          ordem: number
+          prompt_exemplo: string | null
+          titulo: string
+        }
+        Insert: {
+          badge?: string | null
+          criado_em?: string
+          explicacao?: string | null
+          ferramenta_id: string
+          id?: string
+          ordem?: number
+          prompt_exemplo?: string | null
+          titulo: string
+        }
+        Update: {
+          badge?: string | null
+          criado_em?: string
+          explicacao?: string | null
+          ferramenta_id?: string
+          id?: string
+          ordem?: number
+          prompt_exemplo?: string | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferramenta_casos_teste_ferramenta_id_fkey"
+            columns: ["ferramenta_id"]
+            isOneToOne: false
+            referencedRelation: "ferramentas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferramenta_casos_uso: {
+        Row: {
+          criado_em: string
+          ferramenta_id: string
+          id: string
+          ordem: number
+          texto: string
+        }
+        Insert: {
+          criado_em?: string
+          ferramenta_id: string
+          id?: string
+          ordem?: number
+          texto: string
+        }
+        Update: {
+          criado_em?: string
+          ferramenta_id?: string
+          id?: string
+          ordem?: number
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferramenta_casos_uso_ferramenta_id_fkey"
+            columns: ["ferramenta_id"]
+            isOneToOne: false
+            referencedRelation: "ferramentas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferramenta_funcionalidades: {
+        Row: {
+          criado_em: string
+          descricao: string | null
+          ferramenta_id: string
+          id: string
+          imagem_url: string | null
+          ordem: number
+          titulo: string
+        }
+        Insert: {
+          criado_em?: string
+          descricao?: string | null
+          ferramenta_id: string
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          titulo: string
+        }
+        Update: {
+          criado_em?: string
+          descricao?: string | null
+          ferramenta_id?: string
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferramenta_funcionalidades_ferramenta_id_fkey"
+            columns: ["ferramenta_id"]
+            isOneToOne: false
+            referencedRelation: "ferramentas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ferramenta_tags: {
+        Row: {
+          criado_em: string
+          ferramenta_id: string
+          id: string
+          ordem: number
+          rotulo: string
+          tipo: Database["public"]["Enums"]["ferramenta_tag_tipo"]
+        }
+        Insert: {
+          criado_em?: string
+          ferramenta_id: string
+          id?: string
+          ordem?: number
+          rotulo: string
+          tipo: Database["public"]["Enums"]["ferramenta_tag_tipo"]
+        }
+        Update: {
+          criado_em?: string
+          ferramenta_id?: string
+          id?: string
+          ordem?: number
+          rotulo?: string
+          tipo?: Database["public"]["Enums"]["ferramenta_tag_tipo"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ferramenta_tags_ferramenta_id_fkey"
+            columns: ["ferramenta_id"]
+            isOneToOne: false
+            referencedRelation: "ferramentas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ferramentas: {
         Row: {
           atualizado_em: string
@@ -623,10 +804,14 @@ export type Database = {
           criado_em: string
           criado_por: string | null
           descricao: string | null
+          descricao_longa: string | null
+          frase_destaque: string | null
           icone_url: string | null
           id: string
+          imagem_capa_url: string | null
           nome: string
           status: Database["public"]["Enums"]["generic_status"]
+          subtitulo: string | null
           tipo_abertura:
             | Database["public"]["Enums"]["ferramenta_abertura"]
             | null
@@ -638,10 +823,14 @@ export type Database = {
           criado_em?: string
           criado_por?: string | null
           descricao?: string | null
+          descricao_longa?: string | null
+          frase_destaque?: string | null
           icone_url?: string | null
           id?: string
+          imagem_capa_url?: string | null
           nome: string
           status?: Database["public"]["Enums"]["generic_status"]
+          subtitulo?: string | null
           tipo_abertura?:
             | Database["public"]["Enums"]["ferramenta_abertura"]
             | null
@@ -653,10 +842,14 @@ export type Database = {
           criado_em?: string
           criado_por?: string | null
           descricao?: string | null
+          descricao_longa?: string | null
+          frase_destaque?: string | null
           icone_url?: string | null
           id?: string
+          imagem_capa_url?: string | null
           nome?: string
           status?: Database["public"]["Enums"]["generic_status"]
+          subtitulo?: string | null
           tipo_abertura?:
             | Database["public"]["Enums"]["ferramenta_abertura"]
             | null
@@ -1219,6 +1412,7 @@ export type Database = {
       card_estilo_t: "flat" | "sombra" | "borda" | "imagem"
       card_tamanho_t: "compacto" | "medio" | "grande"
       ferramenta_abertura: "nova_aba" | "mesma_aba" | "modal"
+      ferramenta_tag_tipo: "input" | "output" | "integracao"
       generic_status: "ativo" | "inativo"
       grupo_escopo: "global" | "ambiente"
       importacao_status:
@@ -1369,6 +1563,7 @@ export const Constants = {
       card_estilo_t: ["flat", "sombra", "borda", "imagem"],
       card_tamanho_t: ["compacto", "medio", "grande"],
       ferramenta_abertura: ["nova_aba", "mesma_aba", "modal"],
+      ferramenta_tag_tipo: ["input", "output", "integracao"],
       generic_status: ["ativo", "inativo"],
       grupo_escopo: ["global", "ambiente"],
       importacao_status: [
