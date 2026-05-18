@@ -99,7 +99,7 @@ function AmbientesList() {
                     <div className="inline-flex gap-1">
                       <button
                         onClick={() => {
-                          const url = `${window.location.origin}/e/${a.slug}/login`;
+                          const url = `${window.location.origin}/e/${a.slug}/entrar`;
                           void navigator.clipboard.writeText(url);
                           toast.success("Link copiado", { description: url });
                         }}
