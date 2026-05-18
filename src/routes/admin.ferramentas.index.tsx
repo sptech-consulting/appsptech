@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, ExternalLink } from "lucide-react";
+import { Plus, Pencil, ExternalLink, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 type Ferramenta = {
@@ -17,7 +17,7 @@ type Ferramenta = {
   status: "ativo" | "inativo";
 };
 
-export const Route = createFileRoute("/admin/ferramentas")({
+export const Route = createFileRoute("/admin/ferramentas/")({
   component: FerramentasPage,
 });
 
@@ -100,12 +100,27 @@ function FerramentasPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <button
-                      onClick={() => navigate({ to: "/admin/ferramentas/$id", params: { id: it.id } })}
-                      className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
-                    >
-                      <Pencil className="h-3 w-3" /> Editar
-                    </button>
+                    <div className="inline-flex items-center gap-1">
+                      <button
+                        onClick={() => navigate({ to: "/admin/ferramentas/$id", params: { id: it.id } })}
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
+                      >
+                        <Pencil className="h-3 w-3" /> Editar
+                      </button>
+                      <button
+                        onClick={async () => {
+                          const novo = it.status === "ativo" ? "inativo" : "ativo";
+                          const { error } = await supabase.from("ferramentas").update({ status: novo }).eq("id", it.id);
+                          if (error) return toast.error(error.message);
+                          toast.success(novo === "inativo" ? "Ferramenta inativada." : "Ferramenta restaurada.");
+                          void load();
+                        }}
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold hover:bg-muted"
+                        title={it.status === "ativo" ? "Inativar" : "Restaurar"}
+                      >
+                        {it.status === "ativo" ? <><Archive className="h-3 w-3" /> Inativar</> : <><RotateCcw className="h-3 w-3" /> Restaurar</>}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

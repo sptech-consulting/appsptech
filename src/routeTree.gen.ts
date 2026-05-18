@@ -24,11 +24,11 @@ import { Route as AdminMetricasRouteImport } from './routes/admin.metricas'
 import { Route as AdminLogsRouteImport } from './routes/admin.logs'
 import { Route as AdminImportacoesRouteImport } from './routes/admin.importacoes'
 import { Route as AdminGruposRouteImport } from './routes/admin.grupos'
-import { Route as AdminFerramentasRouteImport } from './routes/admin.ferramentas'
 import { Route as AdminComentariosRouteImport } from './routes/admin.comentarios'
 import { Route as AdminAulasRouteImport } from './routes/admin.aulas'
 import { Route as AdminAlunosRouteImport } from './routes/admin.alunos'
 import { Route as ESlugIndexRouteImport } from './routes/e.$slug.index'
+import { Route as AdminFerramentasIndexRouteImport } from './routes/admin.ferramentas.index'
 import { Route as AdminCursosIndexRouteImport } from './routes/admin.cursos.index'
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
 import { Route as ESlugResultadosRouteImport } from './routes/e.$slug.resultados'
@@ -118,11 +118,6 @@ const AdminGruposRoute = AdminGruposRouteImport.update({
   path: '/grupos',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminFerramentasRoute = AdminFerramentasRouteImport.update({
-  id: '/ferramentas',
-  path: '/ferramentas',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminComentariosRoute = AdminComentariosRouteImport.update({
   id: '/comentarios',
   path: '/comentarios',
@@ -142,6 +137,11 @@ const ESlugIndexRoute = ESlugIndexRouteImport.update({
   id: '/e/$slug/',
   path: '/e/$slug/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFerramentasIndexRoute = AdminFerramentasIndexRouteImport.update({
+  id: '/ferramentas/',
+  path: '/ferramentas/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCursosIndexRoute = AdminCursosIndexRouteImport.update({
   id: '/cursos/',
@@ -164,9 +164,9 @@ const ESlugEntrarRoute = ESlugEntrarRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminFerramentasIdRoute = AdminFerramentasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AdminFerramentasRoute,
+  id: '/ferramentas/$id',
+  path: '/ferramentas/$id',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminCursosIdRoute = AdminCursosIdRouteImport.update({
   id: '/cursos/$id',
@@ -221,7 +221,6 @@ export interface FileRoutesByFullPath {
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
-  '/admin/ferramentas': typeof AdminFerramentasRouteWithChildren
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -240,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/admin/cursos/': typeof AdminCursosIndexRoute
+  '/admin/ferramentas/': typeof AdminFerramentasIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
   '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
@@ -254,7 +254,6 @@ export interface FileRoutesByTo {
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
-  '/admin/ferramentas': typeof AdminFerramentasRouteWithChildren
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -273,6 +272,7 @@ export interface FileRoutesByTo {
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
   '/admin/cursos': typeof AdminCursosIndexRoute
+  '/admin/ferramentas': typeof AdminFerramentasIndexRoute
   '/e/$slug': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
   '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
@@ -290,7 +290,6 @@ export interface FileRoutesById {
   '/admin/alunos': typeof AdminAlunosRoute
   '/admin/aulas': typeof AdminAulasRoute
   '/admin/comentarios': typeof AdminComentariosRoute
-  '/admin/ferramentas': typeof AdminFerramentasRouteWithChildren
   '/admin/grupos': typeof AdminGruposRoute
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -309,6 +308,7 @@ export interface FileRoutesById {
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/admin/cursos/': typeof AdminCursosIndexRoute
+  '/admin/ferramentas/': typeof AdminFerramentasIndexRoute
   '/e/$slug/': typeof ESlugIndexRoute
   '/e/$slug/aula/$aulaId': typeof ESlugAulaAulaIdRoute
   '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
@@ -327,7 +327,6 @@ export interface FileRouteTypes {
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
-    | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
     | '/admin/logs'
@@ -346,6 +345,7 @@ export interface FileRouteTypes {
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/admin/cursos/'
+    | '/admin/ferramentas/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
     | '/e/$slug/ferramenta/$ferramentaId'
@@ -360,7 +360,6 @@ export interface FileRouteTypes {
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
-    | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
     | '/admin/logs'
@@ -379,6 +378,7 @@ export interface FileRouteTypes {
     | '/e/$slug/resultados'
     | '/admin/ambientes'
     | '/admin/cursos'
+    | '/admin/ferramentas'
     | '/e/$slug'
     | '/e/$slug/aula/$aulaId'
     | '/e/$slug/ferramenta/$ferramentaId'
@@ -395,7 +395,6 @@ export interface FileRouteTypes {
     | '/admin/alunos'
     | '/admin/aulas'
     | '/admin/comentarios'
-    | '/admin/ferramentas'
     | '/admin/grupos'
     | '/admin/importacoes'
     | '/admin/logs'
@@ -414,6 +413,7 @@ export interface FileRouteTypes {
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/admin/cursos/'
+    | '/admin/ferramentas/'
     | '/e/$slug/'
     | '/e/$slug/aula/$aulaId'
     | '/e/$slug/ferramenta/$ferramentaId'
@@ -546,13 +546,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGruposRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/ferramentas': {
-      id: '/admin/ferramentas'
-      path: '/ferramentas'
-      fullPath: '/admin/ferramentas'
-      preLoaderRoute: typeof AdminFerramentasRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/comentarios': {
       id: '/admin/comentarios'
       path: '/comentarios'
@@ -580,6 +573,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/e/$slug/'
       preLoaderRoute: typeof ESlugIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/ferramentas/': {
+      id: '/admin/ferramentas/'
+      path: '/ferramentas'
+      fullPath: '/admin/ferramentas/'
+      preLoaderRoute: typeof AdminFerramentasIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/cursos/': {
       id: '/admin/cursos/'
@@ -611,10 +611,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/ferramentas/$id': {
       id: '/admin/ferramentas/$id'
-      path: '/$id'
+      path: '/ferramentas/$id'
       fullPath: '/admin/ferramentas/$id'
       preLoaderRoute: typeof AdminFerramentasIdRouteImport
-      parentRoute: typeof AdminFerramentasRoute
+      parentRoute: typeof AdminRoute
     }
     '/admin/cursos/$id': {
       id: '/admin/cursos/$id'
@@ -675,22 +675,10 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminFerramentasRouteChildren {
-  AdminFerramentasIdRoute: typeof AdminFerramentasIdRoute
-}
-
-const AdminFerramentasRouteChildren: AdminFerramentasRouteChildren = {
-  AdminFerramentasIdRoute: AdminFerramentasIdRoute,
-}
-
-const AdminFerramentasRouteWithChildren =
-  AdminFerramentasRoute._addFileChildren(AdminFerramentasRouteChildren)
-
 interface AdminRouteChildren {
   AdminAlunosRoute: typeof AdminAlunosRoute
   AdminAulasRoute: typeof AdminAulasRoute
   AdminComentariosRoute: typeof AdminComentariosRoute
-  AdminFerramentasRoute: typeof AdminFerramentasRouteWithChildren
   AdminGruposRoute: typeof AdminGruposRoute
   AdminImportacoesRoute: typeof AdminImportacoesRoute
   AdminLogsRoute: typeof AdminLogsRoute
@@ -701,15 +689,16 @@ interface AdminRouteChildren {
   AdminAmbientesIdRoute: typeof AdminAmbientesIdRoute
   AdminAmbientesNovoRoute: typeof AdminAmbientesNovoRoute
   AdminCursosIdRoute: typeof AdminCursosIdRoute
+  AdminFerramentasIdRoute: typeof AdminFerramentasIdRoute
   AdminAmbientesIndexRoute: typeof AdminAmbientesIndexRoute
   AdminCursosIndexRoute: typeof AdminCursosIndexRoute
+  AdminFerramentasIndexRoute: typeof AdminFerramentasIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlunosRoute: AdminAlunosRoute,
   AdminAulasRoute: AdminAulasRoute,
   AdminComentariosRoute: AdminComentariosRoute,
-  AdminFerramentasRoute: AdminFerramentasRouteWithChildren,
   AdminGruposRoute: AdminGruposRoute,
   AdminImportacoesRoute: AdminImportacoesRoute,
   AdminLogsRoute: AdminLogsRoute,
@@ -720,8 +709,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAmbientesIdRoute: AdminAmbientesIdRoute,
   AdminAmbientesNovoRoute: AdminAmbientesNovoRoute,
   AdminCursosIdRoute: AdminCursosIdRoute,
+  AdminFerramentasIdRoute: AdminFerramentasIdRoute,
   AdminAmbientesIndexRoute: AdminAmbientesIndexRoute,
   AdminCursosIndexRoute: AdminCursosIndexRoute,
+  AdminFerramentasIndexRoute: AdminFerramentasIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
