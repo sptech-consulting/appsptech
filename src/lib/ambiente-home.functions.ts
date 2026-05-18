@@ -82,6 +82,7 @@ export type CursoItem = {
   nivel: string | null;
   total_aulas: number;
   primeira_aula_id: string | null;
+  primeira_aula_slug: string | null;
   ordem: number;
   destaque: boolean;
 };
