@@ -159,7 +159,7 @@ function AmbienteHome() {
   ];
 
   function openFerramenta(f: FerramentaItem) {
-    navigate({ to: "/e/$slug/ferramenta/$ferramentaId", params: { slug, ferramentaId: f.id } });
+    navigate({ to: "/e/$slug/ferramenta/$ferramentaId", params: { slug, ferramentaId: f.slug ?? f.id } });
   }
 
   return (
