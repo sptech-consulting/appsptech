@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { isUuid } from "@/lib/slug";
 
 export type AulaPlayerComentario = {
   id: string;
@@ -99,11 +100,10 @@ async function resolveAcesso(slug: string, aulaId: string, userId: string) {
     .maybeSingle();
   if (!vinc) throw new Error("Sem acesso a este ambiente");
 
-  const { data: aula } = await supabaseAdmin
-    .from("aulas")
-    .select("*")
-    .eq("id", aulaId)
-    .maybeSingle();
+  const aulaQuery = supabaseAdmin.from("aulas").select("*");
+  const { data: aula } = isUuid(aulaId)
+    ? await aulaQuery.eq("id", aulaId).maybeSingle()
+    : await aulaQuery.eq("slug", aulaId).maybeSingle();
   if (!aula || aula.status !== "publicada") throw new Error("Aula não encontrada");
   if (!aula.modulo_id) throw new Error("Aula sem módulo");
 

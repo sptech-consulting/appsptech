@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { isUuid } from "@/lib/slug";
 
 export type NovidadeDetalhe = {
   id: string;
@@ -53,11 +54,12 @@ export const getNovidadeDetalhe = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!vinc) throw new Error("Acesso negado");
 
-    const { data: n } = await supabaseAdmin
+    const novQuery = supabaseAdmin
       .from("novidades")
-      .select("id, titulo, resumo, conteudo, imagem_url, fonte_url, fonte_nome, categoria, publicado_em, status, ambiente_id")
-      .eq("id", data.novidadeId)
-      .maybeSingle();
+      .select("id, titulo, resumo, conteudo, imagem_url, fonte_url, fonte_nome, categoria, publicado_em, status, ambiente_id, slug");
+    const { data: n } = isUuid(data.novidadeId)
+      ? await novQuery.eq("id", data.novidadeId).maybeSingle()
+      : await novQuery.eq("slug", data.novidadeId).eq("ambiente_id", amb.id).maybeSingle();
     if (!n || n.ambiente_id !== amb.id || n.status !== "publicada") {
       throw new Error("Novidade não encontrada");
     }

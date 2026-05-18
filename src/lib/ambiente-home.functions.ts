@@ -35,6 +35,7 @@ export type AmbienteHomeBranding = {
 
 export type FerramentaItem = {
   id: string;
+  slug: string | null;
   nome: string;
   descricao: string | null;
   url: string | null;
@@ -46,6 +47,7 @@ export type FerramentaItem = {
 
 export type NovidadeItem = {
   id: string;
+  slug: string | null;
   titulo: string;
   resumo: string | null;
   imagem_url: string | null;
@@ -58,6 +60,7 @@ export type NovidadeItem = {
 
 export type AulaItem = {
   id: string;
+  slug: string | null;
   titulo: string;
   descricao: string | null;
   modulo: string | null;
@@ -147,7 +150,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
     if (ferrIds.length) {
       const { data: ferr } = await supabaseAdmin
         .from("ferramentas")
-        .select("id, nome, descricao, url, icone_url, categoria, tipo_abertura, status")
+        .select("id, slug, nome, descricao, url, icone_url, categoria, tipo_abertura, status")
         .in("id", ferrIds)
         .eq("status", "ativo");
       const byId = new Map((ferr ?? []).map((f) => [f.id, f]));
@@ -158,6 +161,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
           const f = byId.get(l.ferramenta_id)!;
           return {
             id: f.id,
+            slug: (f as { slug: string | null }).slug ?? null,
             nome: f.nome,
             descricao: f.descricao,
             url: f.url,
@@ -172,7 +176,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
     // 4) Novidades publicadas do ambiente (recebidas via webhook n8n)
     const { data: novRows } = await supabaseAdmin
       .from("novidades")
-      .select("id, titulo, resumo, imagem_url, fonte_nome, fonte_url, categoria, publicado_em")
+      .select("id, slug, titulo, resumo, imagem_url, fonte_nome, fonte_url, categoria, publicado_em")
       .eq("ambiente_id", amb.id)
       .eq("status", "publicada")
       .order("publicado_em", { ascending: false, nullsFirst: false })
@@ -180,6 +184,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
 
     const novidades: NovidadeItem[] = (novRows ?? []).map((n) => ({
       id: n.id,
+      slug: (n as { slug: string | null }).slug ?? null,
       titulo: n.titulo,
       resumo: n.resumo,
       imagem_url: n.imagem_url,

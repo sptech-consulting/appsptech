@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { isUuid } from "@/lib/slug";
 
 export type FerramentaTagTipo = "input" | "output" | "integracao";
 
@@ -62,23 +63,25 @@ export const getFerramentaDetalhe = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!vincAluno) throw new Error("Acesso negado");
 
+    // Resolve por UUID ou slug
+    const ferrQuery = supabaseAdmin
+      .from("ferramentas")
+      .select(
+        "id, nome, descricao, subtitulo, descricao_longa, url, icone_url, imagem_capa_url, categoria, tipo_abertura, frase_destaque, status, slug",
+      );
+    const { data: f } = isUuid(data.ferramentaId)
+      ? await ferrQuery.eq("id", data.ferramentaId).maybeSingle()
+      : await ferrQuery.eq("slug", data.ferramentaId).maybeSingle();
+    if (!f || f.status !== "ativo") throw new Error("Ferramenta indisponível");
+
     const { data: vincFerr } = await supabaseAdmin
       .from("ambiente_ferramentas")
       .select("id, status")
       .eq("ambiente_id", amb.id)
-      .eq("ferramenta_id", data.ferramentaId)
+      .eq("ferramenta_id", f.id)
       .eq("status", "ativo")
       .maybeSingle();
     if (!vincFerr) throw new Error("Ferramenta não disponível neste ambiente");
-
-    const { data: f } = await supabaseAdmin
-      .from("ferramentas")
-      .select(
-        "id, nome, descricao, subtitulo, descricao_longa, url, icone_url, imagem_capa_url, categoria, tipo_abertura, frase_destaque, status",
-      )
-      .eq("id", data.ferramentaId)
-      .maybeSingle();
-    if (!f || f.status !== "ativo") throw new Error("Ferramenta indisponível");
 
     const [casosUsoRes, tagsRes, blocosRes, funcsRes, casosTesteRes] = await Promise.all([
       supabaseAdmin.from("ferramenta_casos_uso").select("id, texto, ordem").eq("ferramenta_id", f.id).order("ordem"),

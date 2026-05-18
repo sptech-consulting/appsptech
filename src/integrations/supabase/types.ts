@@ -489,6 +489,7 @@ export type Database = {
           modulo: string | null
           modulo_id: string | null
           ordem: number
+          slug: string | null
           status: Database["public"]["Enums"]["publicacao_status"]
           thumbnail_url: string | null
           tipo_conteudo: Database["public"]["Enums"]["aula_tipo"] | null
@@ -506,6 +507,7 @@ export type Database = {
           modulo?: string | null
           modulo_id?: string | null
           ordem?: number
+          slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
           thumbnail_url?: string | null
           tipo_conteudo?: Database["public"]["Enums"]["aula_tipo"] | null
@@ -523,6 +525,7 @@ export type Database = {
           modulo?: string | null
           modulo_id?: string | null
           ordem?: number
+          slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
           thumbnail_url?: string | null
           tipo_conteudo?: Database["public"]["Enums"]["aula_tipo"] | null
@@ -810,6 +813,7 @@ export type Database = {
           id: string
           imagem_capa_url: string | null
           nome: string
+          slug: string | null
           status: Database["public"]["Enums"]["generic_status"]
           subtitulo: string | null
           tipo_abertura:
@@ -829,6 +833,7 @@ export type Database = {
           id?: string
           imagem_capa_url?: string | null
           nome: string
+          slug?: string | null
           status?: Database["public"]["Enums"]["generic_status"]
           subtitulo?: string | null
           tipo_abertura?:
@@ -848,6 +853,7 @@ export type Database = {
           id?: string
           imagem_capa_url?: string | null
           nome?: string
+          slug?: string | null
           status?: Database["public"]["Enums"]["generic_status"]
           subtitulo?: string | null
           tipo_abertura?:
@@ -1114,6 +1120,7 @@ export type Database = {
           imagem_url: string | null
           publicado_em: string | null
           resumo: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["publicacao_status"]
           tags: string[] | null
           titulo: string
@@ -1131,6 +1138,7 @@ export type Database = {
           imagem_url?: string | null
           publicado_em?: string | null
           resumo?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
           tags?: string[] | null
           titulo: string
@@ -1148,6 +1156,7 @@ export type Database = {
           imagem_url?: string | null
           publicado_em?: string | null
           resumo?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
           tags?: string[] | null
           titulo?: string
@@ -1201,6 +1210,7 @@ export type Database = {
           ordem: number
           publicado_em: string | null
           resumo: string | null
+          slug: string | null
           status: Database["public"]["Enums"]["publicacao_status"]
           tags: string[] | null
           titulo: string
@@ -1221,6 +1231,7 @@ export type Database = {
           ordem?: number
           publicado_em?: string | null
           resumo?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
           tags?: string[] | null
           titulo: string
@@ -1241,6 +1252,7 @@ export type Database = {
           ordem?: number
           publicado_em?: string | null
           resumo?: string | null
+          slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
           tags?: string[] | null
           titulo?: string
@@ -1348,6 +1360,10 @@ export type Database = {
       claim_super_admin: { Args: { _nome: string }; Returns: string }
       current_admin_id: { Args: never; Returns: string }
       current_aluno_id: { Args: never; Returns: string }
+      ensure_unique_slug: {
+        Args: { _base: string; _exclude_id: string; _table: unknown }
+        Returns: string
+      }
       has_admin_permission: { Args: { _permissao: string }; Returns: boolean }
       is_admin_for_ambiente: {
         Args: { _ambiente_id: string }
@@ -1398,6 +1414,7 @@ export type Database = {
           slug: string
         }[]
       }
+      slugify_pt: { Args: { _txt: string }; Returns: string }
     }
     Enums: {
       aluno_status: "ativo" | "inativo" | "bloqueado"
