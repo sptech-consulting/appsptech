@@ -373,9 +373,9 @@ function AmbienteHome() {
               <EffectCard
                 key={n.id}
                 effects={effects}
-                baseStyle={{ ...cardBase, cursor: n.fonte_url ? "pointer" : "default", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
+                baseStyle={{ ...cardBase, cursor: "pointer", minWidth: 300, maxWidth: 340, padding: 0, overflow: "hidden" }}
                 primaria={tk.primaria}
-                onClick={() => n.fonte_url && window.open(n.fonte_url, "_blank", "noopener,noreferrer")}
+                onClick={() => navigate({ to: "/e/$slug/novidade/$novidadeId", params: { slug, novidadeId: n.id } })}
               >
                 {b.card_exibir_imagem && (
                   <div
