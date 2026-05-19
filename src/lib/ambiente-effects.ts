@@ -120,13 +120,18 @@ export function useCardTilt(enabled: boolean) {
       const r = el.getBoundingClientRect();
       const x = e.clientX - r.left;
       const y = e.clientY - r.top;
-      const rx = ((y / r.height) - 0.5) * -10; // tilt up/down
-      const ry = ((x / r.width) - 0.5) * 12;   // tilt left/right
+      const px = x / r.width;
+      const py = y / r.height;
+      // Match docs/referencia_efeitos_missao_ia.html — inclination is bold and perceptible.
+      const rx = (py - 0.5) * 17;
+      const ry = (0.5 - px) * 22;
+      const tx = (0.5 - px) * 28;
+      const ty = (0.5 - py) * 22 - 10;
       el.style.setProperty("--rx", `${rx}deg`);
       el.style.setProperty("--ry", `${ry}deg`);
-      el.style.setProperty("--tx", `${((x / r.width) - 0.5) * 4}px`);
-      el.style.setProperty("--ty", `${((y / r.height) - 0.5) * 4}px`);
-      el.style.setProperty("--s", "1.03");
+      el.style.setProperty("--tx", `${tx}px`);
+      el.style.setProperty("--ty", `${ty}px`);
+      el.style.setProperty("--s", "1.035");
     };
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerleave", reset);
@@ -153,9 +158,10 @@ export function cardTiltStyle(enabled: boolean): React.CSSProperties {
   if (!enabled) return {};
   return {
     transform:
-      "perspective(900px) translate3d(var(--tx,0), var(--ty,0), 0) rotateX(var(--rx,0)) rotateY(var(--ry,0)) scale(var(--s,1))",
+      "perspective(1000px) translate3d(var(--tx,0), var(--ty,0), 0) rotateX(var(--rx,0)) rotateY(var(--ry,0)) scale(var(--s,1))",
     transformStyle: "preserve-3d",
-    transition: "transform .12s cubic-bezier(.16,1,.3,1), box-shadow .3s ease",
-    willChange: "transform",
+    transition: "transform .06s linear, box-shadow .06s linear",
+    willChange: "transform, box-shadow",
+    backfaceVisibility: "hidden",
   };
 }

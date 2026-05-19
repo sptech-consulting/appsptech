@@ -692,7 +692,7 @@ function Carousel({ enterClass, children }: { enterClass: string; children: Reac
       </button>
       <div
         ref={ref}
-        className={`flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-1 px-1 scrollbar-thin ${enterClass}`}
+        className={`flex gap-5 overflow-x-auto snap-x snap-mandatory pt-8 pb-12 -my-4 -mx-4 px-4 scrollbar-thin ${enterClass}`}
         style={{ scrollbarWidth: "thin" }}
       >
         {Array.isArray(children) ? (
