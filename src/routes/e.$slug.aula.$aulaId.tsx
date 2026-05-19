@@ -540,7 +540,7 @@ function VideoPlayer({
       </div>
     );
   }
-  const embed = toEmbedUrl(url);
+  const embed = toEmbedUrl(url, startAt);
   if (embed) {
     return (
       <iframe
