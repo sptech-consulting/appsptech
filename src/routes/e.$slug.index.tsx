@@ -318,7 +318,14 @@ function AmbienteHome() {
               <EffectCard
                 key={f.id}
                 effects={effects}
-                baseStyle={{ ...cardBase, cursor: f.url ? "pointer" : "default", minWidth: 280, maxWidth: 320 }}
+                baseStyle={{
+                  ...cardBase,
+                  cursor: f.url ? "pointer" : "default",
+                  width: 300,
+                  height: 340,
+                  display: "flex",
+                  flexDirection: "column",
+                }}
                 primaria={tk.primaria}
                 onClick={() => openFerramenta(f)}
               >
@@ -347,13 +354,13 @@ function AmbienteHome() {
                 {f.categoria && (
                   <div className="text-[10px] uppercase tracking-wider opacity-60 mb-1">{f.categoria}</div>
                 )}
-                <div className="font-bold text-lg leading-tight">{f.nome}</div>
-                {f.descricao && (
-                  <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">{f.descricao}</div>
-                )}
+                <div className="font-bold text-lg leading-tight line-clamp-2">{f.nome}</div>
+                <div className="mt-1.5 text-xs opacity-70 line-clamp-3 min-h-[3em]">
+                  {f.descricao ?? ""}
+                </div>
                 {f.url && (
                   <div
-                    className={`mt-5 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
+                    className={`mt-auto self-start inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full ${btnLift}`}
                     style={{ backgroundColor: tk.botao, color: "#fff" }}
                   >
                     Acessar <ExternalLink className="h-3 w-3" />
