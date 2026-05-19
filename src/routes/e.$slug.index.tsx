@@ -64,10 +64,15 @@ function AmbienteHome() {
         setTheme(savedTheme ?? (res.branding.tema as "claro" | "escuro"));
         setMuted(localStorage.getItem(`amb:${slug}:muted`) === "1");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro ao carregar ambiente");
+        const msg = err instanceof Error ? err.message : "Erro ao carregar ambiente";
+        if (/unauthorized|no authorization header/i.test(msg)) {
+          navigate({ to: "/e/$slug/entrar", params: { slug }, replace: true });
+          return;
+        }
+        setError(msg);
       }
     })();
-  }, [slug, fetchHome]);
+  }, [slug, fetchHome, navigate]);
 
   useEffect(() => {
     if (data) localStorage.setItem(`amb:${slug}:theme`, theme);
