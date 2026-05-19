@@ -158,9 +158,10 @@ export function cardTiltStyle(enabled: boolean): React.CSSProperties {
   if (!enabled) return {};
   return {
     transform:
-      "perspective(900px) translate3d(var(--tx,0), var(--ty,0), 0) rotateX(var(--rx,0)) rotateY(var(--ry,0)) scale(var(--s,1))",
+      "perspective(1000px) translate3d(var(--tx,0), var(--ty,0), 0) rotateX(var(--rx,0)) rotateY(var(--ry,0)) scale(var(--s,1))",
     transformStyle: "preserve-3d",
-    transition: "transform .12s cubic-bezier(.16,1,.3,1), box-shadow .3s ease",
-    willChange: "transform",
+    transition: "transform .06s linear, box-shadow .06s linear",
+    willChange: "transform, box-shadow",
+    backfaceVisibility: "hidden",
   };
 }
