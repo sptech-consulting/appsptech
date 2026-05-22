@@ -112,11 +112,6 @@ export function ImageUpload({
             }}
           />
           {helper && <div className="text-[11px] text-muted-foreground">{helper}</div>}
-          {value && (
-            <div className="text-[10px] text-muted-foreground font-mono truncate max-w-full" title={value}>
-              {value.split("/").pop()}
-            </div>
-          )}
         </div>
       </div>
     </div>
