@@ -128,11 +128,16 @@ async function invite(body: any): Promise<Response> {
     if (gErr) return json({ error: gErr.message }, 400);
   }
 
-  const { data: linkData } = await admin.auth.admin.generateLink({ type: "recovery", email });
+  let resetLink: string | null = null;
+  if (!senhaDefinida) {
+    const { data: linkData } = await admin.auth.admin.generateLink({ type: "recovery", email });
+    resetLink = linkData?.properties?.action_link ?? null;
+  }
   return json({
     id: novo.id,
     auth_user_id: authUserId,
-    reset_link: linkData?.properties?.action_link ?? null,
+    reset_link: resetLink,
+    senha_definida: senhaDefinida,
   });
 }
 
