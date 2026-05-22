@@ -6,11 +6,15 @@ import { ApresentacaoBlock } from "@/components/ApresentacaoBlock";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/e/$slug/resultados/$trabalhoId")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    codigo: typeof s.codigo === "string" ? s.codigo : undefined,
+  }),
   component: TrabalhoDetalhe,
 });
 
 function TrabalhoDetalhe() {
   const { slug, trabalhoId } = Route.useParams();
+  const search = Route.useSearch();
   const navigate = useNavigate();
   const obter = useServerFn(obterTrabalhoPublico);
   const registrar = useServerFn(registrarVisualizacaoTrabalho);
@@ -18,7 +22,11 @@ function TrabalhoDetalhe() {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    const codigo = sessionStorage.getItem(`resultados:${slug}:codigo`);
+    let codigo = sessionStorage.getItem(`resultados:${slug}:codigo`);
+    if (search.codigo) {
+      codigo = search.codigo.toUpperCase().replace(/\s+/g, "");
+      sessionStorage.setItem(`resultados:${slug}:codigo`, codigo);
+    }
     if (!codigo) {
       void navigate({ to: "/e/$slug/resultados", params: { slug } });
       return;
@@ -29,7 +37,7 @@ function TrabalhoDetalhe() {
         void registrar({ data: { codigo, trabalhoId } }).catch(() => {});
       })
       .catch((e) => setErro(e instanceof Error ? e.message : "Erro"));
-  }, [slug, trabalhoId, navigate, obter, registrar]);
+  }, [slug, trabalhoId, navigate, obter, registrar, search.codigo]);
 
   if (erro)
     return (
