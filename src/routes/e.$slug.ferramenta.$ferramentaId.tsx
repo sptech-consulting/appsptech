@@ -78,16 +78,22 @@ function FerramentaPage() {
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: cor_card,
-    boxShadow: "0 1px 2px rgba(16,24,40,.04), 0 8px 24px -12px rgba(16,24,40,.08)",
+    boxShadow:
+      "0 1px 2px rgba(16,24,40,.04), 0 12px 32px -14px rgba(16,24,40,.18), 0 30px 60px -30px rgba(16,24,40,.12)",
   };
-  const tagCls = "inline-flex items-center rounded-full text-xs font-medium px-3 py-1.5";
+  const tagCls =
+    "inline-flex items-center rounded-full text-xs font-medium px-3.5 py-1.5 backdrop-blur-sm transition hover:scale-[1.03]";
   const tagStyle: React.CSSProperties = {
-    backgroundColor: cor_primaria + "1a",
+    background: `linear-gradient(135deg, ${cor_primaria}26, ${cor_primaria}12)`,
     color: cor_primaria,
+    boxShadow: `inset 0 0 0 1px ${cor_primaria}33`,
   };
   const chevBtn =
     "h-9 w-9 rounded-full flex items-center justify-center transition hover:bg-black/5";
   const chevBtnStyle: React.CSSProperties = { border: `1px solid ${cor_borda}`, color: cor_primaria };
+
+  // Floating decoration images pulled from funcionalidades that have imagens
+  const floatImgs = f.funcionalidades.filter((fn) => fn.imagem_url).slice(0, 2);
 
   const scrollCasos = (dir: -1 | 1) => {
     const el = casosScrollRef.current;
