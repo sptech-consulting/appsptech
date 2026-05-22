@@ -238,7 +238,6 @@ export function AmbienteForm({
                     onChange={(url) => set("logo_url", url)}
                     folder="ambientes/logos"
                     aspect="aspect-square"
-                    helper="PNG ou SVG com fundo transparente (até 5 MB)."
                   />
                   <ImageUpload
                     label="Favicon"
@@ -246,7 +245,6 @@ export function AmbienteForm({
                     onChange={(url) => set("favicon_url", url)}
                     folder="ambientes/favicons"
                     aspect="aspect-square"
-                    helper="PNG quadrado (32x32 ou 64x64)."
                   />
                   <ImageUpload
                     label="Imagem de capa"
@@ -254,7 +252,6 @@ export function AmbienteForm({
                     onChange={(url) => set("imagem_capa_url", url)}
                     folder="ambientes/capas"
                     aspect="aspect-video"
-                    helper="Aparece no topo da home do aluno."
                   />
                   <ImageUpload
                     label="Imagem de login"
@@ -262,7 +259,6 @@ export function AmbienteForm({
                     onChange={(url) => set("imagem_login_url", url)}
                     folder="ambientes/login"
                     aspect="aspect-video"
-                    helper="Fundo da tela de login do ambiente."
                   />
                 </div>
 
