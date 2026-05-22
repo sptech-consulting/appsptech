@@ -18,7 +18,7 @@ type Trabalho = {
 
 type Ambiente = { id: string; nome: string };
 
-export const Route = createFileRoute("/admin/trabalhos")({
+export const Route = createFileRoute("/admin/trabalhos/")({
   component: TrabalhosPage,
 });
 
