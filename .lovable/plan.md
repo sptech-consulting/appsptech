@@ -1,62 +1,109 @@
-# Slugs amigáveis para ferramenta, aula, novidade e trabalho
 
-Trocar UUIDs nas URLs por slugs legíveis, com fallback por UUID para não quebrar links antigos.
+## Objetivo
 
-## URLs
+Transformar o módulo **Resultados** num espaço rico onde professores (admin) cadastram trabalhos com múltiplas seções, e alunos acessam via código de acesso já existente do ambiente, com um layout que reproduz as telas anexadas (cards numerados + página de detalhe).
 
-| Hoje | Depois |
-|---|---|
-| `/e/$slug/ferramenta/$ferramentaId` | `/e/$slug/ferramenta/$ferramentaSlug` |
-| `/e/$slug/aula/$aulaId` | `/e/$slug/aula/$aulaSlug` |
-| `/e/$slug/novidade/$novidadeId` | `/e/$slug/novidade/$novidadeSlug` |
-| `/e/$slug/resultados/$trabalhoId` | `/e/$slug/resultados/$trabalhoSlug` |
+## 1. Banco de dados (migration)
 
-Slug global por entidade (não por ambiente) — mais simples e suficiente.
+Ampliar `trabalhos` e criar tabelas filhas. Tudo com RLS reutilizando as policies já existentes (`is_admin_for_ambiente` / código público).
 
-## Banco
+### Alterações em `trabalhos`
+Novas colunas:
+- `apresentacao_tipo` enum (`video`, `pptx`, `imagem`, `documento`) — nullable
+- `apresentacao_url` text — link YouTube/Vimeo ou arquivo
+- `apresentacao_titulo` text
+- `apresentacao_descricao` text
+- `aplicacao_expectativa` text (rich text / markdown)
+- `apresentacao_imagem_url` text (imagem de capa da apresentação, screenshot do produto)
+- `subtitulo` text (ex.: "Truth Layer + Revenue Command Center")
 
-Migration única adicionando `slug text` (nullable, único) em:
-- `ferramentas`
-- `aulas`
-- `novidades`
-- `trabalhos`
+### Nova tabela `trabalho_funcionalidades`
+- `id`, `trabalho_id` (FK), `ordem`, `titulo`, `descricao`, `imagem_url`, `criado_em`
+- RLS: admin do ambiente gerencia; público lê via join se trabalho está publicado (RPC).
 
-Backfill automático no migration: gerar slug a partir do título via função `slugify_pt(text)` (lowercase, sem acento, `[^a-z0-9]+` → `-`, trim `-`), com sufixo numérico em caso de colisão.
+### Nova tabela `trabalho_links`
+- `id`, `trabalho_id`, `ordem`, `rotulo`, `url`, `icone_url`
+- Mesma RLS.
 
-Função `slugify_pt` fica em `public` e é reutilizada por triggers `BEFORE INSERT/UPDATE` que preenchem `slug` automaticamente quando vier `NULL` ou quando o título mudar e o slug ainda for o derivado anterior.
+### RPCs públicas (atualização)
+- `obter_trabalho_publico(_codigo, _trabalho_id)` retorna também novos campos.
+- Novas RPCs:
+  - `listar_funcionalidades_publicas(_codigo, _trabalho_id)`
+  - `listar_links_publicos(_codigo, _trabalho_id)`
 
-Índices únicos parciais (`WHERE slug IS NOT NULL`) em cada tabela.
+### Storage
+Reutilizar bucket existente (ou criar `trabalhos-assets`) para uploads de imagens de funcionalidades e arquivos de apresentação.
 
-## Resolução nas rotas
+## 2. Server functions (admin)
 
-Em cada loader/route, resolver param assim:
-1. Se o param casa com formato UUID → buscar por `id`.
-2. Senão → buscar por `slug`.
+Em `src/lib/trabalhos.functions.ts` (novo arquivo `trabalhos-admin.functions.ts` com `requireSupabaseAuth`):
+- `criarTrabalho`, `atualizarTrabalho`, `excluirTrabalho` (lógica via status)
+- `salvarFuncionalidade`, `removerFuncionalidade`, `reordenarFuncionalidades`
+- `salvarLink`, `removerLink`
 
-Isso preserva links antigos compartilhados (UUID) e ativa os novos slugs sem redirect explícito.
+Em `src/lib/trabalhos.functions.ts` (público) adicionar:
+- `obterTrabalhoCompleto` retornando trabalho + funcionalidades + links em uma chamada.
 
-Helper único `resolveBySlugOrId(table, param)` em `src/lib/slug.ts`.
+## 3. Admin UI — "Ambientes e Turmas"
 
-## Frontend
+### Lista dentro do edit de ambiente
+Em `src/routes/admin.ambientes.$id.tsx`, adicionar aba/seção **Resultados** quando o ambiente tem `codigo_acesso_resultados`:
+- Lista de trabalhos do ambiente (CRUD)
+- Botão "Novo trabalho"
 
-- `src/routes/e.$slug.index.tsx`: ao navegar para ferramenta/aula/novidade, passar `slug` (com fallback para `id` quando ausente).
-- `src/routes/e.$slug.resultados.tsx`: idem para trabalho.
-- Rotas de detalhe: renomear param para `$ferramentaSlug` / `$aulaSlug` / `$novidadeSlug` / `$trabalhoSlug` e atualizar consultas via helper.
-- Admin: exibir o slug (read-only por enquanto) no formulário de edição de cada entidade, com botão "regenerar a partir do título". Edição manual fica para um próximo passo.
+### Form de trabalho
+Nova rota `src/routes/admin.ambientes.$id.trabalhos.$trabalhoId.tsx` (e `.novo.tsx`) com:
+- Identificação: título, subtítulo, descrição/resumo, autor, turma, tags
+- Mídia: imagem de capa (card), imagem da apresentação (hero do detalhe)
+- Apresentação: tipo + URL/upload + título + descrição
+- **Funcionalidades**: lista dinâmica de blocos (título, descrição, imagem). Reordenar.
+- Aplicação & expectativa: textarea longo
+- Links úteis: lista dinâmica (rótulo + URL + ícone opcional)
+- Status (rascunho / publicada), destaque
 
-## Arquivos afetados
+## 4. Aluno UI — Layout dos screenshots
 
-- novo: `supabase/migrations/*_slugs.sql`
-- novo: `src/lib/slug.ts`
-- editar: `src/routes/e.$slug.ferramenta.$ferramentaId.tsx` → renomear arquivo + loader
-- editar: `src/routes/e.$slug.aula.$aulaId.tsx` → idem
-- editar: `src/routes/e.$slug.novidade.$novidadeId.tsx` → idem
-- editar: `src/routes/e.$slug.resultados.$trabalhoId.tsx` → idem
-- editar: `src/routes/e.$slug.index.tsx`, `src/routes/e.$slug.resultados.tsx` (navegação)
-- editar: `src/lib/ferramenta.functions.ts`, `aula-player.functions.ts`, `novidade.functions.ts`, `trabalhos.functions.ts` (aceitar slug ou id)
-- editar: admins (`admin.ferramentas.$id.tsx`, `admin.aulas.tsx`, `admin.trabalhos.tsx`, novidades dentro de `admin.ambientes.$id.tsx`) — mostrar slug
+### `src/routes/e.$slug.resultados.tsx` (atualizar)
+Cards seguem o screenshot 1:
+- Grid 3 colunas em desktop
+- Cada card: thumbnail flutuante topo-esquerda, número "01" grande topo-direita (cinza claro), título, descrição (3 linhas), botão "Mostrar detalhes →"
+- Estilo glass/floating com sombra suave, sem borda dura. Respeitar tokens do ambiente (`cor_primaria` para botão/número-hover).
+- Fundo neutro com leve gradiente da identidade.
 
-## Compatibilidade
+### `src/routes/e.$slug.resultados.$trabalhoId.tsx` (refatorar)
+Seguindo screenshot 2:
+- Header: botão voltar (←), número grande "02" cinza, título grande (destaque com `cor_primaria`), descrição centralizada
+- Hero: imagem(ns) de apresentação flutuante com sombra
+- Seção "Subtítulo + descrição rica" (texto longo com destaques)
+- Bloco apresentação: imagem grande à esquerda + ícone/título/descrição/CTA à direita
+- **Principais funcionalidades**: layout zigzag — imagem (lado alternado) + texto. Renderiza dinamicamente de `trabalho_funcionalidades`.
+- Bloco "Onde se aplica e expectativa": card destacado com borda fina
+- **Links úteis**: rodapé com pílulas/botões pequenos
 
-- Links antigos com UUID continuam funcionando.
-- `routeTree.gen.ts` é regenerado automaticamente após renomear os arquivos.
+Player de vídeo embeddado reutilizando `toEmbedUrl` (YouTube/Vimeo) de `e.$slug.aula.$aulaId.tsx`. Extrair para `src/lib/video-embed.ts` para reuso.
+
+## 5. Componente reutilizável
+
+`src/components/ApresentacaoBlock.tsx` para renderizar o bloco de apresentação conforme o tipo:
+- `video` → iframe
+- `imagem` → `<img>`
+- `pptx`/`documento` → botão de download + thumbnail
+
+## Detalhes técnicos
+
+- Tema/cores: usar `cor_primaria/secundaria/fundo/texto` do ambiente em todas as superfícies da área do aluno (já é padrão no projeto). Admin permanece com paleta SPTech.
+- Exclusões lógicas: trabalho → `status='arquivada'`. Funcionalidades/links removidos fisicamente.
+- Slug: já existe trigger `slugify_pt` em `trabalhos`. Manter resolução por slug.
+- RLS: novas tabelas filhas reusam `is_admin_for_ambiente(trabalho.ambiente_id)` e leitura via RPC `SECURITY DEFINER` que valida o código.
+
+## Ordem de execução
+
+1. Migration (tabelas, colunas, RPCs).
+2. Server functions admin + público.
+3. Admin form completo + lista dentro do ambiente.
+4. Refator aluno (cards numerados + detalhe rico).
+5. Extrair embed util e revisar visual.
+
+## Confirmação necessária
+
+Por causa do tamanho (migration + ~6 arquivos novos/alterados), confirmo o plano antes de executar. Após "ok", começo pela migration.
