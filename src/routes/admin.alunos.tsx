@@ -16,6 +16,7 @@ import { Plus, Pencil, Upload, Link2, Search, Trash2, History, Mail } from "luci
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { enviarConviteAluno } from "@/lib/aluno-convite.functions";
+import { definirSenhaTempAluno } from "@/lib/admin-alunos.functions";
 
 type Aluno = {
   id: string;
@@ -267,6 +268,7 @@ function AlunoFormDialog({
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [status, setStatus] = useState<"ativo" | "inativo">("ativo");
+  const [senhaTemp, setSenhaTemp] = useState("");
   const [ambienteIds, setAmbienteIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -276,6 +278,7 @@ function AlunoFormDialog({
     setEmail(editing?.email_acesso ?? "");
     setWhatsapp(editing?.whatsapp ?? "");
     setStatus((editing?.status as "ativo" | "inativo") ?? "ativo");
+    setSenhaTemp("");
     if (editing) {
       void supabase
         .from("ambiente_alunos")
