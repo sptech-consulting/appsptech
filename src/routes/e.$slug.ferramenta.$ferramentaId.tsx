@@ -145,43 +145,54 @@ function FerramentaPage() {
           )}
         </div>
 
-        {/* BLOCOS / TAGS / CASOS DE USO */}
-        <div className="grid md:grid-cols-3 gap-5 mb-16">
+        {/* BLOCOS / TAGS / CASOS DE USO — Bento Grid */}
+        <div className="grid md:grid-cols-3 auto-rows-[minmax(180px,auto)] gap-5 mb-16">
           {f.casos_uso.length > 0 && (
-            <div className="rounded-2xl p-6" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-base">Casos de Uso</h3>
-              <ul className="space-y-2 text-sm opacity-80">
-                {f.casos_uso.map((c) => (<li key={c.id}>• {c.texto}</li>))}
+            <div className="rounded-2xl p-7 md:row-span-2 flex flex-col" style={cardStyle}>
+              <h3 className="font-semibold mb-5 text-lg">Casos de Uso</h3>
+              <ul className="space-y-4 text-sm leading-relaxed opacity-85">
+                {f.casos_uso.map((c) => (
+                  <li key={c.id} className="flex gap-2">
+                    <span style={{ color: cor_primaria }} className="font-bold">▪</span>
+                    <span>{c.texto}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
           {inputs.length > 0 && (
-            <div className="rounded-2xl p-6" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-base">Formas de Input</h3>
+            <div className="rounded-2xl p-7" style={cardStyle}>
+              <h3 className="font-semibold mb-4 text-lg">Formas de Input</h3>
               <div className="flex flex-wrap gap-2">{inputs.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
             </div>
           )}
           {outputs.length > 0 && (
-            <div className="rounded-2xl p-6" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-base">Formas de Output</h3>
+            <div className="rounded-2xl p-7" style={cardStyle}>
+              <h3 className="font-semibold mb-4 text-lg">Formas de Output</h3>
               <div className="flex flex-wrap gap-2">{outputs.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
             </div>
           )}
+          {f.blocos.slice(0, 2).map((b) => (
+            <div key={b.id} className="rounded-2xl p-7" style={cardStyle}>
+              <h3 className="font-semibold mb-3 text-lg">{b.titulo}</h3>
+              <p className="text-sm opacity-75 whitespace-pre-wrap leading-relaxed">{b.conteudo}</p>
+            </div>
+          ))}
           {integracoes.length > 0 && (
-            <div className="rounded-2xl p-6" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-base">Integrações</h3>
+            <div className="rounded-2xl p-7" style={cardStyle}>
+              <h3 className="font-semibold mb-4 text-lg">Integrações</h3>
               <div className="flex flex-wrap gap-2">{integracoes.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
             </div>
           )}
-          {f.blocos.map((b) => (
-            <div key={b.id} className="rounded-2xl p-6" style={cardStyle}>
-              <h3 className="font-semibold mb-3 text-base">{b.titulo}</h3>
+          {f.blocos.slice(2).map((b) => (
+            <div key={b.id} className="rounded-2xl p-7" style={cardStyle}>
+              <h3 className="font-semibold mb-3 text-lg">{b.titulo}</h3>
               <p className="text-sm opacity-75 whitespace-pre-wrap leading-relaxed">{b.conteudo}</p>
             </div>
           ))}
           {f.frase_destaque && (
             <div
-              className="rounded-2xl px-6 py-7 text-center font-bold uppercase tracking-wide text-sm md:col-span-3"
+              className="rounded-2xl px-6 py-7 flex items-center justify-center text-center font-bold uppercase tracking-wide text-sm md:col-span-3"
               style={{ backgroundColor: cor_primaria, color: "#fff" }}
             >
               {f.frase_destaque}
