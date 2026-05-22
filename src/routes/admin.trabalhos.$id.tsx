@@ -151,11 +151,13 @@ function TrabalhoEditPage() {
     setT((prev) => (prev ? { ...prev, [k]: v } : prev));
   }
 
-  async function salvar() {
+  async function salvar(novoStatus?: Trabalho["status"]) {
     if (!t) return;
     if (!t.ambiente_id) return toast.error("Selecione um ambiente.");
     if (!t.titulo.trim()) return toast.error("Informe o título.");
     if (!t.autor_nome.trim()) return toast.error("Informe o(s) autor(es).");
+    const statusFinal = novoStatus ?? t.status;
+    if (novoStatus) patch("status", novoStatus);
     setSaving(true);
     const payload = {
       ambiente_id: t.ambiente_id,
