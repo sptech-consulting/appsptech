@@ -305,6 +305,10 @@ function AlunoFormDialog({
         whatsapp: whatsapp.trim() || null,
         status,
       };
+      const senhaTrim = senhaTemp.trim();
+      if (senhaTrim && (senhaTrim.length < 8 || senhaTrim.length > 72)) {
+        throw new Error("A senha temporária deve ter entre 8 e 72 caracteres.");
+      }
       let alunoId = editing?.id;
       if (editing) {
         const { error } = await supabase.from("alunos").update(payload).eq("id", editing.id);
@@ -350,7 +354,25 @@ function AlunoFormDialog({
             .in("id", toDeactivate);
         }
       }
-      toast.success(editing ? "Aluno atualizado." : "Aluno criado.");
+      // senha temporária (opcional)
+      if (alunoId && senhaTrim) {
+        try {
+          await definirSenhaTempAluno({ aluno_id: alunoId, senha: senhaTrim });
+        } catch (err) {
+          toast.error(
+            "Aluno salvo, mas falhou ao definir senha: " +
+              (err instanceof Error ? err.message : String(err)),
+          );
+          onOpenChange(false);
+          onSaved();
+          return;
+        }
+      }
+      toast.success(
+        editing
+          ? senhaTrim ? "Aluno atualizado e senha definida." : "Aluno atualizado."
+          : senhaTrim ? "Aluno criado com senha temporária." : "Aluno criado.",
+      );
       onOpenChange(false);
       onSaved();
     } catch (err) {
