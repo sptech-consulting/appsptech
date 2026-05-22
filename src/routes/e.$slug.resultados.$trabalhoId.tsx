@@ -25,7 +25,7 @@ function TrabalhoDetalhe() {
     let codigo = sessionStorage.getItem(`resultados:${slug}:codigo`);
     if (search.codigo) {
       codigo = search.codigo.toUpperCase().replace(/\s+/g, "");
-      sessionStorage.setItem(`resultados:${slug}:codigo`, codigo);
+      sessionStorage.setItem(`resultados:${slug}:codigo`, codigo!);
     }
     if (!codigo) {
       void navigate({ to: "/e/$slug/resultados", params: { slug } });
