@@ -56,7 +56,7 @@ type LinkItem = {
   _new?: boolean;
 };
 
-type Ambiente = { id: string; nome: string; slug: string };
+type Ambiente = { id: string; nome: string; slug: string; codigo_acesso_resultados: string | null };
 
 export const Route = createFileRoute("/admin/trabalhos/$id")({
   component: TrabalhoEditPage,
@@ -84,7 +84,7 @@ function TrabalhoEditPage() {
 
   async function load() {
     setLoading(true);
-    const ambsP = supabase.from("ambientes").select("id,nome,slug").order("nome");
+    const ambsP = supabase.from("ambientes").select("id,nome,slug,codigo_acesso_resultados").order("nome");
     if (isNovo) {
       const { data: ambs } = await ambsP;
       const ambientesList = (ambs ?? []) as Ambiente[];
@@ -151,11 +151,13 @@ function TrabalhoEditPage() {
     setT((prev) => (prev ? { ...prev, [k]: v } : prev));
   }
 
-  async function salvar() {
+  async function salvar(novoStatus?: Trabalho["status"]) {
     if (!t) return;
     if (!t.ambiente_id) return toast.error("Selecione um ambiente.");
     if (!t.titulo.trim()) return toast.error("Informe o título.");
     if (!t.autor_nome.trim()) return toast.error("Informe o(s) autor(es).");
+    const statusFinal = novoStatus ?? t.status;
+    if (novoStatus) patch("status", novoStatus);
     setSaving(true);
     const payload = {
       ambiente_id: t.ambiente_id,
@@ -173,10 +175,10 @@ function TrabalhoEditPage() {
       apresentacao_imagem_url: t.apresentacao_imagem_url || null,
       aplicacao_expectativa: t.aplicacao_expectativa || null,
       link_externo: t.link_externo || null,
-      status: t.status,
+      status: statusFinal,
       destaque: t.destaque,
       publicado_em:
-        t.status === "publicada" ? t.publicado_em ?? new Date().toISOString() : null,
+        statusFinal === "publicada" ? t.publicado_em ?? new Date().toISOString() : null,
     };
     const sb: any = supabase;
     let trabalhoId = t.id;
@@ -266,7 +268,7 @@ function TrabalhoEditPage() {
           { label: isNovo ? "Novo" : t.titulo },
         ]}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => navigate({ to: "/admin/trabalhos" })}>
               Voltar
             </Button>
@@ -275,8 +277,11 @@ function TrabalhoEditPage() {
                 <Trash2 className="h-4 w-4" /> Arquivar
               </Button>
             )}
-            <Button onClick={salvar} disabled={saving}>
-              <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar"}
+            <Button variant="outline" onClick={() => salvar()} disabled={saving}>
+              <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar rascunho"}
+            </Button>
+            <Button onClick={() => salvar("publicada")} disabled={saving}>
+              {t.status === "publicada" ? "Salvar e manter publicado" : "Publicar"}
             </Button>
           </div>
         }
@@ -575,22 +580,53 @@ function TrabalhoEditPage() {
 
         {/* Visualizar */}
         {!isNovo && ambienteAtual && (
-          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between flex-wrap gap-3">
             <div>
               <div className="text-xs font-bold uppercase tracking-widest text-secondary">Pré-visualizar no mural</div>
-              <div className="text-xs text-muted-foreground">Requer o código de acesso do ambiente.</div>
+              <div className="text-xs text-muted-foreground">
+                {ambienteAtual.codigo_acesso_resultados
+                  ? "Abre em nova aba já autenticado com o código do ambiente."
+                  : "Defina um código de acesso aos Resultados no ambiente para visualizar."}
+              </div>
             </div>
-            <Link
-              to="/e/$slug/resultados/$trabalhoId"
-              params={{ slug: ambienteAtual.slug, trabalhoId: t.slug ?? t.id }}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
-            >
-              <ExternalLink className="h-3 w-3" /> Abrir
-            </Link>
+            {ambienteAtual.codigo_acesso_resultados ? (
+              <a
+                href={`/e/${ambienteAtual.slug}/resultados/${t.slug ?? t.id}?codigo=${encodeURIComponent(ambienteAtual.codigo_acesso_resultados)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
+              >
+                <ExternalLink className="h-3 w-3" /> Abrir
+              </a>
+            ) : (
+              <Link
+                to="/admin/ambientes/$id"
+                params={{ id: ambienteAtual.id }}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
+              >
+                Configurar código
+              </Link>
+            )}
           </div>
         )}
+
+        {/* Barra de ações inferior */}
+        <div className="sticky bottom-4 z-10 rounded-xl border border-border bg-card/95 backdrop-blur p-3 flex flex-wrap items-center justify-between gap-2 shadow-lg">
+          <div className="text-xs text-muted-foreground">
+            Status atual: <strong className="text-secondary">{t.status}</strong>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => navigate({ to: "/admin/trabalhos" })}>
+              Voltar
+            </Button>
+            <Button variant="outline" onClick={() => salvar()} disabled={saving}>
+              <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar rascunho"}
+            </Button>
+            <Button onClick={() => salvar("publicada")} disabled={saving}>
+              {t.status === "publicada" ? "Salvar e manter publicado" : "Publicar"}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
