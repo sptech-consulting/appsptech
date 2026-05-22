@@ -496,12 +496,9 @@ function Select({ value, onChange, options }: { value: string; onChange: (v: str
 
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
-    <div>
+    <div className="min-w-0">
       <Label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-secondary">{label}</Label>
-      <label
-        className="flex items-center gap-2 rounded-md border border-border p-1 cursor-pointer transition-shadow hover:shadow-sm"
-        style={{ backgroundColor: value }}
-      >
+      <div className="flex items-center gap-2 rounded-md border border-border bg-card p-1 transition-shadow hover:shadow-sm">
         <span
           className="relative h-8 w-10 rounded border border-border/60 overflow-hidden shrink-0"
           style={{ backgroundColor: value }}
@@ -517,10 +514,9 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onClick={(e) => e.stopPropagation()}
-          className="h-8 flex-1 rounded bg-card/90 px-2 text-xs font-mono outline-none"
+          className="h-8 min-w-0 flex-1 rounded bg-transparent px-2 text-xs font-mono text-secondary outline-none"
         />
-      </label>
+      </div>
     </div>
   );
 }
