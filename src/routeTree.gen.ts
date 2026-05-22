@@ -42,7 +42,6 @@ import { Route as ESlugResultadosTrabalhoIdRouteImport } from './routes/e.$slug.
 import { Route as ESlugNovidadeNovidadeIdRouteImport } from './routes/e.$slug.novidade.$novidadeId'
 import { Route as ESlugFerramentaFerramentaIdRouteImport } from './routes/e.$slug.ferramenta.$ferramentaId'
 import { Route as ESlugAulaAulaIdRouteImport } from './routes/e.$slug.aula.$aulaId'
-import { Route as ApiPublicNovidadesWebhookTokenRouteImport } from './routes/api/public/novidades/webhook/$token'
 
 const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
   id: '/redefinir-senha',
@@ -211,12 +210,6 @@ const ESlugAulaAulaIdRoute = ESlugAulaAulaIdRouteImport.update({
   path: '/e/$slug/aula/$aulaId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicNovidadesWebhookTokenRoute =
-  ApiPublicNovidadesWebhookTokenRouteImport.update({
-    id: '/api/public/novidades/webhook/$token',
-    path: '/api/public/novidades/webhook/$token',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -252,7 +245,6 @@ export interface FileRoutesByFullPath {
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
   '/e/$slug/resultados/': typeof ESlugResultadosIndexRoute
-  '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -286,7 +278,6 @@ export interface FileRoutesByTo {
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
   '/e/$slug/resultados': typeof ESlugResultadosIndexRoute
-  '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -323,7 +314,6 @@ export interface FileRoutesById {
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
   '/e/$slug/resultados/': typeof ESlugResultadosIndexRoute
-  '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -361,7 +351,6 @@ export interface FileRouteTypes {
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
     | '/e/$slug/resultados/'
-    | '/api/public/novidades/webhook/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -395,7 +384,6 @@ export interface FileRouteTypes {
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
     | '/e/$slug/resultados'
-    | '/api/public/novidades/webhook/$token'
   id:
     | '__root__'
     | '/'
@@ -431,7 +419,6 @@ export interface FileRouteTypes {
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
     | '/e/$slug/resultados/'
-    | '/api/public/novidades/webhook/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -449,7 +436,6 @@ export interface RootRouteChildren {
   ESlugNovidadeNovidadeIdRoute: typeof ESlugNovidadeNovidadeIdRoute
   ESlugResultadosTrabalhoIdRoute: typeof ESlugResultadosTrabalhoIdRoute
   ESlugResultadosIndexRoute: typeof ESlugResultadosIndexRoute
-  ApiPublicNovidadesWebhookTokenRoute: typeof ApiPublicNovidadesWebhookTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -685,13 +671,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugAulaAulaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/novidades/webhook/$token': {
-      id: '/api/public/novidades/webhook/$token'
-      path: '/api/public/novidades/webhook/$token'
-      fullPath: '/api/public/novidades/webhook/$token'
-      preLoaderRoute: typeof ApiPublicNovidadesWebhookTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -764,7 +743,6 @@ const rootRouteChildren: RootRouteChildren = {
   ESlugNovidadeNovidadeIdRoute: ESlugNovidadeNovidadeIdRoute,
   ESlugResultadosTrabalhoIdRoute: ESlugResultadosTrabalhoIdRoute,
   ESlugResultadosIndexRoute: ESlugResultadosIndexRoute,
-  ApiPublicNovidadesWebhookTokenRoute: ApiPublicNovidadesWebhookTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
