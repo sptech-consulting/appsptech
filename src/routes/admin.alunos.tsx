@@ -16,6 +16,7 @@ import { Plus, Pencil, Upload, Link2, Search, Trash2, History, Mail } from "luci
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { enviarConviteAluno } from "@/lib/aluno-convite.functions";
+import { definirSenhaTempAluno } from "@/lib/admin-alunos.functions";
 
 type Aluno = {
   id: string;
@@ -267,6 +268,7 @@ function AlunoFormDialog({
   const [email, setEmail] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [status, setStatus] = useState<"ativo" | "inativo">("ativo");
+  const [senhaTemp, setSenhaTemp] = useState("");
   const [ambienteIds, setAmbienteIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -276,6 +278,7 @@ function AlunoFormDialog({
     setEmail(editing?.email_acesso ?? "");
     setWhatsapp(editing?.whatsapp ?? "");
     setStatus((editing?.status as "ativo" | "inativo") ?? "ativo");
+    setSenhaTemp("");
     if (editing) {
       void supabase
         .from("ambiente_alunos")
@@ -302,6 +305,10 @@ function AlunoFormDialog({
         whatsapp: whatsapp.trim() || null,
         status,
       };
+      const senhaTrim = senhaTemp.trim();
+      if (senhaTrim && (senhaTrim.length < 8 || senhaTrim.length > 72)) {
+        throw new Error("A senha temporária deve ter entre 8 e 72 caracteres.");
+      }
       let alunoId = editing?.id;
       if (editing) {
         const { error } = await supabase.from("alunos").update(payload).eq("id", editing.id);
@@ -347,7 +354,25 @@ function AlunoFormDialog({
             .in("id", toDeactivate);
         }
       }
-      toast.success(editing ? "Aluno atualizado." : "Aluno criado.");
+      // senha temporária (opcional)
+      if (alunoId && senhaTrim) {
+        try {
+          await definirSenhaTempAluno({ aluno_id: alunoId, senha: senhaTrim });
+        } catch (err) {
+          toast.error(
+            "Aluno salvo, mas falhou ao definir senha: " +
+              (err instanceof Error ? err.message : String(err)),
+          );
+          onOpenChange(false);
+          onSaved();
+          return;
+        }
+      }
+      toast.success(
+        editing
+          ? senhaTrim ? "Aluno atualizado e senha definida." : "Aluno atualizado."
+          : senhaTrim ? "Aluno criado com senha temporária." : "Aluno criado.",
+      );
       onOpenChange(false);
       onSaved();
     } catch (err) {
@@ -391,6 +416,21 @@ function AlunoFormDialog({
                 <option value="inativo">Inativo</option>
               </select>
             </div>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              Senha temporária (opcional)
+            </Label>
+            <Input
+              type="text"
+              value={senhaTemp}
+              onChange={(e) => setSenhaTemp(e.target.value)}
+              placeholder="Mínimo 8 caracteres"
+              autoComplete="off"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Se preenchida, o aluno poderá entrar com este e-mail e senha. Caso contrário, use “Convidar” para enviar link de definição.
+            </p>
           </div>
           <div>
             <Label className="text-xs font-semibold uppercase tracking-wider text-secondary">Ambientes vinculados</Label>
