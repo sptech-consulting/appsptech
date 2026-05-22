@@ -78,16 +78,22 @@ function FerramentaPage() {
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: cor_card,
-    boxShadow: "0 1px 2px rgba(16,24,40,.04), 0 8px 24px -12px rgba(16,24,40,.08)",
+    boxShadow:
+      "0 1px 2px rgba(16,24,40,.04), 0 12px 32px -14px rgba(16,24,40,.18), 0 30px 60px -30px rgba(16,24,40,.12)",
   };
-  const tagCls = "inline-flex items-center rounded-full text-xs font-medium px-3 py-1.5";
+  const tagCls =
+    "inline-flex items-center rounded-full text-xs font-medium px-3.5 py-1.5 backdrop-blur-sm transition hover:scale-[1.03]";
   const tagStyle: React.CSSProperties = {
-    backgroundColor: cor_primaria + "1a",
+    background: `linear-gradient(135deg, ${cor_primaria}26, ${cor_primaria}12)`,
     color: cor_primaria,
+    boxShadow: `inset 0 0 0 1px ${cor_primaria}33`,
   };
   const chevBtn =
     "h-9 w-9 rounded-full flex items-center justify-center transition hover:bg-black/5";
   const chevBtnStyle: React.CSSProperties = { border: `1px solid ${cor_borda}`, color: cor_primaria };
+
+  // Floating decoration images pulled from funcionalidades that have imagens
+  const floatImgs = f.funcionalidades.filter((fn) => fn.imagem_url).slice(0, 2);
 
   const scrollCasos = (dir: -1 | 1) => {
     const el = casosScrollRef.current;
@@ -145,58 +151,126 @@ function FerramentaPage() {
           )}
         </div>
 
-        {/* BLOCOS / TAGS / CASOS DE USO — Bento Grid */}
-        <div className="grid md:grid-cols-3 auto-rows-[minmax(180px,auto)] gap-5 mb-16">
-          {f.casos_uso.length > 0 && (
-            <div className="rounded-2xl p-7 md:row-span-2 flex flex-col" style={cardStyle}>
-              <h3 className="font-semibold mb-5 text-lg">Casos de Uso</h3>
-              <ul className="space-y-4 text-sm leading-relaxed opacity-85">
-                {f.casos_uso.map((c) => (
-                  <li key={c.id} className="flex gap-2">
-                    <span style={{ color: cor_primaria }} className="font-bold">▪</span>
-                    <span>{c.texto}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        {/* BLOCOS / TAGS / CASOS DE USO — Bento futurista flutuante */}
+        <div className="relative mb-20">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-10 -z-10 rounded-[3rem] blur-3xl opacity-60"
+            style={{
+              background: `radial-gradient(60% 50% at 20% 30%, ${cor_primaria}1f, transparent 70%), radial-gradient(50% 40% at 85% 70%, ${cor_botao}1a, transparent 70%)`,
+            }}
+          />
+
+          <div className="relative grid md:grid-cols-6 auto-rows-[120px] gap-5">
+            {f.casos_uso.length > 0 && (
+              <div className="rounded-3xl p-7 md:col-span-2 md:row-span-3 flex flex-col relative overflow-hidden" style={cardStyle}>
+                <div
+                  aria-hidden
+                  className="absolute -top-16 -right-16 h-48 w-48 rounded-full opacity-20 blur-2xl"
+                  style={{ backgroundColor: cor_primaria }}
+                />
+                <h3 className="font-semibold mb-5 text-lg relative">Casos de Uso</h3>
+                <ul className="space-y-4 text-sm leading-relaxed opacity-85 relative">
+                  {f.casos_uso.map((c) => (
+                    <li key={c.id} className="flex gap-2">
+                      <span style={{ color: cor_primaria }} className="font-bold mt-0.5">▪</span>
+                      <span>{c.texto}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {inputs.length > 0 && (
+              <div className="rounded-3xl p-6 md:col-span-2 md:row-span-2" style={cardStyle}>
+                <h3 className="font-semibold mb-4 text-base">Formas de Input</h3>
+                <div className="flex flex-wrap gap-2">{inputs.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
+              </div>
+            )}
+
+            {outputs.length > 0 && (
+              <div className="rounded-3xl p-6 md:col-span-2 md:row-span-2" style={cardStyle}>
+                <h3 className="font-semibold mb-4 text-base">Formas de Output</h3>
+                <div className="flex flex-wrap gap-2">{outputs.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
+              </div>
+            )}
+
+            {f.blocos[0] && (
+              <div className="rounded-3xl p-6 md:col-span-2 md:row-span-2" style={cardStyle}>
+                <h3 className="font-semibold mb-2 text-base">{f.blocos[0].titulo}</h3>
+                <p className="text-sm opacity-75 whitespace-pre-wrap leading-relaxed">{f.blocos[0].conteudo}</p>
+              </div>
+            )}
+
+            {integracoes.length > 0 && (
+              <div className="rounded-3xl p-6 md:col-span-2 md:row-span-2" style={cardStyle}>
+                <h3 className="font-semibold mb-4 text-base">Integrações</h3>
+                <div className="flex flex-wrap gap-2">{integracoes.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
+              </div>
+            )}
+
+            {f.blocos.slice(1).map((b) => (
+              <div key={b.id} className="rounded-3xl p-6 md:col-span-2 md:row-span-2" style={cardStyle}>
+                <h3 className="font-semibold mb-2 text-base">{b.titulo}</h3>
+                <p className="text-sm opacity-75 whitespace-pre-wrap leading-relaxed">{b.conteudo}</p>
+              </div>
+            ))}
+
+            {f.frase_destaque && (
+              <div
+                className="rounded-3xl px-6 py-7 flex items-center justify-center text-center font-bold uppercase tracking-wider text-sm md:col-span-6 md:row-span-2 relative overflow-hidden"
+                style={{
+                  background: `linear-gradient(120deg, ${cor_primaria}, ${cor_botao})`,
+                  color: "#fff",
+                  boxShadow: `0 20px 40px -20px ${cor_primaria}80`,
+                }}
+              >
+                <div
+                  aria-hidden
+                  className="absolute inset-0 opacity-30 mix-blend-overlay"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle at 20% 30%, rgba(255,255,255,.4), transparent 40%), radial-gradient(circle at 80% 70%, rgba(255,255,255,.3), transparent 40%)",
+                  }}
+                />
+                <span className="relative">{f.frase_destaque}</span>
+              </div>
+            )}
+          </div>
+
+          {floatImgs[0] && (
+            <img
+              src={floatImgs[0].imagem_url!}
+              alt=""
+              aria-hidden
+              className="hidden md:block absolute pointer-events-none object-cover rounded-2xl"
+              style={{
+                top: "32%",
+                left: "28%",
+                width: "180px",
+                height: "130px",
+                transform: "rotate(-6deg)",
+                boxShadow: "0 24px 50px -12px rgba(16,24,40,.35), 0 0 0 6px #fff",
+                zIndex: 5,
+              }}
+            />
           )}
-          {inputs.length > 0 && (
-            <div className="rounded-2xl p-7" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-lg">Formas de Input</h3>
-              <div className="flex flex-wrap gap-2">{inputs.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
-            </div>
-          )}
-          {outputs.length > 0 && (
-            <div className="rounded-2xl p-7" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-lg">Formas de Output</h3>
-              <div className="flex flex-wrap gap-2">{outputs.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
-            </div>
-          )}
-          {f.blocos.slice(0, 2).map((b) => (
-            <div key={b.id} className="rounded-2xl p-7" style={cardStyle}>
-              <h3 className="font-semibold mb-3 text-lg">{b.titulo}</h3>
-              <p className="text-sm opacity-75 whitespace-pre-wrap leading-relaxed">{b.conteudo}</p>
-            </div>
-          ))}
-          {integracoes.length > 0 && (
-            <div className="rounded-2xl p-7" style={cardStyle}>
-              <h3 className="font-semibold mb-4 text-lg">Integrações</h3>
-              <div className="flex flex-wrap gap-2">{integracoes.map((t) => <span key={t.id} className={tagCls} style={tagStyle}>{t.rotulo}</span>)}</div>
-            </div>
-          )}
-          {f.blocos.slice(2).map((b) => (
-            <div key={b.id} className="rounded-2xl p-7" style={cardStyle}>
-              <h3 className="font-semibold mb-3 text-lg">{b.titulo}</h3>
-              <p className="text-sm opacity-75 whitespace-pre-wrap leading-relaxed">{b.conteudo}</p>
-            </div>
-          ))}
-          {f.frase_destaque && (
-            <div
-              className="rounded-2xl px-6 py-7 flex items-center justify-center text-center font-bold uppercase tracking-wide text-sm md:col-span-3"
-              style={{ backgroundColor: cor_primaria, color: "#fff" }}
-            >
-              {f.frase_destaque}
-            </div>
+          {floatImgs[1] && (
+            <img
+              src={floatImgs[1].imagem_url!}
+              alt=""
+              aria-hidden
+              className="hidden md:block absolute pointer-events-none object-cover rounded-2xl"
+              style={{
+                top: "8%",
+                right: "20%",
+                width: "150px",
+                height: "150px",
+                transform: "rotate(5deg)",
+                boxShadow: "0 24px 50px -12px rgba(16,24,40,.35), 0 0 0 6px #fff",
+                zIndex: 5,
+              }}
+            />
           )}
         </div>
 
