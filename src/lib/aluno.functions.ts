@@ -93,3 +93,68 @@ export const checkAlunoAmbienteAccess = createServerFn({ method: "POST" })
     }
     return { ok: true as const };
   });
+
+/**
+ * Retorna o aluno autenticado + lista de ambientes ativos vinculados a ele.
+ * Usa supabaseAdmin para não depender de RLS / timing do JWT no browser.
+ */
+export const listarAmbientesDoAluno = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const userId = context.userId;
+
+    // Garante o vínculo via email (idempotente)
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const email = (authUser?.user?.email ?? (context.claims.email as string | undefined) ?? "")
+      .toLowerCase()
+      .trim();
+
+    let { data: aluno } = await supabaseAdmin
+      .from("alunos")
+      .select("id, nome_completo, email_acesso, status, auth_user_id")
+      .eq("auth_user_id", userId)
+      .limit(1)
+      .maybeSingle();
+
+    if (!aluno && email) {
+      const { data: byEmail } = await supabaseAdmin
+        .from("alunos")
+        .select("id, nome_completo, email_acesso, status, auth_user_id")
+        .ilike("email_acesso", email)
+        .limit(1)
+        .maybeSingle();
+      if (byEmail && (!byEmail.auth_user_id || byEmail.auth_user_id === userId)) {
+        const { data: updated } = await supabaseAdmin
+          .from("alunos")
+          .update({ auth_user_id: userId })
+          .eq("id", byEmail.id)
+          .select("id, nome_completo, email_acesso, status, auth_user_id")
+          .single();
+        aluno = updated;
+      }
+    }
+
+    if (!aluno) return { aluno: null, ambientes: [] as Array<{ id: string; nome: string; slug: string; cor_primaria: string | null; imagem_capa_url: string | null }> };
+
+    const { data: vinculos } = await supabaseAdmin
+      .from("ambiente_alunos")
+      .select("ambiente_id, status, ambientes:ambiente_id(id, nome, slug, cor_primaria, imagem_capa_url, status)")
+      .eq("aluno_id", aluno.id)
+      .eq("status", "ativo");
+
+    const ambientes = (vinculos ?? [])
+      .map((v: any) => v.ambientes)
+      .filter((a: any) => a && a.status === "ativo")
+      .map((a: any) => ({
+        id: a.id,
+        nome: a.nome,
+        slug: a.slug,
+        cor_primaria: a.cor_primaria,
+        imagem_capa_url: a.imagem_capa_url,
+      }));
+
+    return {
+      aluno: { nome_completo: aluno.nome_completo, email_acesso: aluno.email_acesso },
+      ambientes,
+    };
+  });
