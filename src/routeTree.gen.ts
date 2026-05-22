@@ -31,13 +31,13 @@ import { Route as AdminTrabalhosIndexRouteImport } from './routes/admin.trabalho
 import { Route as AdminFerramentasIndexRouteImport } from './routes/admin.ferramentas.index'
 import { Route as AdminCursosIndexRouteImport } from './routes/admin.cursos.index'
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
-import { Route as ESlugResultadosRouteImport } from './routes/e.$slug.resultados'
 import { Route as ESlugEntrarRouteImport } from './routes/e.$slug.entrar'
 import { Route as AdminTrabalhosIdRouteImport } from './routes/admin.trabalhos.$id'
 import { Route as AdminFerramentasIdRouteImport } from './routes/admin.ferramentas.$id'
 import { Route as AdminCursosIdRouteImport } from './routes/admin.cursos.$id'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
 import { Route as AdminAmbientesIdRouteImport } from './routes/admin.ambientes.$id'
+import { Route as ESlugResultadosIndexRouteImport } from './routes/e.$slug.resultados.index'
 import { Route as ESlugResultadosTrabalhoIdRouteImport } from './routes/e.$slug.resultados.$trabalhoId'
 import { Route as ESlugNovidadeNovidadeIdRouteImport } from './routes/e.$slug.novidade.$novidadeId'
 import { Route as ESlugFerramentaFerramentaIdRouteImport } from './routes/e.$slug.ferramenta.$ferramentaId'
@@ -154,11 +154,6 @@ const AdminAmbientesIndexRoute = AdminAmbientesIndexRouteImport.update({
   path: '/ambientes/',
   getParentRoute: () => AdminRoute,
 } as any)
-const ESlugResultadosRoute = ESlugResultadosRouteImport.update({
-  id: '/e/$slug/resultados',
-  path: '/e/$slug/resultados',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ESlugEntrarRoute = ESlugEntrarRouteImport.update({
   id: '/e/$slug/entrar',
   path: '/e/$slug/entrar',
@@ -189,11 +184,16 @@ const AdminAmbientesIdRoute = AdminAmbientesIdRouteImport.update({
   path: '/ambientes/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const ESlugResultadosIndexRoute = ESlugResultadosIndexRouteImport.update({
+  id: '/e/$slug/resultados/',
+  path: '/e/$slug/resultados/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ESlugResultadosTrabalhoIdRoute =
   ESlugResultadosTrabalhoIdRouteImport.update({
-    id: '/$trabalhoId',
-    path: '/$trabalhoId',
-    getParentRoute: () => ESlugResultadosRoute,
+    id: '/e/$slug/resultados/$trabalhoId',
+    path: '/e/$slug/resultados/$trabalhoId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ESlugNovidadeNovidadeIdRoute = ESlugNovidadeNovidadeIdRouteImport.update({
   id: '/e/$slug/novidade/$novidadeId',
@@ -242,7 +242,6 @@ export interface FileRoutesByFullPath {
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
   '/admin/trabalhos/$id': typeof AdminTrabalhosIdRoute
   '/e/$slug/entrar': typeof ESlugEntrarRoute
-  '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/admin/cursos/': typeof AdminCursosIndexRoute
   '/admin/ferramentas/': typeof AdminFerramentasIndexRoute
@@ -252,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
+  '/e/$slug/resultados/': typeof ESlugResultadosIndexRoute
   '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRoutesByTo {
@@ -276,7 +276,6 @@ export interface FileRoutesByTo {
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
   '/admin/trabalhos/$id': typeof AdminTrabalhosIdRoute
   '/e/$slug/entrar': typeof ESlugEntrarRoute
-  '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
   '/admin/cursos': typeof AdminCursosIndexRoute
   '/admin/ferramentas': typeof AdminFerramentasIndexRoute
@@ -286,6 +285,7 @@ export interface FileRoutesByTo {
   '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
+  '/e/$slug/resultados': typeof ESlugResultadosIndexRoute
   '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRoutesById {
@@ -313,7 +313,6 @@ export interface FileRoutesById {
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
   '/admin/trabalhos/$id': typeof AdminTrabalhosIdRoute
   '/e/$slug/entrar': typeof ESlugEntrarRoute
-  '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
   '/admin/cursos/': typeof AdminCursosIndexRoute
   '/admin/ferramentas/': typeof AdminFerramentasIndexRoute
@@ -323,6 +322,7 @@ export interface FileRoutesById {
   '/e/$slug/ferramenta/$ferramentaId': typeof ESlugFerramentaFerramentaIdRoute
   '/e/$slug/novidade/$novidadeId': typeof ESlugNovidadeNovidadeIdRoute
   '/e/$slug/resultados/$trabalhoId': typeof ESlugResultadosTrabalhoIdRoute
+  '/e/$slug/resultados/': typeof ESlugResultadosIndexRoute
   '/api/public/novidades/webhook/$token': typeof ApiPublicNovidadesWebhookTokenRoute
 }
 export interface FileRouteTypes {
@@ -351,7 +351,6 @@ export interface FileRouteTypes {
     | '/admin/ferramentas/$id'
     | '/admin/trabalhos/$id'
     | '/e/$slug/entrar'
-    | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/admin/cursos/'
     | '/admin/ferramentas/'
@@ -361,6 +360,7 @@ export interface FileRouteTypes {
     | '/e/$slug/ferramenta/$ferramentaId'
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
+    | '/e/$slug/resultados/'
     | '/api/public/novidades/webhook/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -385,7 +385,6 @@ export interface FileRouteTypes {
     | '/admin/ferramentas/$id'
     | '/admin/trabalhos/$id'
     | '/e/$slug/entrar'
-    | '/e/$slug/resultados'
     | '/admin/ambientes'
     | '/admin/cursos'
     | '/admin/ferramentas'
@@ -395,6 +394,7 @@ export interface FileRouteTypes {
     | '/e/$slug/ferramenta/$ferramentaId'
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
+    | '/e/$slug/resultados'
     | '/api/public/novidades/webhook/$token'
   id:
     | '__root__'
@@ -421,7 +421,6 @@ export interface FileRouteTypes {
     | '/admin/ferramentas/$id'
     | '/admin/trabalhos/$id'
     | '/e/$slug/entrar'
-    | '/e/$slug/resultados'
     | '/admin/ambientes/'
     | '/admin/cursos/'
     | '/admin/ferramentas/'
@@ -431,6 +430,7 @@ export interface FileRouteTypes {
     | '/e/$slug/ferramenta/$ferramentaId'
     | '/e/$slug/novidade/$novidadeId'
     | '/e/$slug/resultados/$trabalhoId'
+    | '/e/$slug/resultados/'
     | '/api/public/novidades/webhook/$token'
   fileRoutesById: FileRoutesById
 }
@@ -443,11 +443,12 @@ export interface RootRouteChildren {
   AdminEntrarRoute: typeof AdminEntrarRoute
   AlunoEntrarRoute: typeof AlunoEntrarRoute
   ESlugEntrarRoute: typeof ESlugEntrarRoute
-  ESlugResultadosRoute: typeof ESlugResultadosRouteWithChildren
   ESlugIndexRoute: typeof ESlugIndexRoute
   ESlugAulaAulaIdRoute: typeof ESlugAulaAulaIdRoute
   ESlugFerramentaFerramentaIdRoute: typeof ESlugFerramentaFerramentaIdRoute
   ESlugNovidadeNovidadeIdRoute: typeof ESlugNovidadeNovidadeIdRoute
+  ESlugResultadosTrabalhoIdRoute: typeof ESlugResultadosTrabalhoIdRoute
+  ESlugResultadosIndexRoute: typeof ESlugResultadosIndexRoute
   ApiPublicNovidadesWebhookTokenRoute: typeof ApiPublicNovidadesWebhookTokenRoute
 }
 
@@ -607,13 +608,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAmbientesIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/e/$slug/resultados': {
-      id: '/e/$slug/resultados'
-      path: '/e/$slug/resultados'
-      fullPath: '/e/$slug/resultados'
-      preLoaderRoute: typeof ESlugResultadosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/e/$slug/entrar': {
       id: '/e/$slug/entrar'
       path: '/e/$slug/entrar'
@@ -656,12 +650,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAmbientesIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/e/$slug/resultados/': {
+      id: '/e/$slug/resultados/'
+      path: '/e/$slug/resultados'
+      fullPath: '/e/$slug/resultados/'
+      preLoaderRoute: typeof ESlugResultadosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/e/$slug/resultados/$trabalhoId': {
       id: '/e/$slug/resultados/$trabalhoId'
-      path: '/$trabalhoId'
+      path: '/e/$slug/resultados/$trabalhoId'
       fullPath: '/e/$slug/resultados/$trabalhoId'
       preLoaderRoute: typeof ESlugResultadosTrabalhoIdRouteImport
-      parentRoute: typeof ESlugResultadosRoute
+      parentRoute: typeof rootRouteImport
     }
     '/e/$slug/novidade/$novidadeId': {
       id: '/e/$slug/novidade/$novidadeId'
@@ -748,18 +749,6 @@ const AlunoRouteChildren: AlunoRouteChildren = {
 
 const AlunoRouteWithChildren = AlunoRoute._addFileChildren(AlunoRouteChildren)
 
-interface ESlugResultadosRouteChildren {
-  ESlugResultadosTrabalhoIdRoute: typeof ESlugResultadosTrabalhoIdRoute
-}
-
-const ESlugResultadosRouteChildren: ESlugResultadosRouteChildren = {
-  ESlugResultadosTrabalhoIdRoute: ESlugResultadosTrabalhoIdRoute,
-}
-
-const ESlugResultadosRouteWithChildren = ESlugResultadosRoute._addFileChildren(
-  ESlugResultadosRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -769,13 +758,24 @@ const rootRouteChildren: RootRouteChildren = {
   AdminEntrarRoute: AdminEntrarRoute,
   AlunoEntrarRoute: AlunoEntrarRoute,
   ESlugEntrarRoute: ESlugEntrarRoute,
-  ESlugResultadosRoute: ESlugResultadosRouteWithChildren,
   ESlugIndexRoute: ESlugIndexRoute,
   ESlugAulaAulaIdRoute: ESlugAulaAulaIdRoute,
   ESlugFerramentaFerramentaIdRoute: ESlugFerramentaFerramentaIdRoute,
   ESlugNovidadeNovidadeIdRoute: ESlugNovidadeNovidadeIdRoute,
+  ESlugResultadosTrabalhoIdRoute: ESlugResultadosTrabalhoIdRoute,
+  ESlugResultadosIndexRoute: ESlugResultadosIndexRoute,
   ApiPublicNovidadesWebhookTokenRoute: ApiPublicNovidadesWebhookTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
