@@ -1,9 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { RecordDialog, type FieldDef } from "@/components/RecordDialog";
 import { Plus, Pencil, Star } from "lucide-react";
 import { toast } from "sonner";
 
