@@ -69,7 +69,7 @@ function TrabalhoDetalhe() {
     <main className="min-h-screen bg-background">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-border bg-card">
-        <div className="mx-auto max-w-6xl px-6 pt-8 pb-4">
+        <div className="mx-auto max-w-6xl px-6 pt-6 pb-4 flex items-center justify-between gap-4">
           <Link
             to="/e/$slug/resultados"
             params={{ slug }}
@@ -77,7 +77,15 @@ function TrabalhoDetalhe() {
           >
             <ArrowLeft className="h-3 w-3" /> Voltar ao mural
           </Link>
+          <Link
+            to="/e/$slug"
+            params={{ slug }}
+            className="text-xs font-semibold text-muted-foreground hover:text-secondary"
+          >
+            Área do aluno →
+          </Link>
         </div>
+
         <div className="mx-auto max-w-6xl px-6 pb-10 grid gap-8 md:grid-cols-[1.1fr,0.9fr] items-center">
           <div>
             <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-primary">
