@@ -74,33 +74,64 @@ export const listarTrabalhosPublicos = createServerFn({ method: "POST" })
     return list.map((t) => ({ ...t, slug: slugById.get(t.id) ?? null }));
   });
 
+export type TrabalhoPublicoCompleto = {
+  id: string;
+  titulo: string;
+  subtitulo: string | null;
+  resumo: string | null;
+  conteudo: string | null;
+  autor_nome: string;
+  turma: string | null;
+  imagem_capa_url: string | null;
+  link_externo: string | null;
+  tags: string[] | null;
+  publicado_em: string | null;
+  ambiente_nome: string;
+  ambiente_slug: string;
+  apresentacao_tipo: "video" | "pptx" | "imagem" | "documento" | "link" | null;
+  apresentacao_url: string | null;
+  apresentacao_titulo: string | null;
+  apresentacao_descricao: string | null;
+  apresentacao_imagem_url: string | null;
+  aplicacao_expectativa: string | null;
+  ordem: number;
+  funcionalidades: Array<{
+    id: string;
+    ordem: number;
+    titulo: string;
+    descricao: string | null;
+    imagem_url: string | null;
+  }>;
+  links: Array<{
+    id: string;
+    ordem: number;
+    rotulo: string;
+    url: string;
+    icone_url: string | null;
+  }>;
+};
+
 export const obterTrabalhoPublico = createServerFn({ method: "POST" })
   .inputValidator((input: { codigo: string; trabalhoId: string }) => {
     if (!input?.codigo || !input?.trabalhoId) throw new Error("Parâmetros inválidos");
     return { codigo: normCodigo(input.codigo), trabalhoId: input.trabalhoId };
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<TrabalhoPublicoCompleto> => {
     const trabalhoId = await resolverTrabalhoId(data.trabalhoId);
-    const { data: rows, error } = await supabaseAdmin.rpc("obter_trabalho_publico", {
-      _codigo: data.codigo,
-      _trabalho_id: trabalhoId,
-    });
+    const [{ data: rows, error }, { data: funcs, error: e2 }, { data: links, error: e3 }] = await Promise.all([
+      supabaseAdmin.rpc("obter_trabalho_publico", { _codigo: data.codigo, _trabalho_id: trabalhoId }),
+      supabaseAdmin.rpc("listar_funcionalidades_publicas", { _codigo: data.codigo, _trabalho_id: trabalhoId }),
+      supabaseAdmin.rpc("listar_links_publicos", { _codigo: data.codigo, _trabalho_id: trabalhoId }),
+    ]);
     if (error) throw new Error(error.message);
+    if (e2) throw new Error(e2.message);
+    if (e3) throw new Error(e3.message);
     const row = (rows ?? [])[0];
     if (!row) throw new Error("Trabalho não encontrado.");
-    return row as {
-      id: string;
-      titulo: string;
-      resumo: string | null;
-      conteudo: string | null;
-      autor_nome: string;
-      turma: string | null;
-      imagem_capa_url: string | null;
-      link_externo: string | null;
-      tags: string[] | null;
-      publicado_em: string | null;
-      ambiente_nome: string;
-      ambiente_slug: string;
+    return {
+      ...(row as Omit<TrabalhoPublicoCompleto, "funcionalidades" | "links">),
+      funcionalidades: (funcs ?? []) as TrabalhoPublicoCompleto["funcionalidades"],
+      links: (links ?? []) as TrabalhoPublicoCompleto["links"],
     };
   });
 
