@@ -1207,9 +1207,96 @@ export type Database = {
         }
         Relationships: []
       }
+      trabalho_funcionalidades: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          descricao: string | null
+          id: string
+          imagem_url: string | null
+          ordem: number
+          titulo: string
+          trabalho_id: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          titulo: string
+          trabalho_id: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          ordem?: number
+          titulo?: string
+          trabalho_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trabalho_funcionalidades_trabalho_id_fkey"
+            columns: ["trabalho_id"]
+            isOneToOne: false
+            referencedRelation: "trabalhos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trabalho_links: {
+        Row: {
+          criado_em: string
+          icone_url: string | null
+          id: string
+          ordem: number
+          rotulo: string
+          trabalho_id: string
+          url: string
+        }
+        Insert: {
+          criado_em?: string
+          icone_url?: string | null
+          id?: string
+          ordem?: number
+          rotulo: string
+          trabalho_id: string
+          url: string
+        }
+        Update: {
+          criado_em?: string
+          icone_url?: string | null
+          id?: string
+          ordem?: number
+          rotulo?: string
+          trabalho_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trabalho_links_trabalho_id_fkey"
+            columns: ["trabalho_id"]
+            isOneToOne: false
+            referencedRelation: "trabalhos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trabalhos: {
         Row: {
           ambiente_id: string
+          aplicacao_expectativa: string | null
+          apresentacao_descricao: string | null
+          apresentacao_imagem_url: string | null
+          apresentacao_tipo:
+            | Database["public"]["Enums"]["trabalho_apresentacao_tipo"]
+            | null
+          apresentacao_titulo: string | null
+          apresentacao_url: string | null
           atualizado_em: string
           autor_nome: string
           conteudo: string | null
@@ -1224,6 +1311,7 @@ export type Database = {
           resumo: string | null
           slug: string | null
           status: Database["public"]["Enums"]["publicacao_status"]
+          subtitulo: string | null
           tags: string[] | null
           titulo: string
           turma: string | null
@@ -1231,6 +1319,14 @@ export type Database = {
         }
         Insert: {
           ambiente_id: string
+          aplicacao_expectativa?: string | null
+          apresentacao_descricao?: string | null
+          apresentacao_imagem_url?: string | null
+          apresentacao_tipo?:
+            | Database["public"]["Enums"]["trabalho_apresentacao_tipo"]
+            | null
+          apresentacao_titulo?: string | null
+          apresentacao_url?: string | null
           atualizado_em?: string
           autor_nome: string
           conteudo?: string | null
@@ -1245,6 +1341,7 @@ export type Database = {
           resumo?: string | null
           slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
+          subtitulo?: string | null
           tags?: string[] | null
           titulo: string
           turma?: string | null
@@ -1252,6 +1349,14 @@ export type Database = {
         }
         Update: {
           ambiente_id?: string
+          aplicacao_expectativa?: string | null
+          apresentacao_descricao?: string | null
+          apresentacao_imagem_url?: string | null
+          apresentacao_tipo?:
+            | Database["public"]["Enums"]["trabalho_apresentacao_tipo"]
+            | null
+          apresentacao_titulo?: string | null
+          apresentacao_url?: string | null
           atualizado_em?: string
           autor_nome?: string
           conteudo?: string | null
@@ -1266,6 +1371,7 @@ export type Database = {
           resumo?: string | null
           slug?: string | null
           status?: Database["public"]["Enums"]["publicacao_status"]
+          subtitulo?: string | null
           tags?: string[] | null
           titulo?: string
           turma?: string | null
@@ -1382,6 +1488,26 @@ export type Database = {
         Returns: boolean
       }
       is_any_admin: { Args: never; Returns: boolean }
+      listar_funcionalidades_publicas: {
+        Args: { _codigo: string; _trabalho_id: string }
+        Returns: {
+          descricao: string
+          id: string
+          imagem_url: string
+          ordem: number
+          titulo: string
+        }[]
+      }
+      listar_links_publicos: {
+        Args: { _codigo: string; _trabalho_id: string }
+        Returns: {
+          icone_url: string
+          id: string
+          ordem: number
+          rotulo: string
+          url: string
+        }[]
+      }
       listar_trabalhos_publicos: {
         Args: { _codigo: string }
         Returns: {
@@ -1401,13 +1527,21 @@ export type Database = {
         Returns: {
           ambiente_nome: string
           ambiente_slug: string
+          aplicacao_expectativa: string
+          apresentacao_descricao: string
+          apresentacao_imagem_url: string
+          apresentacao_tipo: Database["public"]["Enums"]["trabalho_apresentacao_tipo"]
+          apresentacao_titulo: string
+          apresentacao_url: string
           autor_nome: string
           conteudo: string
           id: string
           imagem_capa_url: string
           link_externo: string
+          ordem: number
           publicado_em: string
           resumo: string
+          subtitulo: string
           tags: string[]
           titulo: string
           turma: string
@@ -1452,6 +1586,12 @@ export type Database = {
         | "falhou"
       importacao_tipo: "csv" | "xlsx"
       publicacao_status: "rascunho" | "publicada" | "arquivada"
+      trabalho_apresentacao_tipo:
+        | "video"
+        | "pptx"
+        | "imagem"
+        | "documento"
+        | "link"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1604,6 +1744,13 @@ export const Constants = {
       ],
       importacao_tipo: ["csv", "xlsx"],
       publicacao_status: ["rascunho", "publicada", "arquivada"],
+      trabalho_apresentacao_tipo: [
+        "video",
+        "pptx",
+        "imagem",
+        "documento",
+        "link",
+      ],
     },
   },
 } as const
