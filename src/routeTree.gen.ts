@@ -33,6 +33,7 @@ import { Route as AdminCursosIndexRouteImport } from './routes/admin.cursos.inde
 import { Route as AdminAmbientesIndexRouteImport } from './routes/admin.ambientes.index'
 import { Route as ESlugResultadosRouteImport } from './routes/e.$slug.resultados'
 import { Route as ESlugEntrarRouteImport } from './routes/e.$slug.entrar'
+import { Route as AdminTrabalhosIdRouteImport } from './routes/admin.trabalhos.$id'
 import { Route as AdminFerramentasIdRouteImport } from './routes/admin.ferramentas.$id'
 import { Route as AdminCursosIdRouteImport } from './routes/admin.cursos.$id'
 import { Route as AdminAmbientesNovoRouteImport } from './routes/admin.ambientes.novo'
@@ -163,6 +164,11 @@ const ESlugEntrarRoute = ESlugEntrarRouteImport.update({
   path: '/e/$slug/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTrabalhosIdRoute = AdminTrabalhosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminTrabalhosRoute,
+} as any)
 const AdminFerramentasIdRoute = AdminFerramentasIdRouteImport.update({
   id: '/ferramentas/$id',
   path: '/ferramentas/$id',
@@ -225,7 +231,7 @@ export interface FileRoutesByFullPath {
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/metricas': typeof AdminMetricasRoute
-  '/admin/trabalhos': typeof AdminTrabalhosRoute
+  '/admin/trabalhos': typeof AdminTrabalhosRouteWithChildren
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/aluno/entrar': typeof AlunoEntrarRoute
@@ -235,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
+  '/admin/trabalhos/$id': typeof AdminTrabalhosIdRoute
   '/e/$slug/entrar': typeof ESlugEntrarRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
@@ -258,7 +265,7 @@ export interface FileRoutesByTo {
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/metricas': typeof AdminMetricasRoute
-  '/admin/trabalhos': typeof AdminTrabalhosRoute
+  '/admin/trabalhos': typeof AdminTrabalhosRouteWithChildren
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/entrar': typeof AdminEntrarRoute
   '/aluno/entrar': typeof AlunoEntrarRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
+  '/admin/trabalhos/$id': typeof AdminTrabalhosIdRoute
   '/e/$slug/entrar': typeof ESlugEntrarRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes': typeof AdminAmbientesIndexRoute
@@ -294,7 +302,7 @@ export interface FileRoutesById {
   '/admin/importacoes': typeof AdminImportacoesRoute
   '/admin/logs': typeof AdminLogsRoute
   '/admin/metricas': typeof AdminMetricasRoute
-  '/admin/trabalhos': typeof AdminTrabalhosRoute
+  '/admin/trabalhos': typeof AdminTrabalhosRouteWithChildren
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin_/entrar': typeof AdminEntrarRoute
   '/aluno_/entrar': typeof AlunoEntrarRoute
@@ -304,6 +312,7 @@ export interface FileRoutesById {
   '/admin/ambientes/novo': typeof AdminAmbientesNovoRoute
   '/admin/cursos/$id': typeof AdminCursosIdRoute
   '/admin/ferramentas/$id': typeof AdminFerramentasIdRoute
+  '/admin/trabalhos/$id': typeof AdminTrabalhosIdRoute
   '/e/$slug/entrar': typeof ESlugEntrarRoute
   '/e/$slug/resultados': typeof ESlugResultadosRouteWithChildren
   '/admin/ambientes/': typeof AdminAmbientesIndexRoute
@@ -341,6 +350,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/admin/ferramentas/$id'
+    | '/admin/trabalhos/$id'
     | '/e/$slug/entrar'
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/admin/ferramentas/$id'
+    | '/admin/trabalhos/$id'
     | '/e/$slug/entrar'
     | '/e/$slug/resultados'
     | '/admin/ambientes'
@@ -409,6 +420,7 @@ export interface FileRouteTypes {
     | '/admin/ambientes/novo'
     | '/admin/cursos/$id'
     | '/admin/ferramentas/$id'
+    | '/admin/trabalhos/$id'
     | '/e/$slug/entrar'
     | '/e/$slug/resultados'
     | '/admin/ambientes/'
@@ -609,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ESlugEntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/trabalhos/$id': {
+      id: '/admin/trabalhos/$id'
+      path: '/$id'
+      fullPath: '/admin/trabalhos/$id'
+      preLoaderRoute: typeof AdminTrabalhosIdRouteImport
+      parentRoute: typeof AdminTrabalhosRoute
+    }
     '/admin/ferramentas/$id': {
       id: '/admin/ferramentas/$id'
       path: '/ferramentas/$id'
@@ -675,6 +694,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminTrabalhosRouteChildren {
+  AdminTrabalhosIdRoute: typeof AdminTrabalhosIdRoute
+}
+
+const AdminTrabalhosRouteChildren: AdminTrabalhosRouteChildren = {
+  AdminTrabalhosIdRoute: AdminTrabalhosIdRoute,
+}
+
+const AdminTrabalhosRouteWithChildren = AdminTrabalhosRoute._addFileChildren(
+  AdminTrabalhosRouteChildren,
+)
+
 interface AdminRouteChildren {
   AdminAlunosRoute: typeof AdminAlunosRoute
   AdminAulasRoute: typeof AdminAulasRoute
@@ -683,7 +714,7 @@ interface AdminRouteChildren {
   AdminImportacoesRoute: typeof AdminImportacoesRoute
   AdminLogsRoute: typeof AdminLogsRoute
   AdminMetricasRoute: typeof AdminMetricasRoute
-  AdminTrabalhosRoute: typeof AdminTrabalhosRoute
+  AdminTrabalhosRoute: typeof AdminTrabalhosRouteWithChildren
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAmbientesIdRoute: typeof AdminAmbientesIdRoute
@@ -703,7 +734,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminImportacoesRoute: AdminImportacoesRoute,
   AdminLogsRoute: AdminLogsRoute,
   AdminMetricasRoute: AdminMetricasRoute,
-  AdminTrabalhosRoute: AdminTrabalhosRoute,
+  AdminTrabalhosRoute: AdminTrabalhosRouteWithChildren,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminAmbientesIdRoute: AdminAmbientesIdRoute,
