@@ -418,6 +418,22 @@ function AlunoFormDialog({
             </div>
           </div>
           <div>
+          <div>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              Senha temporária (opcional)
+            </Label>
+            <Input
+              type="text"
+              value={senhaTemp}
+              onChange={(e) => setSenhaTemp(e.target.value)}
+              placeholder="Mínimo 8 caracteres"
+              autoComplete="off"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Se preenchida, o aluno poderá entrar com este e-mail e senha. Caso contrário, use “Convidar” para enviar link de definição.
+            </p>
+          </div>
+          <div>
             <Label className="text-xs font-semibold uppercase tracking-wider text-secondary">Ambientes vinculados</Label>
             <div className="mt-1 max-h-40 overflow-auto rounded-md border border-border p-2 space-y-1">
               {ambientes.length === 0 && (
