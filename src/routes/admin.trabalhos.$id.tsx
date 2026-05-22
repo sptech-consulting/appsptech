@@ -56,7 +56,7 @@ type LinkItem = {
   _new?: boolean;
 };
 
-type Ambiente = { id: string; nome: string; slug: string };
+type Ambiente = { id: string; nome: string; slug: string; codigo_acesso_resultados: string | null };
 
 export const Route = createFileRoute("/admin/trabalhos/$id")({
   component: TrabalhoEditPage,
