@@ -5,7 +5,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { AmbienteForm, type AmbienteFormState, DEFAULT_AMBIENTE } from "@/components/AmbienteForm";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Link2, ExternalLink } from "lucide-react";
+import { Link2, ExternalLink, Trophy } from "lucide-react";
+import { Link as RouterLink } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin/ambientes/$id")({
   component: EditAmbiente,
