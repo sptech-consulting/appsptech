@@ -270,12 +270,14 @@ function NewAdminDialog({
 }: {
   grupos: Grupo[];
   ambientes: Ambiente[];
-  invite: (args: { data: any }) => Promise<{ reset_link: string | null }>;
+  invite: (args: { data: any }) => Promise<{ reset_link: string | null; senha_definida?: boolean }>;
   onClose: () => void;
   onCreated: (resetLink: string | null) => void;
 }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [usarSenha, setUsarSenha] = useState(false);
+  const [senha, setSenha] = useState("");
   const [selected, setSelected] = useState<
     { grupo_id: string; acesso_global: boolean; ambiente_id: string | null }[]
   >([]);
