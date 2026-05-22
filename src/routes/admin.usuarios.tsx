@@ -300,11 +300,21 @@ function NewAdminDialog({
 
   async function submit() {
     if (!nome.trim() || !email.trim()) return toast.error("Preencha nome e e-mail.");
+    if (usarSenha && senha.length < 8) {
+      return toast.error("A senha temporária precisa ter pelo menos 8 caracteres.");
+    }
     setSaving(true);
     try {
-      const { reset_link } = await invite({ data: { nome, email, grupos: selected } });
-      toast.success("Administrador criado.");
-      onCreated(reset_link);
+      const payload: any = { nome, email, grupos: selected };
+      if (usarSenha) payload.senha_temporaria = senha;
+      const { reset_link, senha_definida } = await invite({ data: payload });
+      if (senha_definida) {
+        toast.success("Administrador criado com senha temporária.");
+        onCreated(null);
+      } else {
+        toast.success("Administrador criado.");
+        onCreated(reset_link);
+      }
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -326,6 +336,35 @@ function NewAdminDialog({
           <div>
             <Label>E-mail</Label>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div className="rounded-md border border-border p-3 space-y-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-secondary">
+              <input
+                type="checkbox"
+                checked={usarSenha}
+                onChange={(e) => setUsarSenha(e.target.checked)}
+              />
+              Definir senha temporária agora
+            </label>
+            {usarSenha && (
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Mínimo 8 caracteres"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  autoComplete="off"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  O usuário poderá entrar imediatamente com essa senha. Recomende a troca no primeiro acesso.
+                </p>
+              </div>
+            )}
+            {!usarSenha && (
+              <p className="text-xs text-muted-foreground">
+                Sem senha definida, será gerado um link de redefinição para enviar ao usuário.
+              </p>
+            )}
           </div>
           <div>
             <Label>Grupos</Label>
