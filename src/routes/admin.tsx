@@ -190,7 +190,7 @@ function AdminShellLayout({
   return (
     <div className="min-h-screen flex bg-muted">
       {/* Sidebar desktop */}
-      <aside className="hidden md:flex w-64 border-r border-border bg-card flex-col shrink-0">
+      <aside className="hidden md:flex w-64 border-r border-border bg-card flex-col shrink-0 sticky top-0 h-screen self-start">
         {SidebarContent}
       </aside>
 
