@@ -84,7 +84,7 @@ function TrabalhoEditPage() {
 
   async function load() {
     setLoading(true);
-    const ambsP = supabase.from("ambientes").select("id,nome,slug").order("nome");
+    const ambsP = supabase.from("ambientes").select("id,nome,slug,codigo_acesso_resultados").order("nome");
     if (isNovo) {
       const { data: ambs } = await ambsP;
       const ambientesList = (ambs ?? []) as Ambiente[];
