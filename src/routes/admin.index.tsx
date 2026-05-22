@@ -158,7 +158,7 @@ function AdminDashboard() {
           return (
             <Link
               key={c.label}
-              to={c.to}
+              to={c.to as string}
               className="rounded-xl border border-border bg-card p-4 hover:border-primary transition-colors"
             >
               <div className="flex items-center justify-between text-muted-foreground">

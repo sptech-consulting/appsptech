@@ -149,6 +149,7 @@ function ResultadosPage() {
                 key={t.id}
                 to="/e/$slug/resultados/$trabalhoId"
                 params={{ slug, trabalhoId: t.slug ?? t.id }}
+                search={{ codigo: undefined as unknown as string }}
                 className="group rounded-2xl overflow-hidden border bg-white shadow-sm hover:shadow-xl transition"
                 style={{ borderColor: "rgba(0,0,0,0.08)" }}
               >
