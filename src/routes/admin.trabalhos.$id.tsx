@@ -175,10 +175,10 @@ function TrabalhoEditPage() {
       apresentacao_imagem_url: t.apresentacao_imagem_url || null,
       aplicacao_expectativa: t.aplicacao_expectativa || null,
       link_externo: t.link_externo || null,
-      status: t.status,
+      status: statusFinal,
       destaque: t.destaque,
       publicado_em:
-        t.status === "publicada" ? t.publicado_em ?? new Date().toISOString() : null,
+        statusFinal === "publicada" ? t.publicado_em ?? new Date().toISOString() : null,
     };
     const sb: any = supabase;
     let trabalhoId = t.id;
