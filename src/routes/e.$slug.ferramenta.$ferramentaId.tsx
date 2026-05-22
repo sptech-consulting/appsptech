@@ -38,7 +38,13 @@ function FerramentaPage() {
         setBranding(b);
         if (d.funcionalidades.length > 0) setFuncAberta(d.funcionalidades[0].id);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Erro");
+        const msg = e instanceof Error ? e.message : "Erro";
+        if (/unauthorized|no authorization header|acesso negado|aluno não cadastrado|aluno nao cadastrado/i.test(msg)) {
+          await supabase.auth.signOut().catch(() => {});
+          window.location.href = `/e/${slug}/entrar`;
+          return;
+        }
+        setError(msg);
       }
     })();
   }, [slug, ferramentaId, fetchDetalhe, fetchBranding]);

@@ -65,7 +65,8 @@ function AmbienteHome() {
         setMuted(localStorage.getItem(`amb:${slug}:muted`) === "1");
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Erro ao carregar ambiente";
-        if (/unauthorized|no authorization header/i.test(msg)) {
+        if (/unauthorized|no authorization header|acesso negado|aluno não cadastrado|aluno nao cadastrado/i.test(msg)) {
+          await supabase.auth.signOut().catch(() => {});
           navigate({ to: "/e/$slug/entrar", params: { slug }, replace: true });
           return;
         }
