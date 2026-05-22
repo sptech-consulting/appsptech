@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
-import { ensureAlunoAuthLink } from "@/lib/aluno.functions";
+import { listarAmbientesDoAluno } from "@/lib/aluno.functions";
 
 type Ambiente = { id: string; nome: string; slug: string; cor_primaria: string | null; imagem_capa_url: string | null };
 
@@ -11,26 +10,21 @@ export const Route = createFileRoute("/aluno/")({
 });
 
 function AlunoHome() {
-  const linkAluno = useServerFn(ensureAlunoAuthLink);
+  const carregar = useServerFn(listarAmbientesDoAluno);
   const [ambientes, setAmbientes] = useState<Ambiente[]>([]);
   const [profile, setProfile] = useState<{ nome_completo: string; email_acesso: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      // Garante o vínculo auth.uid -> alunos.auth_user_id antes de consultar
-      const aluno = await linkAluno().catch(() => null);
-      if (aluno) {
-        setProfile({ nome_completo: aluno.nome_completo, email_acesso: aluno.email_acesso });
-        const { data } = await supabase
-          .from("ambientes")
-          .select("id,nome,slug,cor_primaria,imagem_capa_url")
-          .eq("status", "ativo");
-        setAmbientes(data ?? []);
+      const res = await carregar().catch(() => null);
+      if (res?.aluno) {
+        setProfile(res.aluno);
+        setAmbientes(res.ambientes);
       }
       setLoading(false);
     })();
-  }, [linkAluno]);
+  }, [carregar]);
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
