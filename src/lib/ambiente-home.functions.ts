@@ -2,6 +2,20 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+async function getAuthEmail(userId: string, claims: unknown) {
+  const emailFromClaims = typeof (claims as { email?: unknown } | null)?.email === "string"
+    ? (claims as { email: string }).email
+    : "";
+  if (emailFromClaims) return emailFromClaims.toLowerCase().trim();
+
+  try {
+    const { data } = await supabaseAdmin.auth.admin.getUserById(userId);
+    return (data.user?.email ?? "").toLowerCase().trim();
+  } catch {
+    return "";
+  }
+}
+
 export type AmbienteHomeBranding = {
   id: string;
   nome: string;
@@ -111,6 +125,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }): Promise<AmbienteHomeData> => {
     const { userId } = context;
+    if (!userId) throw new Error("Unauthorized");
 
     // 1) Ambiente
     const { data: amb, error: errAmb } = await supabaseAdmin
@@ -131,8 +146,7 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
     if (errAluno) throw new Error(errAluno.message);
 
     if (!aluno) {
-      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
-      const email = authUser?.user?.email?.toLowerCase();
+      const email = await getAuthEmail(userId, context.claims);
       if (email) {
         const { data: porEmail } = await supabaseAdmin
           .from("alunos")
