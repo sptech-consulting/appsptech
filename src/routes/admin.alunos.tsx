@@ -418,7 +418,6 @@ function AlunoFormDialog({
             </div>
           </div>
           <div>
-          <div>
             <Label className="text-xs font-semibold uppercase tracking-wider text-secondary">
               Senha temporária (opcional)
             </Label>
