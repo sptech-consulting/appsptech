@@ -136,14 +136,26 @@ export const listarAmbientesDoAluno = createServerFn({ method: "POST" })
 
     if (!aluno) return { aluno: null, ambientes: [] as Array<{ id: string; nome: string; slug: string; cor_primaria: string | null; imagem_capa_url: string | null }> };
 
-    const { data: vinculos } = await supabaseAdmin
+    const { data: vinculos, error: vinculosError } = await supabaseAdmin
       .from("ambiente_alunos")
-      .select("ambiente_id, status, ambientes:ambiente_id(id, nome, slug, cor_primaria, imagem_capa_url, status)")
+      .select("ambiente_id, status")
       .eq("aluno_id", aluno.id)
       .eq("status", "ativo");
+    if (vinculosError) throw new Error(vinculosError.message);
 
-    const ambientes = (vinculos ?? [])
-      .map((v: any) => v.ambientes)
+    const ambienteIds = [...new Set((vinculos ?? []).map((v) => v.ambiente_id))];
+    const { data: ambienteRows, error: ambientesError } = ambienteIds.length
+      ? await supabaseAdmin
+          .from("ambientes")
+          .select("id, nome, slug, cor_primaria, imagem_capa_url, status")
+          .in("id", ambienteIds)
+          .eq("status", "ativo")
+      : { data: [] as any[], error: null };
+    if (ambientesError) throw new Error(ambientesError.message);
+
+    const byId = new Map((ambienteRows ?? []).map((a: any) => [a.id, a]));
+    const ambientes = ambienteIds
+      .map((id) => byId.get(id))
       .filter((a: any) => a && a.status === "ativo")
       .map((a: any) => ({
         id: a.id,
