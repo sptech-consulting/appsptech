@@ -113,19 +113,29 @@ function ResultadosPage() {
               <h1 className="text-xl font-black">{amb.nome}</h1>
             </div>
           </div>
-          <button
-            onClick={() => {
-              sessionStorage.removeItem(`resultados:${slug}:codigo`);
-              setAmb(null);
-              setCodigo("");
-              setTrabalhos([]);
-            }}
-            className="text-xs font-semibold underline opacity-70 hover:opacity-100"
-          >
-            Sair
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/e/$slug"
+              params={{ slug }}
+              className="text-xs font-semibold opacity-70 hover:opacity-100"
+            >
+              ← Área do aluno
+            </Link>
+            <button
+              onClick={() => {
+                sessionStorage.removeItem(`resultados:${slug}:codigo`);
+                setAmb(null);
+                setCodigo("");
+                setTrabalhos([]);
+              }}
+              className="text-xs font-semibold underline opacity-70 hover:opacity-100"
+            >
+              Trocar código
+            </button>
+          </div>
         </div>
       </header>
+
 
       <section className="mx-auto max-w-6xl px-6 py-10">
         {trabalhos.length === 0 ? (
