@@ -133,6 +133,33 @@ function EditAmbiente() {
         }
       />
       <AccessLinkCard slug={initial.slug} />
+      {initial.codigo_acesso_resultados && (
+        <div className="mb-4 rounded-xl border border-border bg-card p-4 flex items-center gap-3">
+          <Trophy className="h-4 w-4 text-primary" />
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-bold text-secondary uppercase tracking-widest">
+              Mural de Resultados
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Código:{" "}
+              <code className="font-mono">{initial.codigo_acesso_resultados}</code> · Trabalhos
+              publicados aparecem no mural deste ambiente.
+            </div>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <RouterLink
+              to="/admin/trabalhos/$id"
+              params={{ id: "novo" }}
+              search={{ ambiente: id }}
+            >
+              Novo trabalho
+            </RouterLink>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <RouterLink to="/admin/trabalhos">Gerenciar</RouterLink>
+          </Button>
+        </div>
+      )}
       <AmbienteForm
         initial={initial}
         onSubmit={handleSave}
