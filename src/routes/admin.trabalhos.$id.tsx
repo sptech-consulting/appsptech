@@ -261,15 +261,7 @@ function TrabalhoEditPage() {
         description="Cadastro completo de trabalho para o Mural de Resultados."
         crumbs={[
           { label: "Ambientes", to: "/admin/ambientes" },
-          ...(ambienteAtual
-            ? [
-                {
-                  label: ambienteAtual.nome,
-                  to: "/admin/ambientes/$id" as const,
-                  params: { id: ambienteAtual.id },
-                },
-              ]
-            : []),
+          ...(ambienteAtual ? [{ label: ambienteAtual.nome, to: `/admin/ambientes/${ambienteAtual.id}` }] : []),
           { label: "Trabalhos", to: "/admin/trabalhos" },
           { label: isNovo ? "Novo" : t.titulo },
         ]}
