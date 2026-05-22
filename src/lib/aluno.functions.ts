@@ -3,6 +3,20 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+async function getAuthEmail(userId: string, claims: unknown) {
+  const emailFromClaims = typeof (claims as { email?: unknown } | null)?.email === "string"
+    ? ((claims as { email: string }).email)
+    : "";
+  if (emailFromClaims) return emailFromClaims.toLowerCase().trim();
+
+  try {
+    const { data } = await supabaseAdmin.auth.admin.getUserById(userId);
+    return (data.user?.email ?? "").toLowerCase().trim();
+  } catch {
+    return "";
+  }
+}
+
 /**
  * Após o login do aluno, vincula auth.uid() ao registro public.alunos
  * pelo email_acesso (case-insensitive), se ainda não estiver vinculado.
@@ -12,11 +26,8 @@ export const ensureAlunoAuthLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const userId = context.userId;
-    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
-    if (authError) throw new Error(authError.message);
-    const email = (authUser.user?.email ?? (context.claims.email as string | undefined) ?? "")
-      .toLowerCase()
-      .trim();
+    if (!userId) throw new Error("Unauthorized");
+    const email = await getAuthEmail(userId, context.claims);
     if (!email) return null;
 
     // Já vinculado?
@@ -62,6 +73,7 @@ export const checkAlunoAmbienteAccess = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const userId = context.userId;
+    if (!userId) return { ok: false as const, reason: "no_aluno" as const };
     const { data: amb } = await supabaseAdmin
       .from("ambientes")
       .select("id, status")
@@ -102,12 +114,10 @@ export const listarAmbientesDoAluno = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const userId = context.userId;
+    if (!userId) throw new Error("Unauthorized");
 
     // Garante o vínculo via email (idempotente)
-    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
-    const email = (authUser?.user?.email ?? (context.claims.email as string | undefined) ?? "")
-      .toLowerCase()
-      .trim();
+    const email = await getAuthEmail(userId, context.claims);
 
     let { data: aluno } = await supabaseAdmin
       .from("alunos")
