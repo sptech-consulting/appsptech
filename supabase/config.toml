@@ -1,1 +1,5 @@
 project_id = "qioisduqkrdjxpqqiwyb"
+
+[functions.bootstrap-alunos-senha]
+verify_jwt = false
+
