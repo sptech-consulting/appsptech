@@ -74,6 +74,11 @@ async function invite(body: any): Promise<Response> {
     if (!isUuid(g?.grupo_id)) return json({ error: "grupo_id inválido" }, 400);
     if (g.ambiente_id != null && !isUuid(g.ambiente_id)) return json({ error: "ambiente_id inválido" }, 400);
   }
+  const senhaTemporaria = typeof body?.senha_temporaria === "string" ? body.senha_temporaria : "";
+  const usarSenhaTemp = senhaTemporaria.length > 0;
+  if (usarSenhaTemp && (senhaTemporaria.length < 8 || senhaTemporaria.length > 72)) {
+    return json({ error: "A senha temporária deve ter entre 8 e 72 caracteres." }, 400);
+  }
   const email = (body.email as string).toLowerCase().trim();
 
   const { data: existing } = await admin
@@ -81,19 +86,28 @@ async function invite(body: any): Promise<Response> {
   if (existing) return json({ error: "Já existe um administrador com esse e-mail." }, 400);
 
   let authUserId: string | null = null;
+  let senhaDefinida = false;
   const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
   const found = list?.users?.find((u) => (u.email ?? "").toLowerCase() === email);
   if (found) {
     authUserId = found.id;
+    if (usarSenhaTemp) {
+      const { error: updErr } = await admin.auth.admin.updateUserById(found.id, {
+        password: senhaTemporaria,
+      });
+      if (updErr) return json({ error: updErr.message }, 400);
+      senhaDefinida = true;
+    }
   } else {
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email,
       email_confirm: true,
-      password: crypto.randomUUID() + "Aa1!",
+      password: usarSenhaTemp ? senhaTemporaria : crypto.randomUUID() + "Aa1!",
       user_metadata: { nome },
     });
     if (createErr) return json({ error: createErr.message }, 400);
     authUserId = created.user?.id ?? null;
+    senhaDefinida = usarSenhaTemp;
   }
   if (!authUserId) return json({ error: "Falha ao criar usuário de autenticação." }, 500);
 
@@ -114,11 +128,16 @@ async function invite(body: any): Promise<Response> {
     if (gErr) return json({ error: gErr.message }, 400);
   }
 
-  const { data: linkData } = await admin.auth.admin.generateLink({ type: "recovery", email });
+  let resetLink: string | null = null;
+  if (!senhaDefinida) {
+    const { data: linkData } = await admin.auth.admin.generateLink({ type: "recovery", email });
+    resetLink = linkData?.properties?.action_link ?? null;
+  }
   return json({
     id: novo.id,
     auth_user_id: authUserId,
-    reset_link: linkData?.properties?.action_link ?? null,
+    reset_link: resetLink,
+    senha_definida: senhaDefinida,
   });
 }
 

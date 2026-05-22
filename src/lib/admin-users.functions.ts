@@ -28,11 +28,17 @@ async function call<T>(action: string, payload: Record<string, unknown>): Promis
 type InvitePayload = {
   nome: string;
   email: string;
+  senha_temporaria?: string;
   grupos: { grupo_id: string; acesso_global: boolean; ambiente_id?: string | null }[];
 };
 
 export async function inviteAdminUser({ data }: { data: InvitePayload }) {
-  return call<{ id: string; auth_user_id: string; reset_link: string | null }>("invite", data);
+  return call<{
+    id: string;
+    auth_user_id: string;
+    reset_link: string | null;
+    senha_definida: boolean;
+  }>("invite", data);
 }
 
 export async function updateAdminUserGroups({
