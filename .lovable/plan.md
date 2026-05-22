@@ -1,109 +1,113 @@
+# Migração TanStack Start → Vite + React SPA (Vercel)
 
-## Objetivo
+## Contexto e impacto
 
-Transformar o módulo **Resultados** num espaço rico onde professores (admin) cadastram trabalhos com múltiplas seções, e alunos acessam via código de acesso já existente do ambiente, com um layout que reproduz as telas anexadas (cards numerados + página de detalhe).
+O projeto hoje roda em **TanStack Start** com SSR no Cloudflare Workers, usando:
+- `createServerFn` (RPC server-side) em vários `*.functions.ts`
+- Server routes (`src/routes/api/public/novidades/webhook/$token.ts`)
+- Middleware `requireSupabaseAuth` (valida JWT no servidor, RLS aplicada como usuário)
+- Roteamento file-based (`src/routes/*` + `routeTree.gen.ts`)
+- `src/start.ts`, `src/server.ts`, `wrangler.jsonc`
 
-## 1. Banco de dados (migration)
+Migrar para **Vite + SPA puro** implica perder a camada servidor. Toda a lógica server-side precisa virar:
+1. **Chamadas diretas do client ao Supabase** (RLS já protege — é o caminho recomendado)
+2. **Webhook** (`/api/public/novidades/webhook/$token`) → **Supabase Edge Function** (Workers não existe mais)
 
-Ampliar `trabalhos` e criar tabelas filhas. Tudo com RLS reutilizando as policies já existentes (`is_admin_for_ambiente` / código público).
+Lógica que dependia do service role no servidor (se houver) também migra para Edge Functions.
 
-### Alterações em `trabalhos`
-Novas colunas:
-- `apresentacao_tipo` enum (`video`, `pptx`, `imagem`, `documento`) — nullable
-- `apresentacao_url` text — link YouTube/Vimeo ou arquivo
-- `apresentacao_titulo` text
-- `apresentacao_descricao` text
-- `aplicacao_expectativa` text (rich text / markdown)
-- `apresentacao_imagem_url` text (imagem de capa da apresentação, screenshot do produto)
-- `subtitulo` text (ex.: "Truth Layer + Revenue Command Center")
+---
 
-### Nova tabela `trabalho_funcionalidades`
-- `id`, `trabalho_id` (FK), `ordem`, `titulo`, `descricao`, `imagem_url`, `criado_em`
-- RLS: admin do ambiente gerencia; público lê via join se trabalho está publicado (RPC).
+## Plano de migração
 
-### Nova tabela `trabalho_links`
-- `id`, `trabalho_id`, `ordem`, `rotulo`, `url`, `icone_url`
-- Mesma RLS.
+### Fase 1 — Roteamento (TanStack Router SPA, sem Start)
+- Manter `@tanstack/react-router` mas em modo **SPA puro** (sem SSR, sem server routes).
+- Substituir bootstrap: remover `src/start.ts`, `src/server.ts`, `src/router.tsx` (versão Start).
+- Criar `src/main.tsx` (entry SPA) + `index.html` na raiz, montando `<RouterProvider>`.
+- Manter `src/routes/*` (file-based) — o plugin `@tanstack/router-plugin/vite` gera `routeTree.gen.ts` em modo SPA.
+- Remover rotas server-only: `src/routes/api/**` (mover lógica conforme Fase 3).
 
-### RPCs públicas (atualização)
-- `obter_trabalho_publico(_codigo, _trabalho_id)` retorna também novos campos.
-- Novas RPCs:
-  - `listar_funcionalidades_publicas(_codigo, _trabalho_id)`
-  - `listar_links_publicos(_codigo, _trabalho_id)`
+### Fase 2 — Conversão de server functions para chamadas client
+Todos os `*.functions.ts` que usam `requireSupabaseAuth` viram chamadas diretas via `supabase` client no browser. RLS continua garantindo segurança.
 
-### Storage
-Reutilizar bucket existente (ou criar `trabalhos-assets`) para uploads de imagens de funcionalidades e arquivos de apresentação.
+Arquivos afetados (mapear e migrar um a um):
+- `src/lib/ferramenta.functions.ts`
+- `src/lib/ambiente.functions.ts`
+- Demais `*.functions.ts` em `src/lib/`
 
-## 2. Server functions (admin)
+Padrão de substituição:
+```ts
+// Antes (server fn): getFerramentaDetalhe via createServerFn + requireSupabaseAuth
+// Depois (client hook): useQuery + supabase.from('ferramentas').select(...).eq(...)
+```
 
-Em `src/lib/trabalhos.functions.ts` (novo arquivo `trabalhos-admin.functions.ts` com `requireSupabaseAuth`):
-- `criarTrabalho`, `atualizarTrabalho`, `excluirTrabalho` (lógica via status)
-- `salvarFuncionalidade`, `removerFuncionalidade`, `reordenarFuncionalidades`
-- `salvarLink`, `removerLink`
+Loaders de rota que chamavam server fns viram `useQuery` (TanStack Query) nos componentes, ou `loader` que chama supabase diretamente.
 
-Em `src/lib/trabalhos.functions.ts` (público) adicionar:
-- `obterTrabalhoCompleto` retornando trabalho + funcionalidades + links em uma chamada.
+### Fase 3 — Webhook em Supabase Edge Function
+- Migrar `src/routes/api/public/novidades/webhook/$token.ts` para `supabase/functions/novidades-webhook/index.ts`.
+- Atualizar URL externa que dispara o webhook para a URL da Edge Function.
+- Validação do token continua igual (compara contra valor armazenado).
 
-## 3. Admin UI — "Ambientes e Turmas"
+### Fase 4 — Configuração Vite + Vercel
+- `vite.config.ts`: remover `@lovable.dev/vite-tanstack-config`, usar config Vite padrão:
+  ```ts
+  import { defineConfig } from 'vite'
+  import react from '@vitejs/plugin-react'
+  import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+  import path from 'path'
 
-### Lista dentro do edit de ambiente
-Em `src/routes/admin.ambientes.$id.tsx`, adicionar aba/seção **Resultados** quando o ambiente tem `codigo_acesso_resultados`:
-- Lista de trabalhos do ambiente (CRUD)
-- Botão "Novo trabalho"
+  export default defineConfig({
+    plugins: [TanStackRouterVite({ target: 'react', autoCodeSplitting: true }), react()],
+    resolve: { alias: { '@': path.resolve(__dirname, './src') } },
+  })
+  ```
+- Criar `vercel.json` com rewrite SPA:
+  ```json
+  { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+  ```
+- Remover `wrangler.jsonc`, `src/server.ts`, `src/start.ts`.
+- Atualizar `package.json` scripts: `build` → `vite build`, `dev` → `vite`.
+- Remover dependências: `@tanstack/react-start`, `@lovable.dev/vite-tanstack-config`, `wrangler`.
 
-### Form de trabalho
-Nova rota `src/routes/admin.ambientes.$id.trabalhos.$trabalhoId.tsx` (e `.novo.tsx`) com:
-- Identificação: título, subtítulo, descrição/resumo, autor, turma, tags
-- Mídia: imagem de capa (card), imagem da apresentação (hero do detalhe)
-- Apresentação: tipo + URL/upload + título + descrição
-- **Funcionalidades**: lista dinâmica de blocos (título, descrição, imagem). Reordenar.
-- Aplicação & expectativa: textarea longo
-- Links úteis: lista dinâmica (rótulo + URL + ícone opcional)
-- Status (rascunho / publicada), destaque
+### Fase 5 — Variáveis de ambiente na Vercel
+Configurar no dashboard da Vercel:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_PROJECT_ID`
 
-## 4. Aluno UI — Layout dos screenshots
+(Service role **não vai** para a Vercel — fica só nas Edge Functions Supabase.)
 
-### `src/routes/e.$slug.resultados.tsx` (atualizar)
-Cards seguem o screenshot 1:
-- Grid 3 colunas em desktop
-- Cada card: thumbnail flutuante topo-esquerda, número "01" grande topo-direita (cinza claro), título, descrição (3 linhas), botão "Mostrar detalhes →"
-- Estilo glass/floating com sombra suave, sem borda dura. Respeitar tokens do ambiente (`cor_primaria` para botão/número-hover).
-- Fundo neutro com leve gradiente da identidade.
+### Fase 6 — Deploy
+- Conectar repo GitHub à Vercel (via Lovable → GitHub → Vercel).
+- Framework preset: **Vite**.
+- Build command: `vite build` · Output: `dist`.
+- Deploy.
 
-### `src/routes/e.$slug.resultados.$trabalhoId.tsx` (refatorar)
-Seguindo screenshot 2:
-- Header: botão voltar (←), número grande "02" cinza, título grande (destaque com `cor_primaria`), descrição centralizada
-- Hero: imagem(ns) de apresentação flutuante com sombra
-- Seção "Subtítulo + descrição rica" (texto longo com destaques)
-- Bloco apresentação: imagem grande à esquerda + ícone/título/descrição/CTA à direita
-- **Principais funcionalidades**: layout zigzag — imagem (lado alternado) + texto. Renderiza dinamicamente de `trabalho_funcionalidades`.
-- Bloco "Onde se aplica e expectativa": card destacado com borda fina
-- **Links úteis**: rodapé com pílulas/botões pequenos
+---
 
-Player de vídeo embeddado reutilizando `toEmbedUrl` (YouTube/Vimeo) de `e.$slug.aula.$aulaId.tsx`. Extrair para `src/lib/video-embed.ts` para reuso.
+## Riscos e perdas
 
-## 5. Componente reutilizável
+| Item | Hoje (TanStack Start) | Depois (SPA) |
+|---|---|---|
+| Segurança | Middleware server valida JWT antes de tocar Supabase | RLS é a única barreira (precisa estar 100% correta em todas as tabelas) |
+| SEO | SSR renderiza HTML completo | SPA renderiza vazio até JS carregar (impacto em SEO/preview) |
+| Webhook | Rota TanStack | Edge Function Supabase (URL muda) |
+| Secrets server-side | `process.env` em server fns | Não existe — tudo client ou Edge Function |
+| Performance inicial | HTML pré-renderizado | Tela branca até bundle carregar |
 
-`src/components/ApresentacaoBlock.tsx` para renderizar o bloco de apresentação conforme o tipo:
-- `video` → iframe
-- `imagem` → `<img>`
-- `pptx`/`documento` → botão de download + thumbnail
+**Importante:** RLS precisa estar revisada em todas as tabelas antes de remover a camada server, porque o client passa a falar direto com o Supabase.
 
-## Detalhes técnicos
+---
 
-- Tema/cores: usar `cor_primaria/secundaria/fundo/texto` do ambiente em todas as superfícies da área do aluno (já é padrão no projeto). Admin permanece com paleta SPTech.
-- Exclusões lógicas: trabalho → `status='arquivada'`. Funcionalidades/links removidos fisicamente.
-- Slug: já existe trigger `slugify_pt` em `trabalhos`. Manter resolução por slug.
-- RLS: novas tabelas filhas reusam `is_admin_for_ambiente(trabalho.ambiente_id)` e leitura via RPC `SECURITY DEFINER` que valida o código.
+## Estimativa de escopo
+- ~15–25 arquivos editados (rotas, lib/*.functions.ts → hooks/queries)
+- 3–5 arquivos novos (main.tsx, index.html, vercel.json, edge function)
+- ~8 arquivos removidos (start.ts, server.ts, wrangler.jsonc, api routes)
 
-## Ordem de execução
+---
 
-1. Migration (tabelas, colunas, RPCs).
-2. Server functions admin + público.
-3. Admin form completo + lista dentro do ambiente.
-4. Refator aluno (cards numerados + detalhe rico).
-5. Extrair embed util e revisar visual.
+## Confirmação necessária antes de iniciar
+1. **Confirma a perda de SSR/SEO?** Páginas públicas (ex: resultados de trabalhos por código) vão renderizar via JS apenas.
+2. **Confirma migrar o webhook para Edge Function Supabase?** A URL externa do webhook precisará ser atualizada onde quer que esteja configurada.
+3. **Quer que eu revise as RLS policies das tabelas críticas antes de remover a camada server?** (Recomendado.)
 
-## Confirmação necessária
-
-Por causa do tamanho (migration + ~6 arquivos novos/alterados), confirmo o plano antes de executar. Após "ok", começo pela migration.
+Se confirmar os 3 pontos, executo a migração completa e preparo para deploy na Vercel.
