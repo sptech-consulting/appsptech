@@ -122,13 +122,38 @@ export const getAmbienteHome = createServerFn({ method: "POST" })
     if (errAmb) throw new Error(errAmb.message);
     if (!amb) throw new Error("Ambiente não encontrado ou inativo");
 
-    // 2) Aluno + verificação de vínculo
-    const { data: aluno, error: errAluno } = await supabaseAdmin
+    // 2) Aluno + auto-link de auth_user_id caso ainda não vinculado
+    let { data: aluno, error: errAluno } = await supabaseAdmin
       .from("alunos")
       .select("id, nome_completo, email_acesso, status")
       .eq("auth_user_id", userId)
       .maybeSingle();
     if (errAluno) throw new Error(errAluno.message);
+
+    if (!aluno) {
+      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+      const email = authUser?.user?.email?.toLowerCase();
+      if (email) {
+        const { data: porEmail } = await supabaseAdmin
+          .from("alunos")
+          .select("id, nome_completo, email_acesso, status, auth_user_id")
+          .ilike("email_acesso", email)
+          .maybeSingle();
+        if (porEmail && !porEmail.auth_user_id) {
+          await supabaseAdmin
+            .from("alunos")
+            .update({ auth_user_id: userId })
+            .eq("id", porEmail.id);
+          aluno = {
+            id: porEmail.id,
+            nome_completo: porEmail.nome_completo,
+            email_acesso: porEmail.email_acesso,
+            status: porEmail.status,
+          };
+        }
+      }
+    }
+
     if (!aluno || aluno.status !== "ativo") {
       throw new Error("Aluno não cadastrado ou inativo");
     }
