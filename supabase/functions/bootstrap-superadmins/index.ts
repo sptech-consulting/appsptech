@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false, autoRefreshToken: false } });
 const EMAIL = "manoel.almeida@sptech.school";
-const SENHA = "23456789";
+const SENHA = "SpTech@2026";
 const GRUPO = "c716050a-db7f-48c2-a4fa-fa0e935f1620";
 Deno.serve(async () => {
   const all: any[] = [];
