@@ -268,7 +268,7 @@ function TrabalhoEditPage() {
           { label: isNovo ? "Novo" : t.titulo },
         ]}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => navigate({ to: "/admin/trabalhos" })}>
               Voltar
             </Button>
@@ -277,8 +277,11 @@ function TrabalhoEditPage() {
                 <Trash2 className="h-4 w-4" /> Arquivar
               </Button>
             )}
-            <Button onClick={salvar} disabled={saving}>
-              <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar"}
+            <Button variant="outline" onClick={() => salvar()} disabled={saving}>
+              <Save className="h-4 w-4" /> {saving ? "Salvando…" : "Salvar rascunho"}
+            </Button>
+            <Button onClick={() => salvar("publicada")} disabled={saving}>
+              {t.status === "publicada" ? "Salvar e manter publicado" : "Publicar"}
             </Button>
           </div>
         }
