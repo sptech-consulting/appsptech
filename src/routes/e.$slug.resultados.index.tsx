@@ -56,32 +56,46 @@ function ResultadosPage() {
 
   if (!amb) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-muted px-6">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (codigo.trim()) void entrar(codigo.trim());
-          }}
-          className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-lg space-y-4"
-        >
-          <h1 className="text-2xl font-black text-secondary">Mural de Resultados</h1>
-          <p className="text-sm text-muted-foreground">
-            Informe o código de acesso compartilhado pelo seu professor para abrir o mural de trabalhos.
-          </p>
-          <Input
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/\s+/g, ""))}
-            placeholder="Ex.: SPT2026"
-            className="font-mono text-lg tracking-widest uppercase text-center"
-            autoFocus
-          />
-          <Button type="submit" disabled={loading || !codigo.trim()} className="w-full">
-            {loading ? "Validando…" : "Entrar"}
-          </Button>
-        </form>
+      <main className="min-h-screen flex flex-col bg-muted">
+        <div className="px-6 py-3 border-b border-border bg-card">
+          <div className="mx-auto max-w-6xl">
+            <Link
+              to="/e/$slug"
+              params={{ slug }}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-secondary"
+            >
+              ← Voltar à Área do aluno
+            </Link>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-6">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (codigo.trim()) void entrar(codigo.trim());
+            }}
+            className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-lg space-y-4"
+          >
+            <h1 className="text-2xl font-black text-secondary">Mural de Resultados</h1>
+            <p className="text-sm text-muted-foreground">
+              Informe o código de acesso compartilhado pelo seu professor para abrir o mural de trabalhos.
+            </p>
+            <Input
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/\s+/g, ""))}
+              placeholder="Ex.: SPT2026"
+              className="font-mono text-lg tracking-widest uppercase text-center"
+              autoFocus
+            />
+            <Button type="submit" disabled={loading || !codigo.trim()} className="w-full">
+              {loading ? "Validando…" : "Entrar"}
+            </Button>
+          </form>
+        </div>
       </main>
     );
   }
+
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: tk.fundo, color: tk.texto }}>
