@@ -9,14 +9,31 @@ export const Route = createFileRoute("/aluno")({
     if (!data.session) throw redirect({ to: "/aluno/entrar" });
 
     // Sessão pode pertencer a um admin logado no mesmo navegador.
-    // Só liberamos a área do aluno se o auth_user_id estiver vinculado a um aluno ativo.
-    const { data: aluno } = await supabase
+    // Liberamos a área se o auth_user_id estiver vinculado a um aluno ativo,
+    // OU se houver um aluno ativo cadastrado com o mesmo e-mail (vínculo
+    // pendente que será resolvido automaticamente pelo serverFn da página).
+    const userId = data.session.user.id;
+    const email = data.session.user.email?.toLowerCase() ?? null;
+
+    const { data: porAuth } = await supabase
       .from("alunos")
       .select("id")
-      .eq("auth_user_id", data.session.user.id)
+      .eq("auth_user_id", userId)
       .eq("status", "ativo")
       .maybeSingle();
-    if (!aluno) throw redirect({ to: "/aluno/entrar" });
+    if (porAuth) return;
+
+    if (email) {
+      const { data: porEmail } = await supabase
+        .from("alunos")
+        .select("id")
+        .ilike("email_acesso", email)
+        .eq("status", "ativo")
+        .maybeSingle();
+      if (porEmail) return;
+    }
+
+    throw redirect({ to: "/aluno/entrar" });
   },
   component: AlunoShell,
 });
