@@ -50,8 +50,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 
 ## FASE 3 — Middleware de Autorização (substitui RLS)
 
-- [ ] **Task 3.1** — Middleware RBAC para admin
-  `feat/rbac-middleware` · require-auth, require-admin, require-permission, require-ambiente-scope
+- [x] **Task 3.1** — Middleware RBAC para admin + hardening de escalada de privilégio
+  `feat/rbac-middleware` · [PR #11](https://github.com/sptech-consulting/pos.graduacao.cms/pull/11)
 
 - [ ] **Task 3.2** — Middleware de acesso de aluno
   `feat/aluno-middleware` · require-aluno-auth, require-aluno-ambiente
