@@ -1,18 +1,21 @@
 import Fastify from "fastify";
 import { config } from "./config.js";
+import { registerCookie } from "./plugins/cookie.js";
 import { registerCors } from "./plugins/cors.js";
+import { registerJwt } from "./plugins/jwt.js";
 import { registerRateLimit } from "./plugins/rate-limit.js";
+import { registerSwagger } from "./plugins/swagger.js";
+import { authRoutes } from "./routes/auth/index.js";
 import { healthRoutes } from "./routes/health.js";
 
 const isProd = config.NODE_ENV === "production";
 
 const app = Fastify({
   logger: isProd
-    ? true // pino JSON in production
+    ? true
     : { transport: { target: "pino-pretty", options: { colorize: true } } },
 });
 
-// Sanitize error responses in production — no stack traces or internal paths
 app.setErrorHandler((error: Error & { statusCode?: number }, _req, reply) => {
   const statusCode = error.statusCode ?? 500;
   app.log.error(error);
@@ -28,9 +31,16 @@ app.setNotFoundHandler((_req, reply) => {
 });
 
 async function start(): Promise<void> {
+  // Swagger must be registered before routes so it can collect schemas
+  await registerSwagger(app);
+
   await registerCors(app);
   await registerRateLimit(app);
+  await registerCookie(app);
+  await registerJwt(app);
+
   await app.register(healthRoutes);
+  await app.register(authRoutes);
 
   await app.listen({ port: config.BACKEND_PORT, host: "0.0.0.0" });
 }

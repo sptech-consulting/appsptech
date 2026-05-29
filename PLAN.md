@@ -38,8 +38,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 - [ ] **Task 2.1** — JWT login + refresh + logout
   `feat/auth-jwt` · auth.service.ts, argon2, refresh_tokens table, POST /auth/login|refresh|logout
 
-- [ ] **Task 2.2** — Fluxo de reset de senha
-  `feat/password-reset` · password_reset_tokens, POST /auth/forgot-password|reset-password, nodemailer
+- [x] **Task 2.2** — Fluxo de reset de senha + Scalar docs
+  `feat/password-reset` · [PR #7](https://github.com/sptech-consulting/pos.graduacao.cms/pull/7)
 
 - [ ] **Task 2.3** — Fluxo de convite de admin
   `feat/admin-invite` · Substitui Edge Function admin-users, POST /admin/usuarios + PATCH status/grupos
