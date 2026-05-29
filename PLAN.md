@@ -18,8 +18,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 - [x] **Task 0.2** — Scaffold do monorepo pnpm
   `feat/monorepo-scaffold` · [PR #2](https://github.com/sptech-consulting/pos.graduacao.cms/pull/2)
 
-- [ ] **Task 0.3** — Docker Compose baseline
-  `feat/docker-compose` · MySQL 8, MinIO, Redis, adminer, backend placeholder, `.env.example`
+- [x] **Task 0.3** — Docker Compose baseline + limpeza Vercel/Lovable
+  `feat/docker-compose` · [PR #3](https://github.com/sptech-consulting/pos.graduacao.cms/pull/3)
 
 ---
 
