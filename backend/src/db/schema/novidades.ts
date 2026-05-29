@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   char,
   datetime,
@@ -11,7 +12,7 @@ import {
 export const novidades = mysqlTable(
   "novidades",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     // ambiente_id: novidades are scoped to a single ambiente (migration 20260518170552)
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     titulo: text("titulo").notNull(),

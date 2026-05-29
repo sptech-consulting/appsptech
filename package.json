@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter frontend dev",
+    "api": "./scripts/dev-start.sh",
+    "api:reset": "./scripts/dev-start.sh --reset",
     "build": "pnpm --filter shared build && pnpm --filter backend build && pnpm --filter frontend build",
     "lint": "pnpm -r lint",
     "format": "prettier --write .",

@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   char,
   datetime,
@@ -9,7 +10,7 @@ import {
 } from "drizzle-orm/mysql-core";
 
 export const ferramentas = mysqlTable("ferramentas", {
-  id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+  id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
   nome: text("nome").notNull(),
   subtitulo: text("subtitulo"),
   descricao: text("descricao"),
@@ -29,7 +30,7 @@ export const ferramentas = mysqlTable("ferramentas", {
 export const ferramentaCasosUso = mysqlTable(
   "ferramenta_casos_uso",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ferramentaId: char("ferramenta_id", { length: 36 }).notNull(),
     texto: text("texto").notNull(),
     ordem: int("ordem").notNull().default(0),
@@ -41,7 +42,7 @@ export const ferramentaCasosUso = mysqlTable(
 export const ferramentaTags = mysqlTable(
   "ferramenta_tags",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ferramentaId: char("ferramenta_id", { length: 36 }).notNull(),
     tipo: mysqlEnum("tipo", ["input", "output", "integracao"]).notNull(),
     rotulo: text("rotulo").notNull(),
@@ -54,7 +55,7 @@ export const ferramentaTags = mysqlTable(
 export const ferramentaBlocos = mysqlTable(
   "ferramenta_blocos",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ferramentaId: char("ferramenta_id", { length: 36 }).notNull(),
     titulo: text("titulo").notNull(),
     conteudo: text("conteudo").notNull(),
@@ -67,7 +68,7 @@ export const ferramentaBlocos = mysqlTable(
 export const ferramentaFuncionalidades = mysqlTable(
   "ferramenta_funcionalidades",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ferramentaId: char("ferramenta_id", { length: 36 }).notNull(),
     titulo: text("titulo").notNull(),
     descricao: text("descricao"),
@@ -81,7 +82,7 @@ export const ferramentaFuncionalidades = mysqlTable(
 export const ferramentaCasosTeste = mysqlTable(
   "ferramenta_casos_teste",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ferramentaId: char("ferramenta_id", { length: 36 }).notNull(),
     titulo: text("titulo").notNull(),
     badge: text("badge"),

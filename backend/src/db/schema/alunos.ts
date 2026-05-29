@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   char,
   datetime,
@@ -9,7 +10,7 @@ import {
 } from "drizzle-orm/mysql-core";
 
 export const alunos = mysqlTable("alunos", {
-  id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+  id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
   nomeCompleto: text("nome_completo").notNull(),
   emailAcesso: varchar("email_acesso", { length: 320 }).notNull().unique(),
   senhaHash: text("senha_hash"),
@@ -20,7 +21,7 @@ export const alunos = mysqlTable("alunos", {
 });
 
 export const importacoesAlunos = mysqlTable("importacoes_alunos", {
-  id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+  id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
   ambienteId: char("ambiente_id", { length: 36 }).notNull(),
   arquivoNome: text("arquivo_nome"),
   arquivoUrl: text("arquivo_url"),
@@ -44,7 +45,7 @@ export const importacoesAlunos = mysqlTable("importacoes_alunos", {
 });
 
 export const importacoesAlunosErros = mysqlTable("importacoes_alunos_erros", {
-  id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+  id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
   importacaoId: char("importacao_id", { length: 36 }).notNull(),
   numeroLinha: int("numero_linha"),
   nomeCompleto: text("nome_completo"),
