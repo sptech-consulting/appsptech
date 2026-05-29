@@ -86,11 +86,10 @@ ADMIN_NAME="${ADMIN_NAME:-Admin}"
 ADMIN_PASS="${ADMIN_PASS:-Admin@1234}"
 
 info "Configurando usuário admin (${ADMIN_EMAIL})..."
-ADMIN_EMAIL="$ADMIN_EMAIL" ADMIN_NAME="$ADMIN_NAME" ADMIN_PASS="$ADMIN_PASS" \
-  DATABASE_URL="$DATABASE_URL" \
-  node --no-warnings "$ROOT/scripts/create-admin.mjs" 2>/dev/null \
+(cd backend && ADMIN_EMAIL="$ADMIN_EMAIL" ADMIN_NAME="$ADMIN_NAME" ADMIN_PASS="$ADMIN_PASS" \
+  DATABASE_URL="$DATABASE_URL" pnpm db:create-admin) \
   && success "Admin pronto: ${ADMIN_EMAIL} / ${ADMIN_PASS}" \
-  || warn "Não foi possível criar admin (banco pode estar iniciando — rode novamente)"
+  || warn "Não foi possível criar admin — rode novamente se for a primeira execução"
 
 # ── backend ───────────────────────────────────────────────────────────────────
 info "Iniciando backend em http://localhost:${BACKEND_PORT:-3001}..."
