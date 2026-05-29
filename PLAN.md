@@ -35,8 +35,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 
 ## FASE 2 — Autenticação
 
-- [ ] **Task 2.1** — JWT login + refresh + logout
-  `feat/auth-jwt` · auth.service.ts, argon2, refresh_tokens table, POST /auth/login|refresh|logout
+- [x] **Task 2.1** — JWT login + refresh + logout
+  `feat/auth-jwt` · [PR #6](https://github.com/sptech-consulting/pos.graduacao.cms/pull/6)
 
 - [ ] **Task 2.2** — Fluxo de reset de senha
   `feat/password-reset` · password_reset_tokens, POST /auth/forgot-password|reset-password, nodemailer
