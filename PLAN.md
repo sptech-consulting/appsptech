@@ -25,8 +25,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 
 ## FASE 1 — Fundação do Backend
 
-- [ ] **Task 1.1** — Fastify server + config + health check
-  `feat/backend-server` · server.ts, config.ts (Zod), GET /health, Dockerfile
+- [x] **Task 1.1** — Fastify server + config + health check
+  `feat/backend-server` · [PR #4](https://github.com/sptech-consulting/pos.graduacao.cms/pull/4)
 
 - [x] **Task 1.2** — Schema Drizzle ORM + migrations
   `feat/drizzle-schema` · [PR #5](https://github.com/sptech-consulting/pos.graduacao.cms/pull/5)
