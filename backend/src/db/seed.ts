@@ -3,10 +3,22 @@
  * - All 45 permission keys
  * - Super Admin group with all permissions
  *
- * Safe to run multiple times (uses INSERT IGNORE).
+ * Uses DATABASE_URL directly — does not require the full app config.
+ * Safe to run multiple times (uses onDuplicateKeyUpdate).
  */
-import { db } from "./connection.js";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { grupoPermissoes, gruposAcesso, permissoes } from "./schema/index.js";
+
+const DATABASE_URL = process.env["DATABASE_URL"];
+if (!DATABASE_URL) {
+  console.error("DATABASE_URL env var is required");
+  process.exit(1);
+}
+
+const pool = mysql.createPool({ uri: DATABASE_URL, timezone: "+00:00", charset: "utf8mb4" });
+const db = drizzle(pool, { mode: "default" });
 
 const PERMISSOES = [
   // ambientes
@@ -80,9 +92,11 @@ async function seed(): Promise<void> {
     .values({ nome: "Super Admin", descricao: "Acesso total ao sistema", escopo: "global" })
     .onDuplicateKeyUpdate({ set: { descricao: "Acesso total ao sistema" } });
 
-  const [grupo] = await db.select().from(gruposAcesso).where(
-    (await import("drizzle-orm")).eq(gruposAcesso.nome, "Super Admin"),
-  );
+  const [grupo] = await db
+    .select()
+    .from(gruposAcesso)
+    .where(eq(gruposAcesso.nome, "Super Admin"));
+
   const todasPermissoes = await db.select().from(permissoes);
 
   console.log(`Linking ${todasPermissoes.length} permissions to Super Admin...`);
@@ -95,7 +109,7 @@ async function seed(): Promise<void> {
   }
 
   console.log("Seed complete.");
-  process.exit(0);
+  await pool.end();
 }
 
 seed().catch((err) => {
