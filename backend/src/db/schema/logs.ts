@@ -1,7 +1,8 @@
+import { generateId } from "../generate-id.js";
 import { char, datetime, json, mysqlTable, text, varchar } from "drizzle-orm/mysql-core";
 
 export const logsAuditoria = mysqlTable("logs_auditoria", {
-  id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+  id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
   usuarioAdminId: char("usuario_admin_id", { length: 36 }),
   ambienteId: char("ambiente_id", { length: 36 }),
   acao: text("acao").notNull(),

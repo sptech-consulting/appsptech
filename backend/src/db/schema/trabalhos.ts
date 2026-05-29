@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   boolean,
   char,
@@ -13,7 +14,7 @@ import {
 export const trabalhos = mysqlTable(
   "trabalhos",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     titulo: text("titulo").notNull(),
     subtitulo: text("subtitulo"),
@@ -52,7 +53,7 @@ export const trabalhos = mysqlTable(
 export const trabalhoFuncionalidades = mysqlTable(
   "trabalho_funcionalidades",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     trabalhoId: char("trabalho_id", { length: 36 }).notNull(),
     ordem: int("ordem").notNull().default(0),
     titulo: text("titulo").notNull(),
@@ -67,7 +68,7 @@ export const trabalhoFuncionalidades = mysqlTable(
 export const trabalhoLinks = mysqlTable(
   "trabalho_links",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     trabalhoId: char("trabalho_id", { length: 36 }).notNull(),
     ordem: int("ordem").notNull().default(0),
     rotulo: text("rotulo").notNull(),
