@@ -8,6 +8,7 @@ import { registerSwagger } from "./plugins/swagger.js";
 import { authRoutes } from "./routes/auth/index.js";
 import { adminAmbientesRoutes } from "./routes/admin/ambientes.js";
 import { adminCursosRoutes } from "./routes/admin/cursos.js";
+import { adminAlunosRoutes } from "./routes/admin/alunos.js";
 import { adminFerramentasRoutes } from "./routes/admin/ferramentas.js";
 import { adminUsuariosRoutes } from "./routes/admin/usuarios.js";
 import { healthRoutes } from "./routes/health.js";
@@ -47,6 +48,7 @@ async function start(): Promise<void> {
   await app.register(adminAmbientesRoutes);
   await app.register(adminCursosRoutes);
   await app.register(adminFerramentasRoutes);
+  await app.register(adminAlunosRoutes);
 
   await app.listen({ port: config.BACKEND_PORT, host: "0.0.0.0" });
 }
