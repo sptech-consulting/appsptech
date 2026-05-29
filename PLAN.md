@@ -6,6 +6,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 
 **Protocolo de segurança:** toda task inclui análise de riscos e pen-test checklist — discutidos antes da execução.
 
+**TDD obrigatório:** testes escritos ANTES da implementação. Ciclo Red → Green → Refactor → Secure. Nenhum PR sem testes passando — funcionais + hardening de segurança.
+
 **Commits:** conventional commits, atômico por task. Branch a partir de `refactor/loveable-migration`. PR ao final.
 
 ---

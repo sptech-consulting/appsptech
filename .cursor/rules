@@ -6,6 +6,27 @@ Multi-tenant learning platform (SPTech). Migrating from Lovable.dev + Supabase t
 
 Monorepo layout: `frontend/` (React 19 + Vite + TanStack Router), `backend/` (Fastify + Drizzle), `shared/` (Zod schemas), `docker-compose.yml` at root.
 
+## TDD — mandatory before implementation
+
+Cycle: **RED → GREEN → REFACTOR → SECURE**
+
+1. Write failing tests that describe expected behavior
+2. Implement minimum to pass
+3. Refactor keeping tests green
+4. Add security tests (auth bypass, IDOR, permission escalation, input boundaries, rate limit)
+
+Test files live next to the source files they test (`auth.service.ts` → `auth.service.test.ts`).
+
+```bash
+pnpm test          # run all backend tests
+pnpm test:frontend # run frontend tests
+```
+
+No PR is accepted without passing tests covering:
+- Happy path
+- All documented error cases
+- Security controls (each item in the task's pen-test checklist)
+
 ## Code style
 
 - Functions: 4-20 lines. Split if longer.
@@ -27,15 +48,6 @@ Monorepo layout: `frontend/` (React 19 + Vite + TanStack Router), `backend/` (Fa
 - Reference issue numbers / commit SHAs when a line exists because
   of a specific bug or upstream constraint.
 
-## Tests
-
-- Tests run with a single command: `pnpm test` (backend) / `pnpm test:frontend`.
-- Every new function gets a test. Bug fixes get a regression test.
-- Mock external I/O (API, DB, filesystem) with named fake classes,
-  not inline stubs.
-- Tests must be F.I.R.S.T: fast, independent, repeatable,
-  self-validating, timely.
-
 ## Dependencies
 
 - Inject dependencies through constructor/parameter, not global/import.
@@ -45,6 +57,7 @@ Monorepo layout: `frontend/` (React 19 + Vite + TanStack Router), `backend/` (Fa
 
 - Backend: `routes/` → `services/` → `db/schema/`, plus `middleware/` and `plugins/`.
 - Frontend: TanStack Router file-based routing. Business logic stays in `src/lib/`, not in route files.
+- Test files co-located with source files.
 
 ## Formatting
 
@@ -60,5 +73,6 @@ Monorepo layout: `frontend/` (React 19 + Vite + TanStack Router), `backend/` (Fa
 - Every authenticated route uses explicit middleware (require-auth, require-admin, require-permission).
 - Permission checks before any DB write.
 - Rate limiting on auth and public endpoints.
-- Inputs validated via Fastify JSON schema at route boundary.
+- Fastify JSON schema with `additionalProperties: false` at every route boundary.
 - Never commit secrets. Tokens stored as SHA-256 hash.
+- OWASP API Top 10 checked on every PR with new routes.
