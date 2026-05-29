@@ -24,7 +24,7 @@ const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
   const missing = parsed.error.issues
-    .map((i) => `  ${i.path.join(".")}: ${i.message}`)
+    .map((i: { path: (string | number)[]; message: string }) => `  ${i.path.join(".")}: ${i.message}`)
     .join("\n");
   console.error(`Missing or invalid environment variables:\n${missing}`);
   process.exit(1);
