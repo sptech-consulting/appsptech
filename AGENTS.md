@@ -1,6 +1,6 @@
 # pos.graduacao.cms — AI Agent Instructions
 
-## Project context
+## Project
 
 CMS de pós-graduação para a SPTech. Multi-tenant learning platform with environments (ambientes), courses, lessons, tools, news, student progress tracking, and project showcases.
 
@@ -14,10 +14,48 @@ CMS de pós-graduação para a SPTech. Multi-tenant learning platform with envir
 ## Workflow
 
 - Present task plan (what, security risks, pen-test checklist) and get user authorization before executing.
+- **TDD is mandatory**: write tests before implementation. No PR without passing tests.
 - One atomic commit per task. Conventional commits format.
-- Branch from `main` for every task. Open PR when done.
+- Branch from `refactor/loveable-migration` for every task. Open PR when done.
 - Update `PLAN.md` after each merged PR.
 - Security risks and pen-test checklist are surfaced at planning time — not after implementation.
+
+## TDD — Test-Driven Development
+
+### Cycle per task
+
+```
+RED    → write failing tests that describe expected behavior
+GREEN  → implement minimum to make tests pass
+REFACTOR → clean up keeping tests green
+SECURE → add security/hardening tests for every OWASP item relevant to the task
+```
+
+### Test layers
+
+| Layer | File | Tool |
+|---|---|---|
+| Services | `src/services/*.test.ts` | vitest + named fake classes |
+| Routes | `src/routes/**/*.test.ts` | vitest + `app.inject()` |
+| Middleware | `src/middleware/*.test.ts` | vitest unit |
+| Frontend hooks/utils | `src/**/*.test.ts` | vitest |
+
+### Mandatory security tests per endpoint task
+
+- Auth bypass: no token → 401; expired token → 401; wrong role → 403
+- Permission: missing permission → 403; scoped admin on global op → 403
+- IDOR/BOLA: resource from ambiente A accessed by admin of ambiente B → 403
+- Input: oversized payload → 400; extra properties → 400; malformed UUID → 400
+- Rate limit: exceed limit → 429
+
+### Test commands
+
+```bash
+pnpm test            # backend — vitest run
+pnpm test:watch      # backend — vitest watch
+pnpm test:frontend   # frontend
+pnpm test:coverage   # with coverage report
+```
 
 ## Code style
 
@@ -40,15 +78,6 @@ CMS de pós-graduação para a SPTech. Multi-tenant learning platform with envir
 - Reference issue numbers / commit SHAs when a line exists because
   of a specific bug or upstream constraint.
 
-## Tests
-
-- Tests run with a single command: `pnpm test` (backend) / `pnpm test:frontend`.
-- Every new function gets a test. Bug fixes get a regression test.
-- Mock external I/O (API, DB, filesystem) with named fake classes,
-  not inline stubs.
-- Tests must be F.I.R.S.T: fast, independent, repeatable,
-  self-validating, timely.
-
 ## Dependencies
 
 - Inject dependencies through constructor/parameter, not global/import.
@@ -56,18 +85,18 @@ CMS de pós-graduação para a SPTech. Multi-tenant learning platform with envir
 
 ## Structure
 
-- Monorepo: `frontend/`, `backend/`, `shared/` packages at root.
+- Monorepo: `frontend/` · `backend/` · `shared/` (Zod schemas) · `docker-compose.yml` at root.
 - Backend: `src/routes/` → `src/services/` → `src/db/schema/`, with `src/middleware/` and `src/plugins/`.
-- Frontend: TanStack Router file-based routing under `src/routes/`. Business logic in `src/lib/`.
-- Never put business logic in route files — routes are thin.
+- Frontend: TanStack Router file-based routing. Business logic stays in `src/lib/`, not in route files.
+- Test files live next to the files they test (co-location).
 
 ## Formatting
 
-- Use `prettier`. Run before committing. Don't discuss style.
+- `prettier` for everything. Run before committing. Don't discuss style.
 
 ## Logging
 
-- Structured JSON for observability (Fastify pino logger in backend).
+- Structured JSON for observability (pino in backend).
 - Plain text only for user-facing CLI output.
 
 ## Security rules
@@ -79,4 +108,6 @@ CMS de pós-graduação para a SPTech. Multi-tenant learning platform with envir
 - All inputs validated via Fastify JSON schema at the route boundary.
 - UUID route params validated with regex pattern in schema.
 - Tokens stored as SHA-256 hash — never plaintext.
+- `additionalProperties: false` on every body/querystring schema.
 - Pre-signed storage URLs expire in 5 minutes and are scoped to exact key + MIME type.
+- OWASP API Security Top 10 checked on every PR with new routes.
