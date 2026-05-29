@@ -41,8 +41,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 - [x] **Task 2.2** — Fluxo de reset de senha + Scalar docs
   `feat/password-reset` · [PR #7](https://github.com/sptech-consulting/pos.graduacao.cms/pull/7)
 
-- [ ] **Task 2.3** — Fluxo de convite de admin
-  `feat/admin-invite` · Substitui Edge Function admin-users, POST /admin/usuarios + PATCH status/grupos
+- [x] **Task 2.3** — Fluxo de convite de admin
+  `feat/admin-invite` · [PR #10](https://github.com/sptech-consulting/pos.graduacao.cms/pull/10)
 
 ---
 
