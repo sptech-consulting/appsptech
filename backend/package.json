@@ -11,7 +11,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@cms/shared": "workspace:*"
+    "@cms/shared": "workspace:*",
+    "@fastify/cors": "^10.0.2",
+    "@fastify/rate-limit": "^10.2.2",
+    "fastify": "^5.4.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/node": "^22.16.5",
