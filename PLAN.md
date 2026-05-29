@@ -53,8 +53,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 - [x] **Task 3.1** — Middleware RBAC para admin + hardening de escalada de privilégio
   `feat/rbac-middleware` · [PR #11](https://github.com/sptech-consulting/pos.graduacao.cms/pull/11)
 
-- [ ] **Task 3.2** — Middleware de acesso de aluno
-  `feat/aluno-middleware` · require-aluno-auth, require-aluno-ambiente
+- [x] **Task 3.2** — Middleware de acesso de aluno
+  `feat/aluno-middleware` · [PR #13](https://github.com/sptech-consulting/pos.graduacao.cms/pull/13)
 
 ---
 
