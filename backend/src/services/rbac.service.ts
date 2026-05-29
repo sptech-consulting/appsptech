@@ -54,6 +54,22 @@ export async function vinculoGrupoExists(
   return rows.length > 0;
 }
 
+/** Returns true if the admin has acesso_global=true in any group. */
+export async function isGlobalAdmin(adminId: string): Promise<boolean> {
+  const rows = await db
+    .select({ id: usuariosAdminGrupos.id })
+    .from(usuariosAdminGrupos)
+    .where(
+      and(
+        eq(usuariosAdminGrupos.usuarioAdminId, adminId),
+        eq(usuariosAdminGrupos.acessoGlobal, true),
+      ),
+    )
+    .limit(1);
+
+  return rows.length > 0;
+}
+
 /** Returns true if this admin is the only active Super Admin with global access. */
 export async function isLastSuperAdmin(adminId: string): Promise<boolean> {
   const [superAdminGroup] = await db

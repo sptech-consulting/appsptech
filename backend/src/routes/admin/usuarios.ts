@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { db } from "../../db/connection.js";
@@ -12,18 +12,21 @@ import { requireAuth } from "../../middleware/require-auth.js";
 import { requireAdmin } from "../../middleware/require-admin.js";
 import { requirePermission } from "../../middleware/require-permission.js";
 import { audit } from "../../services/audit.service.js";
-import {
-  createPasswordResetToken,
-  hashPassword,
-} from "../../services/auth.service.js";
+import { createPasswordResetToken } from "../../services/auth.service.js";
 import { sendPasswordResetEmail } from "../../services/email.service.js";
-import { isLastSuperAdmin, vinculoGrupoExists } from "../../services/rbac.service.js";
+import {
+  isGlobalAdmin,
+  isLastSuperAdmin,
+  vinculoGrupoExists,
+} from "../../services/rbac.service.js";
 import { config } from "../../config.js";
 
 const createBody = z.object({
   nome: z.string().min(1).max(255),
   email: z.string().email().max(320),
-  grupoIds: z.array(z.string().uuid()).optional(),
+  // FIX: grupoIds removed from invite — prevents escalation where usuarios.criar
+  // is used to assign Super Admin group without needing usuarios.vincular_grupo.
+  // Groups are assigned separately via PATCH .../grupos.
 });
 
 const updateStatusBody = z.object({
@@ -33,6 +36,7 @@ const updateStatusBody = z.object({
 const updateGruposBody = z.object({
   grupoIds: z.array(z.string().uuid()),
   ambienteId: z.string().uuid().optional(),
+  // FIX: acessoGlobal can only be set by a global admin — validated in handler.
   acessoGlobal: z.boolean().default(false),
 });
 
@@ -46,7 +50,7 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
       preHandler: [...preHandlers, requirePermission("usuarios.visualizar")],
       schema: {
         tags: ["Admin — Usuários"],
-        summary: "Lista todos os admins com seus grupos",
+        summary: "Lista todos os admins",
         security: [{ bearerAuth: [] }],
       },
     },
@@ -74,7 +78,7 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
       preHandler: [...preHandlers, requirePermission("usuarios.criar")],
       schema: {
         tags: ["Admin — Usuários"],
-        summary: "Convida novo admin e envia email de definição de senha",
+        summary: "Convida novo admin e envia email de definição de senha (sem atribuição de grupos)",
         security: [{ bearerAuth: [] }],
         body: {
           type: "object",
@@ -82,17 +86,15 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
           properties: {
             nome: { type: "string", minLength: 1, maxLength: 255 },
             email: { type: "string", format: "email", maxLength: 320 },
-            grupoIds: { type: "array", items: { type: "string", format: "uuid" } },
           },
           additionalProperties: false,
         },
       },
     },
     async (req, reply) => {
-      const { nome, email, grupoIds } = createBody.parse(req.body);
+      const { nome, email } = createBody.parse(req.body);
       const normalizedEmail = email.toLowerCase().trim();
 
-      // Permissão verificada — agora podemos tocar no banco
       const [alunoExistente] = await db
         .select({ id: alunos.id })
         .from(alunos)
@@ -103,7 +105,7 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
         return reply.status(400).send({
           statusCode: 400,
           error: "Bad Request",
-          message: `O email ${normalizedEmail} já está cadastrado como aluno. Use um email diferente.`,
+          message: `O email ${normalizedEmail} já está cadastrado como aluno.`,
         });
       }
 
@@ -131,22 +133,6 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
 
       if (!novoAdmin) return reply.status(500).send({ message: "Erro ao criar usuário." });
 
-      // Vincular grupos se fornecidos
-      if (grupoIds?.length) {
-        const grupos = await db
-          .select({ id: gruposAcesso.id })
-          .from(gruposAcesso)
-          .where(inArray(gruposAcesso.id, grupoIds));
-
-        for (const grupo of grupos) {
-          await db
-            .insert(usuariosAdminGrupos)
-            .values({ usuarioAdminId: novoAdmin.id, grupoId: grupo.id, acessoGlobal: true })
-            .onDuplicateKeyUpdate({ set: { acessoGlobal: true } });
-        }
-      }
-
-      // Envia convite com link de reset de senha
       const rawToken = await createPasswordResetToken(novoAdmin.id, "admin");
       const resetUrl = `${config.FRONTEND_URL}/redefinir-senha?token=${rawToken}`;
       sendPasswordResetEmail(normalizedEmail, resetUrl).catch(() => {});
@@ -171,7 +157,7 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
       preHandler: [...preHandlers, requirePermission("usuarios.editar")],
       schema: {
         tags: ["Admin — Usuários"],
-        summary: "Ativa ou inativa um admin (não pode desativar a própria conta)",
+        summary: "Ativa ou inativa um admin",
         security: [{ bearerAuth: [] }],
         params: {
           type: "object",
@@ -237,7 +223,7 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
       preHandler: [...preHandlers, requirePermission("usuarios.vincular_grupo")],
       schema: {
         tags: ["Admin — Usuários"],
-        summary: "Redefine os grupos de um admin (replace total)",
+        summary: "Redefine os grupos de um admin (replace por escopo)",
         security: [{ bearerAuth: [] }],
         params: {
           type: "object",
@@ -259,6 +245,36 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
     async (req, reply) => {
       const { id } = req.params as { id: string };
       const { grupoIds, ambienteId, acessoGlobal } = updateGruposBody.parse(req.body);
+      const callerId = req.user.id;
+      const callerIsGlobal = await isGlobalAdmin(callerId);
+
+      // FIX Vetor 2 — auto-escalada: bloqueia acessoGlobal=true se caller não é global admin
+      if (acessoGlobal && !callerIsGlobal) {
+        return reply.status(403).send({
+          statusCode: 403,
+          error: "Forbidden",
+          message: "Apenas admins com acesso global podem conceder acesso_global a outros.",
+        });
+      }
+
+      // FIX Vetor 2 — bloqueia atribuição de grupos com escopo=global se caller não é global admin
+      if (grupoIds.length > 0 && !callerIsGlobal) {
+        const globalGroups = await db
+          .select({ id: gruposAcesso.id })
+          .from(gruposAcesso)
+          .where(and(eq(gruposAcesso.escopo, "global")));
+
+        const globalGroupIds = new Set(globalGroups.map((g) => g.id));
+        const tryingGlobal = grupoIds.some((gId) => globalGroupIds.has(gId));
+
+        if (tryingGlobal) {
+          return reply.status(403).send({
+            statusCode: 403,
+            error: "Forbidden",
+            message: "Apenas admins com acesso global podem atribuir grupos de escopo global.",
+          });
+        }
+      }
 
       const [admin] = await db
         .select({ id: usuariosAdmin.id })
@@ -268,7 +284,6 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
 
       if (!admin) return reply.status(404).send({ message: "Admin não encontrado." });
 
-      // Proteção: não remover todos grupos se for o último Super Admin
       if (grupoIds.length === 0 && (await isLastSuperAdmin(id))) {
         return reply.status(400).send({
           statusCode: 400,
@@ -277,7 +292,6 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
         });
       }
 
-      // Replace: remove vínculos do escopo (global ou ambiente específico) e reinserc
       await db
         .delete(usuariosAdminGrupos)
         .where(
@@ -300,7 +314,7 @@ export async function adminUsuariosRoutes(app: FastifyInstance): Promise<void> {
       }
 
       await audit({
-        usuarioAdminId: req.user.id,
+        usuarioAdminId: callerId,
         acao: "usuarios_admin.grupos",
         entidade: "usuarios_admin",
         entidadeId: id,
