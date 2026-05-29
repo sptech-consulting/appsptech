@@ -6,6 +6,7 @@ import { registerJwt } from "./plugins/jwt.js";
 import { registerRateLimit } from "./plugins/rate-limit.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { authRoutes } from "./routes/auth/index.js";
+import { adminUsuariosRoutes } from "./routes/admin/usuarios.js";
 import { healthRoutes } from "./routes/health.js";
 
 const isProd = config.NODE_ENV === "production";
@@ -41,6 +42,7 @@ async function start(): Promise<void> {
 
   await app.register(healthRoutes);
   await app.register(authRoutes);
+  await app.register(adminUsuariosRoutes);
 
   await app.listen({ port: config.BACKEND_PORT, host: "0.0.0.0" });
 }
