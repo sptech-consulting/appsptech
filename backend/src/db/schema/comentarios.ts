@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   char,
   datetime,
@@ -12,7 +13,7 @@ import {
 export const aulaComentarios = mysqlTable(
   "aula_comentarios",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     aulaId: char("aula_id", { length: 36 }).notNull(),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     alunoId: char("aluno_id", { length: 36 }),
@@ -33,7 +34,7 @@ export const aulaComentarios = mysqlTable(
 export const aulaComentarioCurtidas = mysqlTable(
   "aula_comentario_curtidas",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     comentarioId: char("comentario_id", { length: 36 }).notNull(),
     alunoId: char("aluno_id", { length: 36 }),
     usuarioAdminId: char("usuario_admin_id", { length: 36 }),
@@ -48,7 +49,7 @@ export const aulaComentarioCurtidas = mysqlTable(
 export const aulaProgresso = mysqlTable(
   "aluno_aula_progresso",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     alunoId: char("aluno_id", { length: 36 }).notNull(),
     aulaId: char("aula_id", { length: 36 }).notNull(),
     concluida: char("concluida", { length: 1 }).notNull().default("0"),

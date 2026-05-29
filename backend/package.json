@@ -15,8 +15,11 @@
   },
   "dependencies": {
     "@cms/shared": "workspace:*",
+    "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^10.0.2",
+    "@fastify/jwt": "^9.1.0",
     "@fastify/rate-limit": "^10.2.2",
+    "@node-rs/argon2": "^2.0.2",
     "drizzle-orm": "^0.44.2",
     "fastify": "^5.4.0",
     "mysql2": "^3.14.0",

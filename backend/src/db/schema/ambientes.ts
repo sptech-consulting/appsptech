@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   boolean,
   char,
@@ -15,7 +16,7 @@ import {
 export const ambientes = mysqlTable(
   "ambientes",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     nome: text("nome").notNull(),
     slug: varchar("slug", { length: 255 }).notNull().unique(),
     descricao: text("descricao"),
@@ -70,7 +71,7 @@ export const ambientes = mysqlTable(
 export const ambienteFerramentas = mysqlTable(
   "ambiente_ferramentas",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     ferramentaId: char("ferramenta_id", { length: 36 }).notNull(),
     ordem: int("ordem").default(0),
@@ -85,7 +86,7 @@ export const ambienteFerramentas = mysqlTable(
 export const ambienteAulas = mysqlTable(
   "ambiente_aulas",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     aulaId: char("aula_id", { length: 36 }).notNull(),
     ordem: int("ordem").default(0),
@@ -101,7 +102,7 @@ export const ambienteAulas = mysqlTable(
 export const ambienteNovidades = mysqlTable(
   "ambiente_novidades",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     novidadeId: char("novidade_id", { length: 36 }).notNull(),
     destaque: boolean("destaque").default(false),
@@ -115,7 +116,7 @@ export const ambienteNovidades = mysqlTable(
 export const ambienteCursos = mysqlTable(
   "ambiente_cursos",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     cursoId: char("curso_id", { length: 36 }).notNull(),
     ordem: int("ordem").notNull().default(0),
@@ -134,7 +135,7 @@ export const ambienteCursos = mysqlTable(
 export const ambienteAlunos = mysqlTable(
   "ambiente_alunos",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     ambienteId: char("ambiente_id", { length: 36 }).notNull(),
     alunoId: char("aluno_id", { length: 36 }).notNull(),
     status: mysqlEnum("status", ["ativo", "inativo"]).notNull().default("ativo"),

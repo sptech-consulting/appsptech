@@ -1,3 +1,4 @@
+import { generateId } from "../generate-id.js";
 import {
   char,
   datetime,
@@ -9,7 +10,7 @@ import {
 } from "drizzle-orm/mysql-core";
 
 export const cursos = mysqlTable("cursos", {
-  id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+  id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
   titulo: text("titulo").notNull(),
   descricao: text("descricao"),
   capaUrl: text("capa_url"),
@@ -25,7 +26,7 @@ export const cursos = mysqlTable("cursos", {
 export const modulos = mysqlTable(
   "modulos",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     cursoId: char("curso_id", { length: 36 }).notNull(),
     titulo: text("titulo").notNull(),
     descricao: text("descricao"),
@@ -40,7 +41,7 @@ export const modulos = mysqlTable(
 export const aulas = mysqlTable(
   "aulas",
   {
-    id: char("id", { length: 36 }).primaryKey().default("(UUID())"),
+    id: char("id", { length: 36 }).primaryKey().$defaultFn(() => generateId()),
     titulo: text("titulo").notNull(),
     descricao: text("descricao"),
     videoUrl: text("video_url"),
