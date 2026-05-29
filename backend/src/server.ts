@@ -4,6 +4,7 @@ import { registerCookie } from "./plugins/cookie.js";
 import { registerCors } from "./plugins/cors.js";
 import { registerJwt } from "./plugins/jwt.js";
 import { registerRateLimit } from "./plugins/rate-limit.js";
+import { registerSwagger } from "./plugins/swagger.js";
 import { authRoutes } from "./routes/auth/index.js";
 import { healthRoutes } from "./routes/health.js";
 
@@ -30,6 +31,9 @@ app.setNotFoundHandler((_req, reply) => {
 });
 
 async function start(): Promise<void> {
+  // Swagger must be registered before routes so it can collect schemas
+  await registerSwagger(app);
+
   await registerCors(app);
   await registerRateLimit(app);
   await registerCookie(app);

@@ -6,14 +6,13 @@ import { db } from "../db/connection.js";
 import { alunos, passwordResetTokens, refreshTokens, usuariosAdmin } from "../db/schema/index.js";
 import type { JwtPayload } from "../plugins/jwt.js";
 
-const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
+const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
-// Generic error used for both "user not found" and "wrong password"
-// to prevent user enumeration via timing or message differences.
+// Same message for "user not found" and "wrong password" — prevents user enumeration
 const INVALID_CREDENTIALS_MSG = "Credenciais inválidas.";
 
-function sha256(value: string): string {
+export function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
@@ -28,7 +27,7 @@ export async function loginAdmin(
     .where(eq(usuariosAdmin.email, email.toLowerCase().trim()))
     .limit(1);
 
-  // Always run verify even when user not found to prevent timing attacks
+  // Always run verify to prevent timing attacks even when user not found
   const hashToCheck = user?.senhaHash ?? "$argon2id$v=19$m=65536,t=3,p=4$placeholder";
   const valid = await verify(hashToCheck, password);
 
@@ -77,12 +76,7 @@ export async function issueTokenPair(
   const tokenHash = sha256(rawToken);
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
 
-  await db.insert(refreshTokens).values({
-    tokenHash,
-    usuarioId: userId,
-    tipoUsuario: role,
-    expiresAt,
-  });
+  await db.insert(refreshTokens).values({ tokenHash, usuarioId: userId, tipoUsuario: role, expiresAt });
 
   return { accessToken, refreshToken: rawToken };
 }
@@ -97,34 +91,21 @@ export async function rotateRefreshToken(
   const [stored] = await db
     .select()
     .from(refreshTokens)
-    .where(
-      and(
-        eq(refreshTokens.tokenHash, tokenHash),
-        isNull(refreshTokens.revokedAt),
-        gt(refreshTokens.expiresAt, now),
-      ),
-    )
+    .where(and(eq(refreshTokens.tokenHash, tokenHash), isNull(refreshTokens.revokedAt), gt(refreshTokens.expiresAt, now)))
     .limit(1);
 
   if (!stored) {
     throw Object.assign(new Error("Refresh token inválido ou expirado."), { statusCode: 401 });
   }
 
-  // Single-use: revoke immediately before issuing new pair
-  await db
-    .update(refreshTokens)
-    .set({ revokedAt: now })
-    .where(eq(refreshTokens.tokenHash, tokenHash));
+  await db.update(refreshTokens).set({ revokedAt: now }).where(eq(refreshTokens.tokenHash, tokenHash));
 
   return issueTokenPair(app, stored.usuarioId, stored.tipoUsuario);
 }
 
 export async function revokeRefreshToken(rawToken: string): Promise<void> {
   const tokenHash = sha256(rawToken);
-  await db
-    .update(refreshTokens)
-    .set({ revokedAt: new Date() })
-    .where(eq(refreshTokens.tokenHash, tokenHash));
+  await db.update(refreshTokens).set({ revokedAt: new Date() }).where(eq(refreshTokens.tokenHash, tokenHash));
 }
 
 export async function hashPassword(password: string): Promise<string> {

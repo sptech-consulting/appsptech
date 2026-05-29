@@ -1,7 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import type { JwtPayload } from "../plugins/jwt.js";
 
-// Extend @fastify/jwt's namespace so req.user is typed as JwtPayload
 declare module "@fastify/jwt" {
   interface FastifyJWT {
     payload: JwtPayload;
