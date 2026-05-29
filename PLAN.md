@@ -2,19 +2,21 @@
 
 Rastreador de tasks da migração. Cada task é discutida antes de executar, tem branch própria e PR ao final.
 
+**Branch alvo dos PRs**: `refactor/loveable-migration`
+
 **Protocolo de segurança:** toda task inclui análise de riscos e pen-test checklist — discutidos antes da execução.
 
-**Commits:** conventional commits, atômico por task. Branch a partir de `main`. PR ao final.
+**Commits:** conventional commits, atômico por task. Branch a partir de `refactor/loveable-migration`. PR ao final.
 
 ---
 
 ## FASE 0 — Configuração & Scaffolding
 
 - [x] **Task 0.1** — Adicionar guia de estilo aos arquivos de config do projeto
-  `feat/project-config-files` · CLAUDE.md, AGENTS.md, .cursor/rules, .github/copilot-instructions.md, PLAN.md
+  `feat/project-config-files` · [PR #1](https://github.com/sptech-consulting/pos.graduacao.cms/pull/1)
 
-- [ ] **Task 0.2** — Scaffold do monorepo
-  `feat/monorepo-scaffold` · package.json workspace (pnpm), mover código para `frontend/`, criar esqueleto `backend/` e `shared/`
+- [x] **Task 0.2** — Scaffold do monorepo pnpm
+  `feat/monorepo-scaffold` · [PR #2](https://github.com/sptech-consulting/pos.graduacao.cms/pull/2)
 
 - [ ] **Task 0.3** — Docker Compose baseline
   `feat/docker-compose` · MySQL 8, MinIO, Redis, adminer, backend placeholder, `.env.example`
