@@ -60,19 +60,19 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 
 ## FASE 4 — Endpoints CRUD Admin
 
-- [ ] **Task 4.1** — Ambientes CRUD
+- [x] **Task 4.1** — Ambientes CRUD
   `feat/admin-ambientes`
 
-- [ ] **Task 4.2** — Cursos, Módulos, Aulas CRUD
+- [x] **Task 4.2** — Cursos, Módulos, Aulas CRUD
   `feat/admin-cursos`
 
-- [ ] **Task 4.3** — Ferramentas CRUD + sub-recursos
+- [x] **Task 4.3** — Ferramentas CRUD + sub-recursos
   `feat/admin-ferramentas`
 
-- [ ] **Task 4.4** — Alunos CRUD + importação em lote
+- [x] **Task 4.4** — Alunos CRUD + importação em lote
   `feat/admin-alunos` · Substitui Edge Function admin-alunos
 
-- [ ] **Task 4.5** — Trabalhos CRUD + acesso público
+- [x] **Task 4.5** — Trabalhos CRUD + acesso público
   `feat/trabalhos`
 
 - [ ] **Task 4.6** — Novidades CRUD + webhook
@@ -112,7 +112,7 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
   `feat/frontend-auth` · Substitui integrations/supabase/ por integrations/api/
 
 - [ ] **Task 7.2** — Migrar arquivos `*.functions.ts` (um branch por arquivo)
-  `feat/frontend-fn-*` · 10 arquivos, ordem por profundidade de dependência
+  `feat/frontend-fn-*` · 11 arquivos, ordem por profundidade de dependência
 
 ---
 
@@ -126,3 +126,10 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 
 - [ ] **Task 8.3** — Auditoria de validação de inputs
   `feat/input-validation` · Revisão de todos os schemas Fastify
+
+---
+
+## FASE 9 — CI/CD
+
+- [ ] **Task 9.1** — GitHub Actions CI para monorepo
+  `feat/ci-pipeline` · Jobs separados por workspace (backend/frontend), path filters, bloqueia PR se testes falharem
