@@ -2,10 +2,6 @@
 # This file is loaded automatically by docker compose in development.
 # DO NOT commit secrets here. Use a .env file.
 services:
-  mysql:
-    ports:
-      - "127.0.0.1:3306:3306"
-
   redis:
     ports:
       - "127.0.0.1:6379:6379"

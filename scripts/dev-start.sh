@@ -52,6 +52,16 @@ docker exec posgraduacaocms-mysql-1 mysqladmin ping \
   || error "MySQL não respondeu após 60s"
 success "MySQL pronto"
 
+# ── garantir usuário e permissões ─────────────────────────────────────────────
+# Necessário quando o volume já existia antes de MYSQL_USER ser definido,
+# ou quando o Docker considera o host de conexão diferente de '%'.
+docker exec posgraduacaocms-mysql-1 mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" 2>/dev/null << SQL
+CREATE DATABASE IF NOT EXISTS cms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'cms_user'@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';
+GRANT ALL PRIVILEGES ON cms.* TO 'cms_user'@'%';
+FLUSH PRIVILEGES;
+SQL
+
 # ── reset opcional ────────────────────────────────────────────────────────────
 if [[ "$RESET" == "true" ]]; then
   warn "Recriando banco de dados..."
