@@ -28,8 +28,8 @@ Rastreador de tasks da migração. Cada task é discutida antes de executar, tem
 - [ ] **Task 1.1** — Fastify server + config + health check
   `feat/backend-server` · server.ts, config.ts (Zod), GET /health, Dockerfile
 
-- [ ] **Task 1.2** — Schema Drizzle ORM + migrations
-  `feat/drizzle-schema` · Traduzir 17 migrations SQL → Drizzle schema por domínio, seed de permissões
+- [x] **Task 1.2** — Schema Drizzle ORM + migrations
+  `feat/drizzle-schema` · [PR #5](https://github.com/sptech-consulting/pos.graduacao.cms/pull/5)
 
 ---
 
