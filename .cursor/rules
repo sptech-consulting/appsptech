@@ -1,0 +1,64 @@
+# pos.graduacao.cms — Cursor Rules
+
+## Project
+
+Multi-tenant learning platform (SPTech). Migrating from Lovable.dev + Supabase to a self-hosted monorepo: Fastify 4 + Drizzle ORM + MySQL 8 + MinIO + JWT auth.
+
+Monorepo layout: `frontend/` (React 19 + Vite + TanStack Router), `backend/` (Fastify + Drizzle), `shared/` (Zod schemas), `docker-compose.yml` at root.
+
+## Code style
+
+- Functions: 4-20 lines. Split if longer.
+- Files: under 500 lines. Split by responsibility.
+- One thing per function, one responsibility per module (SRP).
+- Names: specific and unique. Avoid `data`, `handler`, `Manager`.
+  Prefer names that return <5 grep hits in the codebase.
+- Types: explicit. No `any`, no `Dict`, no untyped functions.
+- No code duplication. Extract shared logic into a function/module.
+- Early returns over nested ifs. Max 2 levels of indentation.
+- Exception messages must include the offending value and expected shape.
+
+## Comments
+
+- Keep your own comments. Don't strip them on refactor — they carry
+  intent and provenance.
+- Write WHY, not WHAT. Skip `// increment counter` above `i++`.
+- Docstrings on public functions: intent + one usage example.
+- Reference issue numbers / commit SHAs when a line exists because
+  of a specific bug or upstream constraint.
+
+## Tests
+
+- Tests run with a single command: `pnpm test` (backend) / `pnpm test:frontend`.
+- Every new function gets a test. Bug fixes get a regression test.
+- Mock external I/O (API, DB, filesystem) with named fake classes,
+  not inline stubs.
+- Tests must be F.I.R.S.T: fast, independent, repeatable,
+  self-validating, timely.
+
+## Dependencies
+
+- Inject dependencies through constructor/parameter, not global/import.
+- Wrap third-party libs behind a thin interface owned by this project.
+
+## Structure
+
+- Backend: `routes/` → `services/` → `db/schema/`, plus `middleware/` and `plugins/`.
+- Frontend: TanStack Router file-based routing. Business logic stays in `src/lib/`, not in route files.
+
+## Formatting
+
+- `prettier` for everything. Don't discuss style.
+
+## Logging
+
+- Structured JSON for observability (pino in backend).
+- Plain text only for user-facing CLI output.
+
+## Security
+
+- Every authenticated route uses explicit middleware (require-auth, require-admin, require-permission).
+- Permission checks before any DB write.
+- Rate limiting on auth and public endpoints.
+- Inputs validated via Fastify JSON schema at route boundary.
+- Never commit secrets. Tokens stored as SHA-256 hash.
